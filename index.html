@@ -2,7 +2,10 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#fef6e4">
 <title>A leer</title>
 <style>
   :root{
@@ -16,16 +19,21 @@
     --shadow:0 12px 30px rgba(0,0,0,.12);
   }
   *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
-  html,body{height:100%;}
+  html{height:100%;-webkit-text-size-adjust:100%;text-size-adjust:100%;}
   body{
-    font-family:"Comic Sans MS","Trebuchet MS",system-ui,sans-serif;
+    font-family:"Comic Sans MS","Trebuchet MS",system-ui,-apple-system,sans-serif;
     background:radial-gradient(circle at 20% 10%,#ffe8cc 0,var(--bg) 55%);
+    background-attachment:fixed;
     color:var(--ink);
     min-height:100%;
+    min-height:100svh;            /* altura real en Safari iOS */
+    width:100%;
+    overflow-x:hidden;            /* nunca scroll horizontal */
     display:flex;
     flex-direction:column;
     align-items:center;
-    padding:24px 16px 40px;
+    /* respeta notch / Dynamic Island / barra inferior del iPhone */
+    padding:calc(24px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) calc(40px + env(safe-area-inset-bottom)) calc(16px + env(safe-area-inset-left));
   }
   h1{
     font-size:clamp(22px,5vw,34px);
@@ -63,9 +71,13 @@
     display:flex;
     flex-wrap:wrap;
     justify-content:center;
+    align-items:center;
     gap:0;
+    max-width:100%;
+    overflow-wrap:anywhere;
     cursor:pointer;
     user-select:none;
+    -webkit-user-select:none;
     transition:transform .15s ease;
   }
   .word:active{transform:scale(.97);}
@@ -107,6 +119,7 @@
     transition:transform .08s ease, box-shadow .08s ease;
     flex:1 1 200px;
     min-width:160px;
+    touch-action:manipulation;    /* sin retardo ni zoom al tocar en iOS */
   }
   button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.15);}
   .btn-split{background:var(--accent2);}
