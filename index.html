@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A leer</title>
+<style>
+  :root{
+    --bg:#fef6e4;
+    --card:#ffffff;
+    --ink:#2b2d42;
+    --accent:#ff6b6b;
+    --accent2:#4d96ff;
+    --green:#38b000;
+    --yellow:#ffd166;
+    --shadow:0 12px 30px rgba(0,0,0,.12);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    font-family:"Comic Sans MS","Trebuchet MS",system-ui,sans-serif;
+    background:radial-gradient(circle at 20% 10%,#ffe8cc 0,var(--bg) 55%);
+    color:var(--ink);
+    min-height:100%;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    padding:24px 16px 40px;
+  }
+  h1{
+    font-size:clamp(22px,5vw,34px);
+    color:var(--accent);
+    text-align:center;
+    margin-bottom:4px;
+    letter-spacing:.5px;
+  }
+  .sub{
+    font-size:14px;
+    color:#8a8f98;
+    margin-bottom:22px;
+    text-align:center;
+  }
+
+  .card{
+    background:var(--card);
+    border-radius:32px;
+    box-shadow:var(--shadow);
+    width:min(560px,100%);
+    padding:40px 24px;
+    text-align:center;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:28px;
+  }
+
+  .word{
+    font-size:clamp(64px,18vw,120px);
+    font-weight:bold;
+    line-height:1;
+    letter-spacing:2px;
+    min-height:1.1em;
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:0;
+    cursor:pointer;
+    user-select:none;
+    transition:transform .15s ease;
+  }
+  .word:active{transform:scale(.97);}
+
+  /* colores alternos por sílaba cuando se separan */
+  .syl{display:inline-block; animation:pop .25s ease;}
+  .syl.sep{margin:0 6px;}
+  .syl.c0{color:var(--accent2);}
+  .syl.c1{color:var(--accent);}
+  .syl.c2{color:var(--green);}
+  .dash{color:#c9ccd1; margin:0 2px;}
+
+  @keyframes pop{from{transform:scale(.6);opacity:0;}to{transform:scale(1);opacity:1;}}
+
+  .hint{
+    font-size:16px;
+    color:#9aa0a6;
+    min-height:20px;
+  }
+
+  .buttons{
+    display:flex;
+    gap:16px;
+    flex-wrap:wrap;
+    justify-content:center;
+    width:min(560px,100%);
+    margin-top:26px;
+  }
+  button{
+    font-family:inherit;
+    font-size:clamp(18px,4.5vw,22px);
+    font-weight:bold;
+    border:none;
+    border-radius:20px;
+    padding:18px 26px;
+    color:#fff;
+    cursor:pointer;
+    box-shadow:0 6px 0 rgba(0,0,0,.15);
+    transition:transform .08s ease, box-shadow .08s ease;
+    flex:1 1 200px;
+    min-width:160px;
+  }
+  button:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.15);}
+  .btn-split{background:var(--accent2);}
+  .btn-next{background:var(--green);}
+
+  .tag{
+    display:inline-block;
+    background:var(--yellow);
+    color:#6b4e00;
+    font-size:14px;
+    font-weight:bold;
+    padding:6px 16px;
+    border-radius:999px;
+    letter-spacing:1px;
+  }
+
+  footer{
+    margin-top:30px;
+    font-size:13px;
+    color:#b0b4ba;
+    text-align:center;
+  }
+</style>
+</head>
+<body>
+  <h1>👦 A leer</h1>
+  <div class="sub">Toca la palabra para escucharla · separa en sílabas · pasa a la siguiente</div>
+
+  <div class="card">
+    <span class="tag" id="grupo">Ll</span>
+    <div class="word" id="word" title="Toca para escuchar"></div>
+    <div class="hint" id="hint">Lee la palabra en voz alta 🙂</div>
+  </div>
+
+  <div class="buttons">
+    <button class="btn-split" id="btnSplit">✂️ Separar sílabas</button>
+    <button class="btn-next" id="btnNext">🔀 Otra palabra</button>
+  </div>
+
+  <footer>Hecho con cariño para que leas de forma aleatoria, no de memoria.</footer>
+
+<script>
+  // Lista de palabras con su grupo y separación silábica
+  const PALABRAS = [
+    {grupo:"Ll", silabas:["Lo","la"]},
+    {grupo:"Ll", silabas:["la","ta"]},
+    {grupo:"Ll", silabas:["lo","ma"]},
+    {grupo:"Ll", silabas:["li","ma"]},
+    {grupo:"Rr", silabas:["Ro","sa"]},
+    {grupo:"Rr", silabas:["ra","ta"]},
+    {grupo:"Rr", silabas:["ri","sa"]},
+    {grupo:"Rr", silabas:["re","mo"]},
+    {grupo:"Rr", silabas:["ru","ta"]},
+  ];
+
+  const wordEl  = document.getElementById("word");
+  const hintEl  = document.getElementById("hint");
+  const grupoEl = document.getElementById("grupo");
+  const btnSplit= document.getElementById("btnSplit");
+  const btnNext = document.getElementById("btnNext");
+
+  let actual = null;
+  let separado = false;
+  let ultimoIndice = -1;
+
+  function palabraCompleta(item){
+    return item.silabas.join("");
+  }
+
+  // Muestra la palabra junta
+  function render(){
+    wordEl.innerHTML = "";
+    if(separado){
+      actual.silabas.forEach((s,i)=>{
+        if(i>0){
+          const d = document.createElement("span");
+          d.className = "dash";
+          d.textContent = "-";
+          wordEl.appendChild(d);
+        }
+        const span = document.createElement("span");
+        span.className = "syl sep c"+(i%3);
+        span.textContent = s;
+        wordEl.appendChild(span);
+      });
+      hintEl.textContent = "Lee sílaba por sílaba: " + actual.silabas.join(" · ");
+    } else {
+      const span = document.createElement("span");
+      span.className = "syl c0";
+      span.textContent = palabraCompleta(actual);
+      wordEl.appendChild(span);
+      hintEl.textContent = "Lee la palabra en voz alta 🙂";
+    }
+    grupoEl.textContent = actual.grupo;
+  }
+
+  // Elige una palabra al azar (sin repetir la inmediata anterior)
+  function siguiente(){
+    let i;
+    do {
+      i = Math.floor(Math.random()*PALABRAS.length);
+    } while(i === ultimoIndice && PALABRAS.length > 1);
+    ultimoIndice = i;
+    actual = PALABRAS[i];
+    separado = false;
+    render();
+  }
+
+  // Lee la palabra con la voz del navegador (en español si existe)
+  function hablar(texto){
+    if(!("speechSynthesis" in window)) return;
+    try{
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(texto);
+      u.lang = "es-ES";
+      u.rate = separado ? 0.6 : 0.9;
+      window.speechSynthesis.speak(u);
+    }catch(e){/* sin voz, no pasa nada */}
+  }
+
+  // Eventos
+  btnSplit.addEventListener("click", ()=>{
+    separado = !separado;
+    render();
+    btnSplit.textContent = separado ? "🔗 Juntar sílabas" : "✂️ Separar sílabas";
+  });
+
+  btnNext.addEventListener("click", ()=>{
+    siguiente();
+    btnSplit.textContent = "✂️ Separar sílabas";
+  });
+
+  wordEl.addEventListener("click", ()=>{
+    if(separado){
+      hablar(actual.silabas.join(" "));
+    } else {
+      hablar(palabraCompleta(actual));
+    }
+  });
+
+  // Inicio
+  siguiente();
+</script>
+</body>
+</html>
