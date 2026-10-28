@@ -101,18 +101,17 @@
   }
 
   .word{
-    font-size:clamp(64px,18vw,120px);
+    font-size:120px;              /* valor inicial; JS lo ajusta para caber en 1 línea */
     font-weight:bold;
-    line-height:1;
+    line-height:1.1;
     letter-spacing:2px;
     min-height:1.1em;
+    width:100%;
     display:flex;
-    flex-wrap:wrap;
+    flex-wrap:nowrap;             /* nunca salta de renglón */
     justify-content:center;
     align-items:center;
     gap:0;
-    max-width:100%;
-    overflow-wrap:anywhere;
     cursor:pointer;
     user-select:none;
     -webkit-user-select:none;
@@ -251,6 +250,19 @@
     pararVoz();
   }
 
+  /* ============ AJUSTE DE TAMAÑO (1 sola línea) ============ */
+  // Reduce el tamaño de la palabra hasta que entre en el ancho sin saltar de renglón.
+  function ajustar(el){
+    if(!el.clientWidth) return;            // pantalla oculta: se ajusta al mostrarse
+    let size = 120;
+    el.style.fontSize = size + "px";
+    let guard = 0;
+    while(el.scrollWidth > el.clientWidth && size > 26 && guard < 200){
+      size -= 2; guard++;
+      el.style.fontSize = size + "px";
+    }
+  }
+
   /* ====================== VOZ ====================== */
   function pararVoz(){ try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
   function hablar(texto, lento){
@@ -305,6 +317,7 @@
     silActual = SILABAS[i];
     silWordEl.innerHTML = '<span class="syl c0">'+silActual.s+'</span>';
     silGrupoEl.textContent = silActual.grupo;
+    ajustar(silWordEl);
   }
   silWordEl.addEventListener("click", ()=> hablar(silActual.s, false));
   document.getElementById("sil-next").addEventListener("click", siguienteSilaba);
@@ -341,6 +354,7 @@
       palHintEl.textContent = "Lee la palabra en voz alta 🙂";
     }
     palGrupoEl.textContent = palActual.grupo;
+    ajustar(palWordEl);
   }
 
   function siguientePalabra(){
@@ -362,6 +376,12 @@
   document.getElementById("pal-next").addEventListener("click", siguientePalabra);
   palWordEl.addEventListener("click", ()=>{
     hablar(palSeparado ? palActual.silabas.join(" ") : palCompleta(palActual), palSeparado);
+  });
+
+  /* ====================== REAJUSTE AL GIRAR / REDIMENSIONAR ====================== */
+  window.addEventListener("resize", ()=>{
+    if(document.getElementById("screen-silabas").classList.contains("active")) ajustar(silWordEl);
+    if(document.getElementById("screen-palabras").classList.contains("active")) ajustar(palWordEl);
   });
 
   /* ====================== INICIO ====================== */
