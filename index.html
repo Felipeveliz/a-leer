@@ -198,12 +198,12 @@
       <button class="menu-btn menu-sil" onclick="irA('silabas')">
         <span class="emoji">🔤</span>
         <span class="label">Lectura de sílabas</span>
-        <span class="desc">la · le · li · ra · re · ri …</span>
+        <span class="desc">la · ra · na · ne · no …</span>
       </button>
       <button class="menu-btn menu-pal" onclick="irA('palabras')">
         <span class="emoji">📖</span>
         <span class="label">Lectura de palabras</span>
-        <span class="desc">Lola · lima · Rosa · ruta …</span>
+        <span class="desc">Lola · Rosa · Nena · maleta …</span>
       </button>
     </div>
     <footer>Hecho con cariño para que leas de forma aleatoria, no de memoria.</footer>
@@ -268,6 +268,7 @@
   const SILABAS = [
     {grupo:"Ll", s:"la"},{grupo:"Ll", s:"le"},{grupo:"Ll", s:"li"},{grupo:"Ll", s:"lo"},{grupo:"Ll", s:"lu"},
     {grupo:"Rr", s:"ra"},{grupo:"Rr", s:"re"},{grupo:"Rr", s:"ri"},{grupo:"Rr", s:"ro"},{grupo:"Rr", s:"ru"},
+    {grupo:"Nn", s:"na"},{grupo:"Nn", s:"ne"},{grupo:"Nn", s:"ni"},{grupo:"Nn", s:"no"},{grupo:"Nn", s:"nu"},
   ];
 
   const PALABRAS = [
@@ -280,6 +281,15 @@
     {grupo:"Rr", silabas:["ri","sa"]},
     {grupo:"Rr", silabas:["re","mo"]},
     {grupo:"Rr", silabas:["ru","ta"]},
+    {grupo:"Nn", silabas:["Ne","na"]},
+    {grupo:"Nn", silabas:["ne","ne"]},
+    {grupo:"Nn", silabas:["no","ta"]},
+    {grupo:"Nn", silabas:["na","ta"]},
+    {grupo:"Repaso", silabas:["a","to","le"]},
+    {grupo:"Repaso", silabas:["a","mor"]},
+    {grupo:"Repaso", silabas:["ma","le","ta"]},
+    {grupo:"Repaso", silabas:["pe","lo","ta"]},
+    {grupo:"Repaso", silabas:["e","lo","te"]},
   ];
 
   /* ====================== LECTURA DE SÍLABAS ====================== */
