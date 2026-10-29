@@ -156,6 +156,9 @@
   button.action:active{transform:translateY(4px);box-shadow:0 2px 0 rgba(0,0,0,.15);}
   .btn-split{background:var(--accent2);}
   .btn-next{background:var(--green);}
+  .btn-prev{background:#8a94a6;}
+  button.action:disabled{opacity:.4;filter:grayscale(.4);cursor:default;box-shadow:0 6px 0 rgba(0,0,0,.08);}
+  button.action:disabled:active{transform:none;box-shadow:0 6px 0 rgba(0,0,0,.08);}
 
   .tag{
     display:inline-block;
@@ -236,6 +239,7 @@
     <div class="buttons">
       <button class="action btn-split" id="pal-split">✂️ Separar sílabas</button>
       <button class="action btn-next" id="pal-next">🔀 Otra palabra</button>
+      <button class="action btn-prev" id="pal-prev" style="flex:1 1 100%">⬅️ Palabra anterior</button>
     </div>
   </section>
 
@@ -327,7 +331,9 @@
   const palHintEl  = document.getElementById("pal-hint");
   const palGrupoEl = document.getElementById("pal-grupo");
   const palSplit   = document.getElementById("pal-split");
+  const palPrev    = document.getElementById("pal-prev");
   let palActual = null, palSeparado = false, palUltimo = -1;
+  let palHistorial = [], palPos = -1;
 
   function palCompleta(item){ return item.silabas.join(""); }
 
@@ -357,15 +363,33 @@
     ajustar(palWordEl);
   }
 
-  function siguientePalabra(){
-    let i;
-    do { i = Math.floor(Math.random()*PALABRAS.length); }
-    while(i === palUltimo && PALABRAS.length > 1);
-    palUltimo = i;
-    palActual = PALABRAS[i];
+  function mostrarPalabra(){
+    palActual = PALABRAS[palHistorial[palPos]];
     palSeparado = false;
     palSplit.textContent = "✂️ Separar sílabas";
     renderPalabra();
+    palPrev.disabled = palPos <= 0;
+  }
+
+  function siguientePalabra(){
+    if(palPos < palHistorial.length - 1){
+      // Si volvimos atrás, avanzamos por el historial ya visto.
+      palPos++;
+    } else {
+      let i;
+      do { i = Math.floor(Math.random()*PALABRAS.length); }
+      while(i === palUltimo && PALABRAS.length > 1);
+      palUltimo = i;
+      palHistorial.push(i);
+      palPos = palHistorial.length - 1;
+    }
+    mostrarPalabra();
+  }
+
+  function palabraAnterior(){
+    if(palPos <= 0) return;
+    palPos--;
+    mostrarPalabra();
   }
 
   palSplit.addEventListener("click", ()=>{
@@ -374,6 +398,7 @@
     palSplit.textContent = palSeparado ? "🔗 Juntar sílabas" : "✂️ Separar sílabas";
   });
   document.getElementById("pal-next").addEventListener("click", siguientePalabra);
+  palPrev.addEventListener("click", palabraAnterior);
   palWordEl.addEventListener("click", ()=>{
     hablar(palSeparado ? palActual.silabas.join(" ") : palCompleta(palActual), palSeparado);
   });
