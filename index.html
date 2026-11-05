@@ -86,6 +86,33 @@
   .menu-sil{background:linear-gradient(135deg,var(--purple),#6930c3);}
   .menu-pal{background:linear-gradient(135deg,var(--accent2),#3a7bd5);}
   .menu-ora{background:linear-gradient(135deg,#f3722c,#f8961e);}
+  .menu-esp{background:linear-gradient(135deg,var(--accent2),#6930c3);}
+  .menu-mate{background:linear-gradient(135deg,#2a9d8f,#1d7870);}
+
+  /* ---- Matemáticas: opciones de respuesta ---- */
+  .opciones{
+    display:flex; gap:12px;
+    width:min(560px,100%);
+    flex-wrap:nowrap;
+    margin-bottom:6px;
+  }
+  .opcion{
+    flex:1 1 0; min-width:0;
+    font-family:inherit; font-size:clamp(26px,8vw,38px); font-weight:bold;
+    border:none; border-radius:18px; padding:18px 4px;
+    background:#fff; color:#2a9d8f;
+    box-shadow:0 5px 0 rgba(0,0,0,.12);
+    cursor:pointer; touch-action:manipulation;
+    transition:transform .08s ease, box-shadow .08s ease;
+  }
+  .opcion:active{transform:translateY(3px); box-shadow:0 2px 0 rgba(0,0,0,.12);}
+  .opcion.correcta{background:var(--green); color:#fff;}
+  .opcion.incorrecta{background:var(--accent); color:#fff; animation:shake .35s;}
+  @keyframes shake{
+    0%,100%{transform:translateX(0);}
+    25%{transform:translateX(-6px);}
+    75%{transform:translateX(6px);}
+  }
 
   /* ---- Pantalla ORACIÓN: pestañas y frase ---- */
   .modos{
@@ -107,13 +134,14 @@
   .modo-btn.active{background:#f3722c; color:#fff; box-shadow:0 4px 0 rgba(0,0,0,.15);}
 
   .frase{
-    font-size:clamp(28px,7.5vw,44px);
-    font-weight:bold; line-height:1.5; color:var(--ink);
-    display:flex; flex-wrap:wrap; justify-content:center;
-    gap:4px 10px;
+    font-size:44px;               /* valor inicial; JS lo ajusta a 1 línea */
+    font-weight:bold; line-height:1.3; color:var(--ink);
+    width:100%;
+    display:flex; flex-wrap:nowrap; justify-content:center;
+    gap:0 2px;
   }
   .palabra{
-    cursor:pointer; padding:2px 10px; border-radius:14px;
+    cursor:pointer; padding:0.06em 0.28em; border-radius:0.3em;
     transition:background .15s, color .15s, transform .1s;
     user-select:none; -webkit-user-select:none;
   }
@@ -141,6 +169,7 @@
     letter-spacing:2px;
     min-height:1.1em;
     width:100%;
+    white-space:nowrap;           /* el texto no se parte en 2 renglones */
     display:flex;
     flex-wrap:nowrap;             /* nunca salta de renglón */
     justify-content:center;
@@ -223,10 +252,30 @@
 </head>
 <body>
 
-  <!-- ============ MENÚ PRINCIPAL ============ -->
-  <section class="screen active" id="screen-menu">
-    <h1>👦 A leer</h1>
-    <div class="sub">Elige qué quieres practicar hoy</div>
+  <!-- ============ MENÚ DE INICIO ============ -->
+  <section class="screen active" id="screen-inicio">
+    <h1>👦 Eliab aprende</h1>
+    <div class="sub">¿Qué quieres practicar hoy?</div>
+    <div class="menu">
+      <button class="menu-btn menu-esp" onclick="irA('menu')">
+        <span class="emoji">📖</span>
+        <span class="label">Español</span>
+        <span class="desc">sílabas · palabras · oración</span>
+      </button>
+      <button class="menu-btn menu-mate" onclick="irA('mate')">
+        <span class="emoji">➕</span>
+        <span class="label">Matemáticas</span>
+        <span class="desc">sumas: 2 · 3 · 4 · 5 · 6</span>
+      </button>
+    </div>
+    <footer>Hecho con cariño para aprender jugando.</footer>
+  </section>
+
+  <!-- ============ MENÚ DE ESPAÑOL ============ -->
+  <section class="screen" id="screen-menu">
+    <button class="back" onclick="irA('inicio')">← Inicio</button>
+    <h1>📖 Español</h1>
+    <div class="sub">Elige qué quieres practicar</div>
     <div class="menu">
       <button class="menu-btn menu-sil" onclick="irA('silabas')">
         <span class="emoji">🔤</span>
@@ -293,6 +342,27 @@
     <div class="buttons" id="ora-nav"></div>
   </section>
 
+  <!-- ============ MATEMÁTICAS: SUMAS ============ -->
+  <section class="screen" id="screen-mate">
+    <button class="back" onclick="irA('inicio')">← Inicio</button>
+    <h1 style="color:#2a9d8f">➕ Sumas</h1>
+    <div class="sub">¿Cuánto es? Toca la respuesta correcta</div>
+    <div class="card">
+      <div class="word" id="mate-suma"></div>
+      <div class="hint" id="mate-hint">Elige el número 🙂</div>
+    </div>
+    <div class="opciones" id="mate-opciones">
+      <button class="opcion" data-n="2">2</button>
+      <button class="opcion" data-n="3">3</button>
+      <button class="opcion" data-n="4">4</button>
+      <button class="opcion" data-n="5">5</button>
+      <button class="opcion" data-n="6">6</button>
+    </div>
+    <div class="buttons">
+      <button class="action btn-next" id="mate-next" style="flex:1 1 100%">🔀 Otra suma</button>
+    </div>
+  </section>
+
 <script>
   /* ====================== NAVEGACIÓN ====================== */
   function irA(pantalla){
@@ -302,17 +372,20 @@
     if(pantalla==="silabas") siguienteSilaba();
     if(pantalla==="palabras") siguientePalabra();
     if(pantalla==="oracion") iniciarOracion();
+    if(pantalla==="mate") nuevaSuma();
     pararVoz();
   }
 
   /* ============ AJUSTE DE TAMAÑO (1 sola línea) ============ */
-  // Reduce el tamaño de la palabra hasta que entre en el ancho sin saltar de renglón.
-  function ajustar(el){
-    if(!el.clientWidth) return;            // pantalla oculta: se ajusta al mostrarse
-    let size = 120;
+  // Reduce el tamaño hasta que el contenido entre en el ancho sin saltar de renglón.
+  function ajustar(el, start, min){
+    if(!el || !el.clientWidth) return;     // pantalla oculta: se ajusta al mostrarse
+    start = start || 120;
+    min   = min   || 26;
+    let size = start;
     el.style.fontSize = size + "px";
     let guard = 0;
-    while(el.scrollWidth > el.clientWidth && size > 26 && guard < 200){
+    while(el.scrollWidth > el.clientWidth && size > min && guard < 300){
       size -= 2; guard++;
       el.style.fontSize = size + "px";
     }
@@ -482,7 +555,7 @@
       // Oración completa: cada palabra se puede tocar
       oraCard.innerHTML =
         '<div class="frase" id="ora-frase">' +
-        ORA_PAL.map((p,i)=>'<span class="palabra" data-i="'+i+'">'+p.w+'</span>').join(" ") +
+        ORA_PAL.map((p,i)=>'<span class="palabra" data-i="'+i+'">'+p.w+'</span>').join("") +
         '</div>' +
         '<div class="hint">Lee la oración completa. Toca una palabra para señalarla 🙂</div>';
       oraNav.innerHTML = "";
@@ -492,6 +565,7 @@
           ch.classList.add("activa");
         };
       });
+      ajustar(document.getElementById("ora-frase"), 48, 12);   // una sola línea
       return;
     }
 
@@ -532,12 +606,65 @@
     });
   });
 
+  /* ====================== MATEMÁTICAS: SUMAS ====================== */
+  // Todas las combinaciones a+b cuyo resultado sea 2, 3, 4, 5 o 6 (incluye el 0).
+  const SUMAS = [];
+  [2,3,4,5,6].forEach(total=>{
+    for(let a=0; a<=total; a++){
+      SUMAS.push({a:a, b:total-a, total:total});
+    }
+  });
+
+  const mateSumaEl = document.getElementById("mate-suma");
+  const mateHintEl = document.getElementById("mate-hint");
+  const mateOpc    = document.getElementById("mate-opciones");
+  let mateActual = null, mateUltimo = -1, mateResuelta = false;
+
+  function nuevaSuma(){
+    let i;
+    do { i = Math.floor(Math.random()*SUMAS.length); }
+    while(i === mateUltimo && SUMAS.length > 1);
+    mateUltimo = i;
+    mateActual = SUMAS[i];
+    mateResuelta = false;
+    mateSumaEl.innerHTML = '<span class="syl c0">'+mateActual.a+' + '+mateActual.b+'</span>';
+    ajustar(mateSumaEl);
+    mateHintEl.textContent = "Elige el número 🙂";
+    mateOpc.querySelectorAll(".opcion").forEach(b=>{
+      b.classList.remove("correcta","incorrecta");
+    });
+  }
+
+  mateOpc.querySelectorAll(".opcion").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      if(mateResuelta) return;
+      const n = parseInt(btn.dataset.n, 10);
+      if(n === mateActual.total){
+        btn.classList.add("correcta");
+        mateHintEl.textContent = "¡Muy bien! 🎉";
+        mateResuelta = true;
+      } else {
+        btn.classList.remove("incorrecta");
+        void btn.offsetWidth;             // reinicia la animación
+        btn.classList.add("incorrecta");
+        mateHintEl.textContent = "Inténtalo otra vez 🤔";
+      }
+    });
+  });
+
+  document.getElementById("mate-next").addEventListener("click", nuevaSuma);
+
   /* ====================== REAJUSTE AL GIRAR / REDIMENSIONAR ====================== */
   window.addEventListener("resize", ()=>{
     if(document.getElementById("screen-silabas").classList.contains("active")) ajustar(silWordEl);
     if(document.getElementById("screen-palabras").classList.contains("active")) ajustar(palWordEl);
-    const ow = document.getElementById("ora-word");
-    if(ow && document.getElementById("screen-oracion").classList.contains("active")) ajustar(ow);
+    if(document.getElementById("screen-mate").classList.contains("active")) ajustar(mateSumaEl);
+    if(document.getElementById("screen-oracion").classList.contains("active")){
+      const ow = document.getElementById("ora-word");
+      if(ow) ajustar(ow);
+      const fr = document.getElementById("ora-frase");
+      if(fr) ajustar(fr, 48, 12);
+    }
   });
 
   /* ====================== INICIO ====================== */
