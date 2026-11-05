@@ -85,6 +85,40 @@
   .menu-btn .desc{font-size:14px; opacity:.9; font-weight:normal;}
   .menu-sil{background:linear-gradient(135deg,var(--purple),#6930c3);}
   .menu-pal{background:linear-gradient(135deg,var(--accent2),#3a7bd5);}
+  .menu-ora{background:linear-gradient(135deg,#f3722c,#f8961e);}
+
+  /* ---- Pantalla ORACIÓN: pestañas y frase ---- */
+  .modos{
+    display:flex; gap:10px;
+    width:min(560px,100%);
+    margin-bottom:18px;
+    flex-wrap:nowrap;
+  }
+  .modo-btn{
+    flex:1 1 0; min-width:0;
+    font-family:inherit; font-size:clamp(14px,3.8vw,17px); font-weight:bold;
+    border:none; border-radius:16px; padding:14px 6px;
+    background:#fff; color:#8a8f98;
+    box-shadow:0 4px 0 rgba(0,0,0,.08);
+    cursor:pointer; touch-action:manipulation;
+    transition:transform .08s ease;
+  }
+  .modo-btn:active{transform:translateY(2px);}
+  .modo-btn.active{background:#f3722c; color:#fff; box-shadow:0 4px 0 rgba(0,0,0,.15);}
+
+  .frase{
+    font-size:clamp(28px,7.5vw,44px);
+    font-weight:bold; line-height:1.5; color:var(--ink);
+    display:flex; flex-wrap:wrap; justify-content:center;
+    gap:4px 10px;
+  }
+  .palabra{
+    cursor:pointer; padding:2px 10px; border-radius:14px;
+    transition:background .15s, color .15s, transform .1s;
+    user-select:none; -webkit-user-select:none;
+  }
+  .palabra:active{transform:scale(.95);}
+  .palabra.activa{background:var(--yellow); color:#6b4e00;}
 
   /* ---- TARJETA DE LECTURA (compartida) ---- */
   .card{
@@ -207,6 +241,11 @@
         <span class="label">Lectura de palabras</span>
         <span class="desc">Lola · Rosa · Nena · maleta …</span>
       </button>
+      <button class="menu-btn menu-ora" onclick="irA('oracion')">
+        <span class="emoji">📝</span>
+        <span class="label">Leer una oración</span>
+        <span class="desc">mi mamá me da elote de cenar</span>
+      </button>
     </div>
     <footer>Hecho con cariño para que leas de forma aleatoria, no de memoria.</footer>
   </section>
@@ -243,6 +282,20 @@
     </div>
   </section>
 
+  <!-- ============ LEER UNA ORACIÓN ============ -->
+  <section class="screen" id="screen-oracion">
+    <button class="back" onclick="irA('menu')">← Menú</button>
+    <h1 style="color:#f3722c">📝 Leer una oración</h1>
+    <div class="sub">Practica las sílabas, luego las palabras y al final la oración completa</div>
+    <div class="modos">
+      <button class="modo-btn" data-modo="sil">🔤 Sílabas</button>
+      <button class="modo-btn" data-modo="pal">📖 Palabras</button>
+      <button class="modo-btn" data-modo="ora">📝 Oración</button>
+    </div>
+    <div class="card" id="ora-card"></div>
+    <div class="buttons" id="ora-nav"></div>
+  </section>
+
 <script>
   /* ====================== NAVEGACIÓN ====================== */
   function irA(pantalla){
@@ -251,6 +304,7 @@
     window.scrollTo(0,0);
     if(pantalla==="silabas") siguienteSilaba();
     if(pantalla==="palabras") siguientePalabra();
+    if(pantalla==="oracion") iniciarOracion();
     pararVoz();
   }
 
@@ -408,10 +462,128 @@
     hablar(palSeparado ? palActual.silabas.join(" ") : palCompleta(palActual), palSeparado);
   });
 
+  /* ====================== LEER UNA ORACIÓN ====================== */
+  // La oración objetivo, dividida en palabras y cada palabra en sílabas.
+  const ORA_PAL = [
+    {w:"mi",    sil:["mi"]},
+    {w:"mamá",  sil:["ma","má"]},
+    {w:"me",    sil:["me"]},
+    {w:"da",    sil:["da"]},
+    {w:"elote", sil:["e","lo","te"]},
+    {w:"de",    sil:["de"]},
+    {w:"cenar", sil:["ce","nar"]},
+  ];
+  // Lista plana de todas las sílabas en orden.
+  const ORA_SIL = ORA_PAL.reduce((acc,p)=>acc.concat(p.sil), []);
+
+  let oraModo = "sil";   // "sil" | "pal" | "ora"
+  let oraIdx  = 0;
+
+  const oraCard = document.getElementById("ora-card");
+  const oraNav  = document.getElementById("ora-nav");
+
+  function iniciarOracion(){
+    oraModo = "sil";
+    oraIdx  = 0;
+    renderOra();
+  }
+
+  function renderOra(){
+    // resalta la pestaña activa
+    document.querySelectorAll(".modo-btn").forEach(b=>{
+      b.classList.toggle("active", b.dataset.modo === oraModo);
+    });
+
+    if(oraModo === "ora"){
+      // Oración completa: cada palabra se puede tocar
+      oraCard.innerHTML =
+        '<div class="frase" id="ora-frase">' +
+        ORA_PAL.map((p,i)=>'<span class="palabra" data-i="'+i+'">'+p.w+'</span>').join(" ") +
+        '</div>' +
+        '<div class="hint">Toca cada palabra, o escucha la oración completa 🙂</div>';
+      oraNav.innerHTML =
+        '<button class="action btn-next" id="ora-leer" style="flex:1 1 100%">▶️ Leer toda la oración</button>';
+      document.getElementById("ora-leer").onclick = leerOracion;
+      document.querySelectorAll("#ora-frase .palabra").forEach(ch=>{
+        ch.onclick = ()=>{
+          document.querySelectorAll("#ora-frase .palabra").forEach(x=>x.classList.remove("activa"));
+          ch.classList.add("activa");
+          hablar(ORA_PAL[+ch.dataset.i].w, false);
+        };
+      });
+      return;
+    }
+
+    // Modo sílabas o palabras: un elemento a la vez, en orden
+    const lista = oraModo === "sil" ? ORA_SIL : ORA_PAL.map(p=>p.w);
+    const texto = lista[oraIdx];
+    const pista = oraModo === "sil"
+        ? "Toca la sílaba para escucharla 🙂"
+        : "Sílabas: " + ORA_PAL[oraIdx].sil.join(" · ");
+
+    oraCard.innerHTML =
+      '<span class="tag">' + (oraIdx+1) + ' / ' + lista.length + '</span>' +
+      '<div class="word" id="ora-word"><span class="syl c0">' + texto + '</span></div>' +
+      '<div class="hint">' + pista + '</div>';
+
+    oraNav.innerHTML =
+      '<button class="action btn-prev" id="ora-prev">⬅️ Anterior</button>' +
+      '<button class="action btn-next" id="ora-next">Siguiente ➡️</button>';
+
+    const w = document.getElementById("ora-word");
+    w.onclick = ()=> hablar(texto, false);
+    ajustar(w);
+
+    document.getElementById("ora-prev").onclick = ()=>{
+      oraIdx = Math.max(0, oraIdx-1); renderOra();
+    };
+    document.getElementById("ora-next").onclick = ()=>{
+      oraIdx = Math.min(lista.length-1, oraIdx+1); renderOra();
+    };
+  }
+
+  // Lee la oración palabra por palabra, resaltando cada una (efecto karaoke)
+  function leerOracion(){
+    const chips = Array.from(document.querySelectorAll("#ora-frase .palabra"));
+    pararVoz();
+    chips.forEach(c=>c.classList.remove("activa"));
+    if(!("speechSynthesis" in window)){
+      // sin voz: al menos resalta rápido para seguir la lectura
+      let k=0; (function paso(){ if(k>0) chips[k-1].classList.remove("activa");
+        if(k>=chips.length) return; chips[k].classList.add("activa"); k++; setTimeout(paso,500); })();
+      return;
+    }
+    let i = 0;
+    function paso(){
+      chips.forEach(c=>c.classList.remove("activa"));
+      if(i >= chips.length) return;
+      const ch = chips[i];
+      ch.classList.add("activa");
+      const u = new SpeechSynthesisUtterance(ORA_PAL[+ch.dataset.i].w);
+      u.lang = "es-ES"; u.rate = 0.8;
+      u.onend   = ()=>{ i++; setTimeout(paso, 120); };
+      u.onerror = ()=>{ i++; setTimeout(paso, 120); };
+      window.speechSynthesis.speak(u);
+    }
+    paso();
+  }
+
+  // pestañas de modo
+  document.querySelectorAll(".modo-btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      oraModo = b.dataset.modo;
+      oraIdx = 0;
+      pararVoz();
+      renderOra();
+    });
+  });
+
   /* ====================== REAJUSTE AL GIRAR / REDIMENSIONAR ====================== */
   window.addEventListener("resize", ()=>{
     if(document.getElementById("screen-silabas").classList.contains("active")) ajustar(silWordEl);
     if(document.getElementById("screen-palabras").classList.contains("active")) ajustar(palWordEl);
+    const ow = document.getElementById("ora-word");
+    if(ow && document.getElementById("screen-oracion").classList.contains("active")) ajustar(ow);
   });
 
   /* ====================== INICIO ====================== */
