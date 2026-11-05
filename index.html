@@ -146,12 +146,9 @@
     justify-content:center;
     align-items:center;
     gap:0;
-    cursor:pointer;
     user-select:none;
     -webkit-user-select:none;
-    transition:transform .15s ease;
   }
-  .word:active{transform:scale(.97);}
 
   .syl{display:inline-block; animation:pop .25s ease;}
   .syl.sep{margin:0 6px;}
@@ -254,10 +251,10 @@
   <section class="screen" id="screen-silabas">
     <button class="back" onclick="irA('menu')">← Menú</button>
     <h1 style="color:var(--purple)">🔤 Lectura de sílabas</h1>
-    <div class="sub">Toca la sílaba para escucharla · pasa a la siguiente</div>
+    <div class="sub">Lee la sílaba en voz alta · pasa a la siguiente</div>
     <div class="card">
       <span class="tag" id="sil-grupo">Ll</span>
-      <div class="word" id="sil-word" title="Toca para escuchar"></div>
+      <div class="word" id="sil-word"></div>
       <div class="hint">Lee la sílaba en voz alta 🙂</div>
     </div>
     <div class="buttons">
@@ -269,10 +266,10 @@
   <section class="screen" id="screen-palabras">
     <button class="back" onclick="irA('menu')">← Menú</button>
     <h1>📖 Lectura de palabras</h1>
-    <div class="sub">Toca la palabra para escucharla · separa en sílabas · pasa a la siguiente</div>
+    <div class="sub">Lee la palabra en voz alta · separa en sílabas · pasa a la siguiente</div>
     <div class="card">
       <span class="tag" id="pal-grupo">Ll</span>
-      <div class="word" id="pal-word" title="Toca para escuchar"></div>
+      <div class="word" id="pal-word"></div>
       <div class="hint" id="pal-hint">Lee la palabra en voz alta 🙂</div>
     </div>
     <div class="buttons">
@@ -322,17 +319,8 @@
   }
 
   /* ====================== VOZ ====================== */
+  // Detiene cualquier lectura en curso (por si el navegador dejó algo sonando).
   function pararVoz(){ try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
-  function hablar(texto, lento){
-    if(!("speechSynthesis" in window)) return;
-    try{
-      window.speechSynthesis.cancel();
-      const u = new SpeechSynthesisUtterance(texto);
-      u.lang = "es-ES";
-      u.rate = lento ? 0.6 : 0.9;
-      window.speechSynthesis.speak(u);
-    }catch(e){}
-  }
 
   /* ====================== DATOS ====================== */
   const SILABAS = [
@@ -382,7 +370,6 @@
     silGrupoEl.textContent = silActual.grupo;
     ajustar(silWordEl);
   }
-  silWordEl.addEventListener("click", ()=> hablar(silActual.s, false));
   document.getElementById("sil-next").addEventListener("click", siguienteSilaba);
 
   /* ====================== LECTURA DE PALABRAS ====================== */
@@ -458,9 +445,6 @@
   });
   document.getElementById("pal-next").addEventListener("click", siguientePalabra);
   palPrev.addEventListener("click", palabraAnterior);
-  palWordEl.addEventListener("click", ()=>{
-    hablar(palSeparado ? palActual.silabas.join(" ") : palCompleta(palActual), palSeparado);
-  });
 
   /* ====================== LEER UNA ORACIÓN ====================== */
   // La oración objetivo, dividida en palabras y cada palabra en sílabas.
@@ -500,15 +484,12 @@
         '<div class="frase" id="ora-frase">' +
         ORA_PAL.map((p,i)=>'<span class="palabra" data-i="'+i+'">'+p.w+'</span>').join(" ") +
         '</div>' +
-        '<div class="hint">Toca cada palabra, o escucha la oración completa 🙂</div>';
-      oraNav.innerHTML =
-        '<button class="action btn-next" id="ora-leer" style="flex:1 1 100%">▶️ Leer toda la oración</button>';
-      document.getElementById("ora-leer").onclick = leerOracion;
+        '<div class="hint">Lee la oración completa. Toca una palabra para señalarla 🙂</div>';
+      oraNav.innerHTML = "";
       document.querySelectorAll("#ora-frase .palabra").forEach(ch=>{
         ch.onclick = ()=>{
           document.querySelectorAll("#ora-frase .palabra").forEach(x=>x.classList.remove("activa"));
           ch.classList.add("activa");
-          hablar(ORA_PAL[+ch.dataset.i].w, false);
         };
       });
       return;
@@ -518,7 +499,7 @@
     const lista = oraModo === "sil" ? ORA_SIL : ORA_PAL.map(p=>p.w);
     const texto = lista[oraIdx];
     const pista = oraModo === "sil"
-        ? "Toca la sílaba para escucharla 🙂"
+        ? "Léela en voz alta 🙂"
         : "Sílabas: " + ORA_PAL[oraIdx].sil.join(" · ");
 
     oraCard.innerHTML =
@@ -531,7 +512,6 @@
       '<button class="action btn-next" id="ora-next">Siguiente ➡️</button>';
 
     const w = document.getElementById("ora-word");
-    w.onclick = ()=> hablar(texto, false);
     ajustar(w);
 
     document.getElementById("ora-prev").onclick = ()=>{
@@ -540,32 +520,6 @@
     document.getElementById("ora-next").onclick = ()=>{
       oraIdx = Math.min(lista.length-1, oraIdx+1); renderOra();
     };
-  }
-
-  // Lee la oración palabra por palabra, resaltando cada una (efecto karaoke)
-  function leerOracion(){
-    const chips = Array.from(document.querySelectorAll("#ora-frase .palabra"));
-    pararVoz();
-    chips.forEach(c=>c.classList.remove("activa"));
-    if(!("speechSynthesis" in window)){
-      // sin voz: al menos resalta rápido para seguir la lectura
-      let k=0; (function paso(){ if(k>0) chips[k-1].classList.remove("activa");
-        if(k>=chips.length) return; chips[k].classList.add("activa"); k++; setTimeout(paso,500); })();
-      return;
-    }
-    let i = 0;
-    function paso(){
-      chips.forEach(c=>c.classList.remove("activa"));
-      if(i >= chips.length) return;
-      const ch = chips[i];
-      ch.classList.add("activa");
-      const u = new SpeechSynthesisUtterance(ORA_PAL[+ch.dataset.i].w);
-      u.lang = "es-ES"; u.rate = 0.8;
-      u.onend   = ()=>{ i++; setTimeout(paso, 120); };
-      u.onerror = ()=>{ i++; setTimeout(paso, 120); };
-      window.speechSynthesis.speak(u);
-    }
-    paso();
   }
 
   // pestañas de modo
