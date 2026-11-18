@@ -77,7 +77,7 @@ Antes de una tarea, revisar si hay un skill que la cubra:
 
 ## 2. Build & run
 
-No hay tests ni linter. Todo pasa por Xcode o `xcodebuild`.
+No hay linter. Todo pasa por Xcode o `xcodebuild`.
 
 ```bash
 open Aprende/Aprende.xcodeproj
@@ -86,6 +86,17 @@ open Aprende/Aprende.xcodeproj
 ```bash
 cd Aprende && xcodebuild -project Aprende.xcodeproj -scheme Aprende -destination 'generic/platform=iOS Simulator' -configuration Debug build CODE_SIGNING_ALLOWED=NO
 ```
+
+### Tests
+El target `AprendeTests` cubre la lógica pura: `TraceEngine`, la tabla de `AppData` y
+los invariantes de `GlyphLibrary`. No cubre vistas; eso va por el skill `qa-aprende`.
+
+```bash
+cd Aprende && xcodebuild test -project Aprende.xcodeproj -scheme Aprende -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+```
+
+Los tests tienen que pasar antes de cada commit que toque `TraceEngine.swift`,
+`Glyphs.swift` o `Models.swift`.
 
 Para archivar y subir a TestFlight / App Store:
 
@@ -160,6 +171,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 └── Aprende/
     ├── Aprende.xcodeproj/      pbxproj mínimo; el código entra por grupo sincronizado
     ├── Config/ExportOptions.plist  Subida a App Store Connect
+    ├── AprendeTests/           Tests de TraceEngine, AppData y GlyphLibrary
     └── Aprende/
         ├── AprendeApp.swift    @main; fuerza esquema claro
         ├── Models.swift        AppData: todo el contenido estático
@@ -248,7 +260,7 @@ este archivo en el mismo commit**. No "después", no "en la siguiente sesión".
 | Patrón o invariante que las próximas sesiones deben respetar | 6. Convenciones |
 | Cambio de bundle ID, deployment target, familia de dispositivos, firma | Encabezado + 2. Build & run |
 | Framework o dependencia nueva | Encabezado + 3. Arquitectura (y por qué) |
-| Herramienta, script o paso de CI nuevo | 2. Build & run |
+| Herramienta, script, test o paso de CI nuevo | 2. Build & run |
 | Skill nuevo en `.claude/skills/` | 1. Skills del proyecto |
 | Pendiente resuelto o nuevo | 8. Pendientes |
 
@@ -285,8 +297,6 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 - [ ] Zona de adultos: reiniciar el progreso, ver qué ha hecho.
 - [ ] Accesibilidad: los botones son puro emoji sin `accessibilityLabel` y las fuentes
       son de tamaño fijo (ignoran Dynamic Type).
-- [ ] Target de tests: `TraceEngine` y el armado de `palabrasEscribe` son lógica pura.
-      Hay que crearlo desde Xcode (el pbxproj se mantiene a mano).
 
 ### Prueba en dispositivo real
 - [ ] iPad físico con Apple Pencil: trazo, rechazo de palma, tolerancias de validación.

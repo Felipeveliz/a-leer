@@ -6,7 +6,12 @@ description: Recorrido de QA de Aprende en el simulador, con las dos personas de
 # QA de Aprende
 
 Nunca dar por buena una pantalla sin verla. Un build verde no dice nada del trazo:
-`TraceEngine` y la identidad de las vistas de SwiftUI solo fallan en ejecución.
+la identidad de las vistas de SwiftUI solo falla en ejecución.
+
+La lógica pura sí está cubierta por el target `AprendeTests`
+(`cd Aprende && xcodebuild test -project Aprende.xcodeproj -scheme Aprende -destination
+'platform=iOS Simulator,name=iPhone 17 Pro'`). Correrlo primero: si falla ahí, no tiene
+sentido abrir el simulador.
 
 **El simulador no sustituye al iPad.** Los toques sintéticos son limpios y rectos; un
 niño de cinco años con el dedo no lo es. Todo lo que diga este skill sobre tolerancias y
@@ -60,6 +65,9 @@ Y el recorrido normal:
 ### Como Eliab lo usa de verdad
 - Trazar **al revés** (de abajo arriba): tiene que rechazarlo, porque la dirección es
   parte de lo que se enseña.
+- **Rayar en zigzag** sobre el camino bueno: también lo rechaza, por longitud. El motor
+  distingue entre un pulso tembloroso (ondulación lenta, pasa) y rayar (recorre más del
+  doble de camino, no pasa). Está fijado en `TraceEngineTests`.
 - Trazar **fuera** de la caja: no debe dar por bueno un garabato.
 - **Fallar tres veces seguidas**: tiene que volver a demostrar el trazo solo.
 - El punto de la "i" con **un toque corto**.
