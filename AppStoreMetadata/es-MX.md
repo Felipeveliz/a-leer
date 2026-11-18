@@ -8,6 +8,7 @@ Idioma principal de la app: **español (México)**. Es el único localizado.
 |---|---|
 | Bundle ID | `com.eduardovelross.aprende` |
 | SKU | `aprende-001` |
+| Apple ID | 6836391055 |
 | Nombre a mostrar en el dispositivo | Aprende |
 | Categoría principal | Educación |
 | Categoría secundaria | (ninguna) |
@@ -21,18 +22,18 @@ Idioma principal de la app: **español (México)**. Es el único localizado.
 ## Nombre (30 caracteres máx.)
 
 ```
-Aprende: leer y escribir
+Aprende
 ```
 
-> "Aprende" a secas casi seguro está tomado en la App Store. Si este también lo está,
-> las alternativas por orden: `Aprende a leer y escribir` (25), `Aprende con Eliab` (17).
-> El nombre en el dispositivo sigue siendo **Aprende** (`CFBundleDisplayName`).
+El nombre estaba libre en la App Store.
 
 ## Subtítulo (30 caracteres máx.)
 
 ```
 Sílabas, sumas y trazo
 ```
+
+Ya cargado en App Store Connect.
 
 ## Texto promocional (170 caracteres máx.)
 
@@ -42,23 +43,26 @@ Tres módulos para los primeros pasos: leer sílabas y palabras, sumar del 2 al 
 
 ## Descripción (4000 caracteres máx.)
 
+**Sin emoji: App Store Connect los rechaza en este campo**
+("This field contains one or more invalid characters").
+
 ```
 Aprende es una app sencilla para acompañar a un niño en sus primeros pasos con la
 lectura, los números y la escritura a mano. Sin anuncios, sin compras, sin cuentas y
 sin conexión a internet.
 
-📖 ESPAÑOL
-Sílabas para leer en voz alta, agrupadas por familia (la, le, li, lo, lu · ra, re, ri…).
+ESPAÑOL
+Sílabas para leer en voz alta, agrupadas por familia (la, le, li, lo, lu / ra, re, ri...).
 Palabras que se pueden separar en sílabas de colores con un toque, para ver cómo se
 arman. Y una oración completa que se practica por partes: primero las sílabas, luego
 las palabras y al final la frase entera.
 
-➕ MATEMÁTICAS
+MATEMÁTICAS
 Sumas con resultado del 2 al 6, el rango con el que se empieza. El niño toca la
 respuesta entre cinco opciones grandes; si acierta, el botón se pone verde, y si no,
 se mueve un poco y lo vuelve a intentar. Nunca hay un tache rojo.
 
-✍️ ESCRIBE
+ESCRIBE
 Lo más cuidado de la app. Cada letra y cada número se traza siguiendo un punto verde y
 una flecha que marcan por dónde empezar y hacia dónde ir, porque la dirección del trazo
 importa tanto como la forma. La app primero enseña cómo se hace con una animación, y
@@ -71,11 +75,11 @@ de memoria y luego la compara con el modelo.
 Funciona con el dedo y con Apple Pencil. Las palabras están ordenadas de la más fácil de
 trazar a la más difícil, y los números también.
 
-⭐️ PROGRESO
+PROGRESO
 Cada palabra y cada número terminados dan una estrella, que se guarda en el dispositivo
 para que el niño vea lo que ya logró.
 
-🔒 PRIVACIDAD
+PRIVACIDAD
 Aprende no recopila ningún dato. No tiene cuentas, ni analítica, ni publicidad, ni
 conexión a ningún servidor. Las estrellas se guardan solo en el dispositivo y se borran
 si se borra la app.
@@ -141,7 +145,8 @@ enlace a X del pie de la pantalla de inicio (`Views/HomeView.swift`).
 
 ## Capturas
 
-- `screenshots/iphone-6.9/` — 1320 × 2868 (iPhone 17 Pro Max). Obligatorias.
+- `screenshots/iphone-6.3/` — **1206 × 2622** (iPhone 17 Pro). Es el tamaño que pide
+  App Store Connect hoy para iPhone (6.1" o 6.3"); 1320 × 2868 lo rechaza.
 - `screenshots/ipad-13/` — 2064 × 2752 (iPad Pro 13"). Obligatorias porque la app
   soporta iPad.
 
