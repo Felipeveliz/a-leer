@@ -29,6 +29,17 @@ sumas y escritura a mano con el dedo o con Apple Pencil. Interfaz en español me
 - No generalizar el estado de un conjunto de archivos a partir de una muestra:
   verificar con `grep` o un script sobre todos.
 
+### Deploy: se libera lo antes posible
+Regla de Felipe (18 de noviembre de 2026, después del primer envío de Aprende):
+**un deploy tiene que quedar reflejado para los usuarios cuanto antes.** Mandar a
+revisión y esperar a aprobarla para liberarla a mano no es terminar el deploy.
+
+- Al preparar la versión, dejar **"Automatically release this version"** en App Store
+  Version Release. Nunca "Manually release" salvo que Felipe lo pida.
+- Si una versión quedó en manual y Apple la aprueba (**Pending Developer Release**),
+  liberarla de inmediato, sin preguntar.
+- "Haz deploy" significa dejar la app **publicada**, no "enviada".
+
 ### Commits
 - **Al terminar cada tarea, commit y push automáticamente, sin preguntar.** (Esta regla
   es propia de este repo; en Delivery Network y Karol es al revés.)
@@ -263,7 +274,8 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 Estado al 18 de noviembre de 2026: **Aprende 1.0 (build 1) está en "Waiting for
 Review"** en App Store Connect (Apple ID **6836391055**), enviada el 18 de noviembre.
 
-- Precio: gratis en 175 países. Salida: **lanzamiento manual** tras la aprobación.
+- Precio: gratis en 175 países. Salida: **automática** en cuanto Apple apruebe
+  (estaba en manual; se cambió el 18 de noviembre por la regla de liberar ASAP).
 - Clasificación **4+**, privacidad **Data Not Collected** (publicada), sin cifrado,
   sin contenido de terceros.
 - Categoría Educación, **sin** marcar "Made for Kids": por eso el enlace a X del pie
@@ -281,7 +293,8 @@ Tres cosas que costaron un intento y conviene no repetir:
 
 ### Pendientes del deploy
 - [ ] Esperar la resolución de Apple (hasta 48 h; avisa por correo).
-- [ ] Cuando apruebe, **publicarla a mano** desde App Store Connect.
+- [ ] Confirmar que sale sola al aprobarse; si por lo que sea queda en
+      **Pending Developer Release**, liberarla de inmediato.
 - [ ] Más capturas de iPad: solo hay la de inicio. Hacen falta toques en el simulador y
       el panel pide aprobar el acceso al dispositivo.
 - [ ] Subir `CURRENT_PROJECT_VERSION` antes de cada build nuevo.
