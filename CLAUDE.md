@@ -9,6 +9,7 @@ sumas y escritura a mano con el dedo o con Apple Pencil. Interfaz en español me
 
 - **Bundle ID**: `com.eduardovelross.aprende`
 - **Deployment target**: iOS 17.0 · `TARGETED_DEVICE_FAMILY = 1,2` (iPhone y iPad)
+- **Equipo de firma**: `AZDP5Q3YFJ`, firma automática
 - **Stack**: SwiftUI + PencilKit + UserDefaults. Sin dependencias externas.
 - **Versión web**: `index.html` en la raíz (GitHub Pages). Es el origen de los contenidos
   de la app nativa, pero **ya no hay paridad obligatoria**: la nativa avanzó con el módulo
@@ -55,16 +56,30 @@ open Aprende/Aprende.xcodeproj
 cd Aprende && xcodebuild -project Aprende.xcodeproj -scheme Aprende -destination 'generic/platform=iOS Simulator' -configuration Debug build CODE_SIGNING_ALLOWED=NO
 ```
 
-`DEVELOPMENT_TEAM` está vacío: el build sin firma funciona, pero para correr en un
-dispositivo real o archivar para TestFlight hay que elegir el *Team* en Xcode › Signing.
+Para archivar y subir a TestFlight / App Store:
+
+```bash
+cd Aprende && xcodebuild -project Aprende.xcodeproj -scheme Aprende -configuration Release -destination 'generic/platform=iOS' -archivePath build/Aprende.xcarchive -allowProvisioningUpdates archive
+```
+
+```bash
+cd Aprende && xcodebuild -exportArchive -archivePath build/Aprende.xcarchive -exportOptionsPlist Config/ExportOptions.plist -exportPath build/export -allowProvisioningUpdates
+```
+
+Subir a App Store Connect **necesita que Xcode tenga la cuenta de Apple con sesión
+iniciada** (Xcode › Settings › Accounts). Sin ella, el archive falla con
+`No Accounts: Add a new account in Accounts settings`. Hay que subir
+`CURRENT_PROJECT_VERSION` en cada subida: App Store Connect rechaza un build repetido.
 
 `scripts/make_icon.swift` genera el icono de 1024 y `scripts/render_glyphs.swift` ayuda
 a revisar los trazos de la biblioteca de glifos.
 
 ### Añadir archivos al proyecto
-El `project.pbxproj` se mantiene a mano (no hay XcodeGen). Lo más seguro es arrastrar el
-archivo al grupo correspondiente en Xcode. A mano, cada archivo necesita `PBXFileReference`,
-`PBXBuildFile` y su entrada en `PBXSourcesBuildPhase`.
+El target usa un **grupo sincronizado con el sistema de archivos**
+(`PBXFileSystemSynchronizedRootGroup` sobre `Aprende/Aprende`), así que las fases
+`Sources` y `Resources` del `pbxproj` están vacías a propósito: **basta con dejar el
+archivo dentro de `Aprende/Aprende/` y Xcode lo compila**. No hay que tocar el
+`project.pbxproj` para añadir código ni recursos.
 
 ## 3. Arquitectura
 
@@ -105,8 +120,14 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 ├── scripts/
 │   ├── make_icon.swift         Genera el AppIcon de 1024
 │   └── render_glyphs.swift     Revisión visual de los trazos
+├── privacidad.html             Política de privacidad (la pide App Store Connect)
+├── soporte.html                Página de soporte (la pide App Store Connect)
+├── AppStoreMetadata/
+│   ├── es-MX.md                Copy de la ficha, respuestas de los cuestionarios
+│   └── screenshots/            Capturas 1320x2868 (iPhone) y 2064x2752 (iPad)
 └── Aprende/
-    ├── Aprende.xcodeproj/      pbxproj a mano (sin XcodeGen)
+    ├── Aprende.xcodeproj/      pbxproj mínimo; el código entra por grupo sincronizado
+    ├── Config/ExportOptions.plist  Subida a App Store Connect
     └── Aprende/
         ├── AprendeApp.swift    @main; fuerza esquema claro
         ├── Models.swift        AppData: todo el contenido estático
@@ -115,6 +136,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
         ├── TraceCanvasView.swift  PKCanvasView + DrawingGuard
         ├── LetterTraceView.swift  Glifo guiado: guías, demo, validación
         ├── ProgressStore.swift    Estrellas en UserDefaults
+        ├── PrivacyInfo.xcprivacy  Manifiesto de privacidad (UserDefaults, CA92.1)
         ├── Theme.swift            Paleta y componentes compartidos
         ├── Assets.xcassets/       AppIcon (1024) y AccentColor
         └── Views/
@@ -237,13 +259,26 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 - [ ] iPad físico con Apple Pencil: trazo, rechazo de palma, tolerancias de validación.
 
 ### TestFlight y primer deploy
-- [ ] Cuenta de Apple Developer Program (99 USD/año).
-- [ ] Elegir el *Team* en Xcode › Signing (`DEVELOPMENT_TEAM` está vacío).
-- [ ] Crear la app en App Store Connect (nombre "Aprende", categoría Educación).
-- [ ] `PrivacyInfo.xcprivacy`: la app usa `UserDefaults`, que es API de *required reason*.
-      App Store Connect lo pide al subir el build.
-- [ ] Product › Archive › Distribute App › TestFlight.
-- [ ] URL de política de privacidad.
-- [ ] Capturas de pantalla para la ficha.
-- [ ] El enlace a X en el footer: si la app entra en la categoría Kids, Apple exige puerta
-      parental para enlaces externos. Decidir si se quita o se protege.
+
+Estado al 18 de noviembre de 2026: **bloqueado en la ficha de App Store Connect.**
+
+- [x] Cuenta de Apple Developer Program (team `AZDP5Q3YFJ`, certificado de distribución
+      en el llavero).
+- [x] `DEVELOPMENT_TEAM` configurado en las dos configuraciones.
+- [x] `PrivacyInfo.xcprivacy` con la razón CA92.1 para `UserDefaults`.
+- [x] URLs de privacidad y soporte, publicadas en GitHub Pages.
+- [x] Copy de la ficha y respuestas de los cuestionarios: `AppStoreMetadata/es-MX.md`.
+- [x] Capturas de iPhone 6.9" (4) y de iPad 13" (1, solo la de inicio).
+- [x] Archive firmado, versión 1.0 build 1.
+- [ ] **Crear la ficha en App Store Connect.** La API de App Store Connect no permite
+      crear el registro inicial de una app, solo versiones de una que ya existe: hay que
+      hacerlo en appstoreconnect.apple.com. Hasta que exista, `-exportArchive` falla con
+      `App record with bundle identifier "com.eduardovelross.aprende" not found`.
+- [ ] Subir el build.
+- [ ] Más capturas de iPad (hacen falta toques en el simulador; el panel pide aprobar
+      el acceso al dispositivo).
+- [ ] Rellenar la ficha, los cuestionarios y enviar a revisión.
+- [ ] El enlace a X en el footer: la ficha se envía como Educación **sin** marcar
+      "Made for Kids" justamente para no toparse con la exigencia de puerta parental
+      para enlaces externos. Si algún día se marca como Kids, hay que quitarlo o
+      protegerlo.
