@@ -40,6 +40,26 @@ revisión y esperar a aprobarla para liberarla a mano no es terminar el deploy.
   liberarla de inmediato, sin preguntar.
 - "Haz deploy" significa dejar la app **publicada**, no "enviada".
 
+### Cómo se trabaja
+- **Reproducir antes de corregir.** Un bug se ve fallar primero. Si no se puede
+  reproducir, no se sabe si el arreglo arregló algo.
+- **Evidencia real, no "debería funcionar".** Un build verde no prueba que el trazo
+  funcione: `TraceEngine` y la identidad de las vistas de SwiftUI solo fallan en
+  ejecución. Antes de decir que algo quedó, haberlo visto en el simulador.
+- **Diff quirúrgico.** Tocar lo que el cambio pide y nada más. Los refactors de paso
+  esconden el arreglo y rompen cosas que nadie estaba mirando.
+- **Toda corrección deja lección.** Si la causa no era obvia, la convención va a la
+  sección 6 y el estado a la sección 8, en el mismo commit. Un bug que vuelve es un bug
+  que no se documentó.
+- **Un flujo que se repite tres veces merece su skill** en `.claude/skills/`.
+
+### Skills del proyecto
+Antes de una tarea, revisar si hay un skill que la cubra:
+- `ios-deploy` — archive, subida, ficha, cuestionarios y envío a revisión.
+- `capturas-app-store` — capturas en los tamaños que Apple acepta.
+- `qa-aprende` — recorrido de QA con las dos personas de prueba y las regresiones
+  conocidas del módulo Escribe.
+
 ### Commits
 - **Al terminar cada tarea, commit y push automáticamente, sin preguntar.** (Esta regla
   es propia de este repo; en Delivery Network y Karol es al revés.)
@@ -127,6 +147,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 ```
 .
 ├── CLAUDE.md
+├── .claude/skills/            ios-deploy · capturas-app-store · qa-aprende
 ├── index.html                  Versión web (GitHub Pages), origen de los contenidos
 ├── scripts/
 │   ├── make_icon.swift         Genera el AppIcon de 1024
@@ -228,6 +249,7 @@ este archivo en el mismo commit**. No "después", no "en la siguiente sesión".
 | Cambio de bundle ID, deployment target, familia de dispositivos, firma | Encabezado + 2. Build & run |
 | Framework o dependencia nueva | Encabezado + 3. Arquitectura (y por qué) |
 | Herramienta, script o paso de CI nuevo | 2. Build & run |
+| Skill nuevo en `.claude/skills/` | 1. Skills del proyecto |
 | Pendiente resuelto o nuevo | 8. Pendientes |
 
 **No hace falta** actualizarlo por: un typo en el copy, un cambio de color o padding, un
