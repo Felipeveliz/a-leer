@@ -21,6 +21,7 @@ struct PalabraEscribeFlowView: View {
     @State private var fase: Fase = .letras
     @State private var actual = 0              // índice de la letra en curso (fases 1 y 2)
     @State private var clearTrigger = 0        // borra el lienzo libre
+    @State private var undoTrigger = 0         // quita el último trazo del lienzo
     @State private var modeloVisible = true    // en fase 3 empieza oculto
     @State private var terminado = false       // fase 3: ya pulsó "¡Listo!"
     @State private var estrellaVisible = false
@@ -179,18 +180,31 @@ struct PalabraEscribeFlowView: View {
         VStack(spacing: 14) {
             GeometryReader { geo in
                 let espacio: CGFloat = 6
-                let unidades = letras.reduce(CGFloat(0)) {
-                    $0 + (GlyphLibrary.glyph(for: $1)?.width ?? 0.4)
-                }
-                let disponible = max(geo.size.width - espacio * CGFloat(max(letras.count - 1, 0)), 50)
-                let alto = min(170, disponible / max(unidades, 0.2))
+                let separadores = espacio * CGFloat(max(letras.count - 1, 0))
+                let unidades = letras.reduce(CGFloat(0)) { $0 + anchoUnidad(de: $1) }
+                let disponible = max(geo.size.width - separadores, 50)
+                // Tope arriba por estética y SUELO abajo para que la letra siga
+                // siendo trazable: con "maleta" en iPhone, repartir el ancho
+                // entre 6 letras dejaba la "l" en 16 pt y era imposible escribir.
+                // Si así la fila no cabe, se desplaza en vez de encogerse más.
+                let alto = max(130, min(170, disponible / max(unidades, 0.2)))
+                let anchoFila = alto * unidades + separadores
 
                 HStack(spacing: espacio) {
                     ForEach(Array(letras.enumerated()), id: \.offset) { i, ch in
                         letraFase2(indice: i, letra: ch, alto: alto)
                     }
                 }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)   // centrado
+                .frame(width: anchoFila, height: geo.size.height)
+                .offset(x: desplazamientoFila(anchoFila: anchoFila,
+                                              ancho: geo.size.width,
+                                              alto: alto,
+                                              espacio: espacio))
+                .frame(width: geo.size.width, alignment: .leading)
+                // Recorta solo a lo ancho: el aviso "¡Casi! Otra vez" vive
+                // debajo de la caja de la letra y tiene que seguir visible.
+                .mask { Rectangle().padding(.vertical, -80) }
+                .animation(.easeOut(duration: 0.25), value: actual)
             }
             .frame(height: 190)
 
@@ -198,28 +212,45 @@ struct PalabraEscribeFlowView: View {
         }
     }
 
+    /// Ancho de la caja de una letra, en unidades de altura.
+    private func anchoUnidad(de ch: Character) -> CGFloat {
+        GlyphLibrary.glyph(for: ch)?.boxFactor ?? GlyphLibrary.minBoxFactor
+    }
+
+    /// Si la palabra completa no cabe a lo ancho, corre la fila para dejar la
+    /// letra en curso al centro, sin pasarse de los extremos.
+    private func desplazamientoFila(anchoFila: CGFloat, ancho: CGFloat,
+                                    alto: CGFloat, espacio: CGFloat) -> CGFloat {
+        guard anchoFila > ancho else { return (ancho - anchoFila) / 2 }   // cabe: centrada
+        let i = min(max(actual, 0), max(letras.count - 1, 0))
+        var x: CGFloat = 0
+        for j in 0..<i { x += alto * anchoUnidad(de: letras[j]) + espacio }
+        let centro = x + alto * anchoUnidad(de: letras[i]) / 2
+        return min(0, max(ancho - anchoFila, ancho / 2 - centro))
+    }
+
     @ViewBuilder
     private func letraFase2(indice i: Int, letra ch: Character, alto: CGFloat) -> some View {
         if let glifo = GlyphLibrary.glyph(for: ch) {
             let acento = ch.isUppercase ? Palette.coral : Palette.blue
-            if i < actual {
-                // Ya lograda: se muestra sólida y bonita.
-                Text(String(ch))
-                    .font(.kid(alto * 0.76))
-                    .foregroundStyle(acento)
-                    .frame(width: glifo.width * alto, height: alto)
-            } else {
-                // Actual: acepta trazos. Futuras: guía tenue deshabilitada.
+            let ancho = glifo.boxFactor * alto
+            if i == actual {
+                // La letra en curso: la única que acepta trazos.
                 LetterTraceView(
                     glyph: glifo,
                     accent: acento,
                     showsDemo: false,
-                    showsFeedbackText: i == actual,
-                    onCompleted: { if i == actual { avanzarFase2() } }
+                    onCompleted: { avanzarFase2() }
                 )
-                .frame(width: glifo.width * alto, height: alto)
-                .allowsHitTesting(i == actual)
-                .opacity(i == actual ? 1 : 0.45)
+                .frame(width: ancho, height: alto)
+            } else {
+                // Las demás solo acompañan. Antes eran LetterTraceView
+                // deshabilitadas: un PKCanvasView y una guía punteada por letra
+                // para algo que nadie puede tocar.
+                Text(String(ch))
+                    .font(.kid(alto * 0.76))
+                    .foregroundStyle(i < actual ? acento : Palette.grayLight)
+                    .frame(width: ancho, height: alto)
             }
         } else {
             // Sin glifo (no debería pasar): se muestra sólida y se salta.
@@ -247,33 +278,38 @@ struct PalabraEscribeFlowView: View {
 
     // MARK: Fase 3 — ¡Tú solo!
 
-    @ViewBuilder
     private var faseTuSolo: some View {
-        if terminado {
-            VStack(spacing: 16) {
-                if estrellaVisible {
-                    Text("⭐️")
-                        .font(.system(size: 64))
-                        .transition(.scale.combined(with: .opacity))
+        VStack(spacing: 16) {
+            if terminado {
+                VStack(spacing: 12) {
+                    if estrellaVisible {
+                        Text("⭐️")
+                            .font(.system(size: 64))
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                    Text("¿Se parece? ¡Ahora escríbela 3 veces en tu cuaderno! 📓")
+                        .font(.kid(20))
+                        .foregroundStyle(Palette.ink)
+                        .multilineTextAlignment(.center)
                 }
-                Text("¿Se parece? ¡Ahora escríbela 3 veces en tu cuaderno! 📓")
-                    .font(.kid(20))
-                    .foregroundStyle(Palette.ink)
-                    .multilineTextAlignment(.center)
-
-                FreeWritePad(clearTrigger: clearTrigger, isEnabled: false)
-                    .frame(height: 260)
-
-                BigButton(title: "Terminar ⭐️", color: Palette.coral) { dismiss() }
-            }
-        } else {
-            VStack(spacing: 16) {
+            } else {
                 HintText(text: "Escribe la palabra tú solo, sin guía 💪")
+            }
 
-                FreeWritePad(clearTrigger: clearTrigger, isEnabled: true)
-                    .frame(height: 300)
+            // UNA sola instancia, fuera del if/else y con la misma altura en los
+            // dos estados. Si estuviera dentro de cada rama, SwiftUI la trataría
+            // como dos vistas distintas, recrearía el PKCanvasView al pulsar
+            // "¡Listo!" y borraría justo lo que hay que comparar con el modelo.
+            FreeWritePad(clearTrigger: clearTrigger,
+                         undoTrigger: undoTrigger,
+                         isEnabled: !terminado)
+                .frame(height: 300)
 
-                HStack(spacing: 14) {
+            if terminado {
+                BigButton(title: "Terminar ⭐️", color: Palette.coral) { dismiss() }
+            } else {
+                HStack(spacing: 12) {
+                    UndoButton { undoTrigger += 1 }
                     BigButton(title: "🧽 Borrar", color: Palette.gray) { clearTrigger += 1 }
                     BigButton(title: "¡Listo! ✅", color: Palette.green) { terminar() }
                 }
@@ -299,6 +335,7 @@ struct PalabraEscribeFlowView: View {
 
 struct FreeWritePad: View {
     var clearTrigger: Int
+    var undoTrigger: Int = 0
     var isEnabled: Bool = true
 
     var body: some View {
@@ -330,6 +367,7 @@ struct FreeWritePad: View {
                 inkColor: UIColor(Palette.ink),
                 inkWidth: 12,
                 clearTrigger: clearTrigger,
+                undoTrigger: undoTrigger,
                 isEnabled: isEnabled,
                 onStrokeEnded: { _ in }
             )

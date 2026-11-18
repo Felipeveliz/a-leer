@@ -23,9 +23,17 @@ struct Glyph {
     let strokes: [GlyphStroke]
 
     /// Trazos escalados a una altura de dibujo concreta (escala uniforme).
-    func scaledStrokes(height: CGFloat) -> [[CGPoint]] {
-        strokes.map { $0.points.map { CGPoint(x: $0.x * height, y: $0.y * height) } }
+    /// `dx` desplaza el glifo cuando la caja es más ancha que él.
+    func scaledStrokes(height: CGFloat, dx: CGFloat = 0) -> [[CGPoint]] {
+        strokes.map { $0.points.map { CGPoint(x: $0.x * height + dx, y: $0.y * height) } }
     }
+
+    /// Ancho de la caja de trazo, en unidades de altura.
+    ///
+    /// Nunca baja de `GlyphLibrary.minBoxFactor`: la "l" y la "i" miden 0.18 de
+    /// ancho, así que su caja quedaba tan estrecha que el niño pintaba fuera del
+    /// lienzo y el trazo se perdía. El glifo va centrado en la caja ancha.
+    var boxFactor: CGFloat { max(width, GlyphLibrary.minBoxFactor) }
 }
 
 // MARK: - Helpers de geometría (ángulos en grados; Y hacia abajo:
@@ -81,6 +89,9 @@ private func stroke(_ segments: [[CGPoint]]...) -> GlyphStroke {
 // MARK: - Catálogo
 
 enum GlyphLibrary {
+
+    /// Ancho mínimo de la caja de trazo (en unidades de altura). Ver `Glyph.boxFactor`.
+    static let minBoxFactor: CGFloat = 0.34
 
     static func glyph(for ch: Character) -> Glyph? { all[ch] }
 

@@ -90,19 +90,30 @@ enum AppData {
     // MARK: Escribe
     /// Palabras del módulo Escribe, ordenadas por dificultad de trazo:
     /// cortas y de líneas simples → con mayúscula → largas de 3 sílabas.
+    /// Ojo: las entradas van con la mayúscula EXACTA de la palabra real
+    /// ("Rosa", no "rosa"), porque la búsqueda es por texto literal.
     static let palabrasEscribe: [Palabra] = {
-        let orden = ["lata", "lima", "loma", "rata", "ruta", "risa", "rosa", "nata", "nota", "nene",
+        let orden = ["lata", "lima", "loma", "rata", "ruta", "risa", "remo", "nata", "nota", "nene",
                      "Lola", "Rosa", "Nena", "amor", "elote", "atole", "pelota", "maleta"]
         var porTexto: [String: Palabra] = [:]
         for p in palabras { porTexto[p.texto] = p }
         var resultado: [Palabra] = []
         var vistos = Set<String>()
         for t in orden {
-            if let p = porTexto[t], !vistos.contains(p.texto) {
+            guard let p = porTexto[t] else {
+                // Entrada muerta en `orden`: una palabra mal escrita se saltaría
+                // en silencio y el orden de dificultad quedaría roto.
+                assertionFailure("palabrasEscribe: '\(t)' no existe en AppData.palabras")
+                continue
+            }
+            if !vistos.contains(p.texto) {
                 resultado.append(p); vistos.insert(p.texto)
             }
         }
         for p in palabras where !vistos.contains(p.texto) {
+            // Palabra que falta en `orden`: cae al final, después de las más
+            // difíciles. Debe quedar vacío.
+            assertionFailure("palabrasEscribe: '\(p.texto)' falta en la lista `orden`")
             resultado.append(p); vistos.insert(p.texto)
         }
         return resultado

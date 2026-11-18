@@ -60,6 +60,7 @@ struct DigitoEscribeFlowView: View {
 
     @State private var paso: Paso = .guiado
     @State private var clearTrigger = 0
+    @State private var undoTrigger = 0
     @State private var modeloVisible = false
     @State private var terminado = false
     @State private var estrellaVisible = false
@@ -152,27 +153,34 @@ struct DigitoEscribeFlowView: View {
             }
 
             if terminado {
-                if estrellaVisible {
-                    Text("⭐️")
-                        .font(.system(size: 64))
-                        .transition(.scale.combined(with: .opacity))
+                VStack(spacing: 12) {
+                    if estrellaVisible {
+                        Text("⭐️")
+                            .font(.system(size: 64))
+                            .transition(.scale.combined(with: .opacity))
+                    }
+                    Text("¡Ahora escríbelo 3 veces en tu cuaderno! 📓")
+                        .font(.kid(20))
+                        .foregroundStyle(Palette.ink)
+                        .multilineTextAlignment(.center)
                 }
-                Text("¡Ahora escríbelo 3 veces en tu cuaderno! 📓")
-                    .font(.kid(20))
-                    .foregroundStyle(Palette.ink)
-                    .multilineTextAlignment(.center)
-
-                FreeWritePad(clearTrigger: clearTrigger, isEnabled: false)
-                    .frame(height: 240)
-
-                BigButton(title: "Terminar ⭐️", color: Palette.teal) { dismiss() }
             } else {
                 HintText(text: "Escribe el número tú solo, sin guía 💪")
+            }
 
-                FreeWritePad(clearTrigger: clearTrigger, isEnabled: true)
-                    .frame(height: 300)
+            // UNA sola instancia, fuera del if/else: ver la nota en
+            // PalabraEscribeFlowView.faseTuSolo (al pulsar "¡Listo!" SwiftUI
+            // recreaba el PKCanvasView y se perdía el trazo del niño).
+            FreeWritePad(clearTrigger: clearTrigger,
+                         undoTrigger: undoTrigger,
+                         isEnabled: !terminado)
+                .frame(height: 300)
 
-                HStack(spacing: 14) {
+            if terminado {
+                BigButton(title: "Terminar ⭐️", color: Palette.teal) { dismiss() }
+            } else {
+                HStack(spacing: 12) {
+                    UndoButton { undoTrigger += 1 }
                     BigButton(title: "🧽 Borrar", color: Palette.gray) { clearTrigger += 1 }
                     BigButton(title: "¡Listo! ✅", color: Palette.green) { terminar() }
                 }

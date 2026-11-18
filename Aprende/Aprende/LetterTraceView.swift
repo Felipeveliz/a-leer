@@ -31,9 +31,12 @@ struct LetterTraceView: View {
 
     var body: some View {
         GeometryReader { geo in
-            let height = min(geo.size.height, geo.size.width / max(glyph.width, 0.18))
-            let boxWidth = height * glyph.width
-            let strokes = glyph.scaledStrokes(height: height)
+            // La caja puede ser más ancha que el glifo (ver `Glyph.boxFactor`):
+            // el glifo se centra con `dx` y el lienzo ocupa la caja completa.
+            let height = min(geo.size.height, geo.size.width / glyph.boxFactor)
+            let boxWidth = height * glyph.boxFactor
+            let dx = (boxWidth - height * glyph.width) / 2
+            let strokes = glyph.scaledStrokes(height: height, dx: dx)
 
             ZStack {
                 TimelineView(.animation(minimumInterval: 1 / 40, paused: demoStart == nil)) { timeline in

@@ -133,6 +133,28 @@ struct BigButton: View {
     }
 }
 
+/// Deshace el último trazo del lienzo libre. Cuadrado y angosto para que
+/// quepa al lado de "Borrar" y "¡Listo!" incluso en iPhone.
+struct UndoButton: View {
+    let action: () -> Void
+
+    var body: some View {
+        Button(action: action) {
+            Text("↩️")
+                .font(.kid(24))
+                .frame(width: 60)
+                .padding(.vertical, 18)
+                .background(
+                    RoundedRectangle(cornerRadius: 20, style: .continuous)
+                        .fill(Palette.blue)
+                        .shadow(color: .black.opacity(0.18), radius: 0, y: 5)
+                )
+        }
+        .buttonStyle(PressDownButtonStyle())
+        .accessibilityLabel("Deshacer el último trazo")
+    }
+}
+
 /// Estilo que "hunde" el botón al tocarlo.
 struct PressDownButtonStyle: ButtonStyle {
     func makeBody(configuration: Configuration) -> some View {
@@ -200,8 +222,16 @@ struct StarBadge: View {
 }
 
 /// Contenedor estándar de pantalla con fondo y scroll.
+///
+/// El scroll se desactiva mientras hay un trazo en curso (`DrawingGuard`):
+/// antes, un trazo vertical lento dentro de un lienzo movía la pantalla en
+/// vez de pintar. El `ScrollView` sigue ahí siempre (no se sustituye por un
+/// `VStack`) para no cambiar la identidad de las vistas hijas: si cambiara,
+/// PencilKit se recrearía y perdería el dibujo.
 struct ScreenScaffold<Content: View>: View {
     @ViewBuilder var content: Content
+
+    @ObservedObject private var trazo = DrawingGuard.shared
 
     var body: some View {
         ZStack {
@@ -216,6 +246,7 @@ struct ScreenScaffold<Content: View>: View {
                 .frame(maxWidth: 700)
                 .frame(maxWidth: .infinity)
             }
+            .scrollDisabled(trazo.activo)
         }
         .navigationBarTitleDisplayMode(.inline)
     }
