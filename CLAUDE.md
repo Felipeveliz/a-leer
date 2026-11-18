@@ -260,41 +260,28 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 
 ### TestFlight y primer deploy
 
-Estado al 18 de noviembre de 2026: la app existe en App Store Connect (**Apple ID
-6836391055**, nombre "Aprende"), con el build 1.0 (1) subido y adjunto, la ficha, las
-capturas y los tres cuestionarios completos. **Falta un solo campo para poder enviarla:
-el teléfono de contacto de App Review.**
+Estado al 18 de noviembre de 2026: **Aprende 1.0 (build 1) está en "Waiting for
+Review"** en App Store Connect (Apple ID **6836391055**), enviada el 18 de noviembre.
 
-Dos cosas que costaron un intento y conviene no repetir:
+- Precio: gratis en 175 países. Salida: **lanzamiento manual** tras la aprobación.
+- Clasificación **4+**, privacidad **Data Not Collected** (publicada), sin cifrado,
+  sin contenido de terceros.
+- Categoría Educación, **sin** marcar "Made for Kids": por eso el enlace a X del pie
+  no necesita puerta parental. Si algún día se marca como Kids, hay que quitarlo.
+- Ficha y capturas en `AppStoreMetadata/`.
+
+Tres cosas que costaron un intento y conviene no repetir:
 - Las capturas de iPhone tienen que ser **1206 × 2622** (6.1"/6.3"). Las de 1320 × 2868
   (iPhone 17 Pro Max) las rechaza.
 - **La descripción no admite emoji.** Devuelve "This field contains one or more invalid
   characters" sin decir dónde.
+- El App ID hay que registrarlo a mano en developer.apple.com antes de crear la ficha:
+  el archive con firma automática no lo dejó registrado, y sin él no aparece en el
+  desplegable de App Store Connect.
 
-- [x] Cuenta de Apple Developer Program (team `AZDP5Q3YFJ`, certificado de distribución
-      en el llavero).
-- [x] `DEVELOPMENT_TEAM` configurado en las dos configuraciones.
-- [x] `PrivacyInfo.xcprivacy` con la razón CA92.1 para `UserDefaults`.
-- [x] URLs de privacidad y soporte, publicadas en GitHub Pages.
-- [x] Copy de la ficha y respuestas de los cuestionarios: `AppStoreMetadata/es-MX.md`.
-- [x] Capturas de iPhone 6.9" (4) y de iPad 13" (1, solo la de inicio).
-- [x] Archive firmado, versión 1.0 build 1.
-- [x] App ID `com.eduardovelross.aprende` registrado en el portal y ficha creada en
-      App Store Connect (la API no permite crear el registro inicial de una app, solo
-      versiones de una que ya existe: hay que hacerlo en appstoreconnect.apple.com).
-- [x] Build 1.0 (1) subido y adjunto a la versión.
-- [x] Ficha: nombre, subtítulo, descripción, palabras clave, URLs, categoría Educación.
-- [x] Capturas: 4 de iPhone (1206 × 2622) y 1 de iPad (2064 × 2752).
-- [x] Content Rights (sin contenido de terceros), clasificación por edad (**4+**),
-      privacidad (**Data Not Collected**, publicada) y cumplimiento de exportación
-      (sin cifrado).
-- [x] Salida programada como **lanzamiento manual** tras la aprobación, no automático.
-- [ ] **Teléfono de contacto de App Review.** Es el único campo que falta; sin él
-      App Store Connect no deja enviar.
-- [ ] Más capturas de iPad (hacen falta toques en el simulador y el panel pide aprobar
-      el acceso al dispositivo).
-- [ ] Enviar a revisión.
-- [ ] El enlace a X en el footer: la ficha se envía como Educación **sin** marcar
-      "Made for Kids" justamente para no toparse con la exigencia de puerta parental
-      para enlaces externos. Si algún día se marca como Kids, hay que quitarlo o
-      protegerlo.
+### Pendientes del deploy
+- [ ] Esperar la resolución de Apple (hasta 48 h; avisa por correo).
+- [ ] Cuando apruebe, **publicarla a mano** desde App Store Connect.
+- [ ] Más capturas de iPad: solo hay la de inicio. Hacen falta toques en el simulador y
+      el panel pide aprobar el acceso al dispositivo.
+- [ ] Subir `CURRENT_PROJECT_VERSION` antes de cada build nuevo.
