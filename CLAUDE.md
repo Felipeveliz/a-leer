@@ -327,46 +327,38 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 
 ### TestFlight y primer deploy
 
-Estado al 19 de noviembre de 2026: **Apple rechazó la 1.0 con Guideline 2.1 —
-Information Needed — New App Submission** (submission `5721a9c8`). No es un defecto de
-la app ni de la ficha: es la petición de información que Apple hace a muchas apps nuevas.
-Pide seis cosas en las notas del revisor.
+Estado al 19 de noviembre de 2026, por la tarde: **Aprende 1.0 con la build 2 está en
+"Waiting for Review"** (Apple ID 6836391055), gratis en 175 países, 4+, Data Not
+Collected y con **salida automática**.
 
-- [x] Puntos 2 a 6 (propósito y público, cómo acceder a las funciones, servicios
-      externos —ninguno—, diferencias regionales —ninguna— y material de terceros
-      —ninguno—) escritos y guardados en App Review Information.
-- [x] Punto 1 contestado por escrito en vez de con vídeo (decisión de Felipe, 19 de
-      noviembre): la app no tiene cuentas, ni contenido de usuario, ni contenido de
-      pago, así que ninguno de los flujos que el vídeo busca enseñar existe, y todo es
-      accesible desde la pantalla de inicio sin configurar nada. Se ofrece grabarlo si
-      lo siguen pidiendo.
-- [x] Respondido en Resolution Center el 19 de noviembre a las 8:16 con los seis puntos.
-- [ ] Esperar la respuesta de Apple.
+Historia corta: Apple rechazó la primera submission con **Guideline 2.1 — Information
+Needed** y se contestaron los seis puntos por escrito, sin vídeo (decisión de Felipe).
+**Responder en Resolution Center NO devuelve la versión a la cola**: se quedó en
+"Rejected" en rojo todo el día, mientras una app en revisión se ve en amarillo como
+"Waiting for Review". Para volver a la cola hubo que **cancelar la submission**
+(queda como "Removed"), lo que devuelve la versión a *Prepare for Submission*, cambiar
+el build y enviar otra vez. Las notas del revisor y la salida automática sobreviven a
+la cancelación.
 
-**El botón "Resubmit to App Review" está deshabilitado** y lo sigue estando después de
-editar las notas y de responder. En un rechazo de tipo *Information Needed* el canal es
-la respuesta en Resolution Center, que es la que devuelve la submission a la cola de
-Apple; "Resubmit" se activa cuando cambias el build o metadata que necesita volver a
-revisarse.
+**El color de la lista de apps es el indicador fiable**: rojo = parada, amarillo = en
+cola. Si después de una acción no se pone amarilla, no está en revisión.
 
-La app sigue siendo gratis en 175 países, 4+, Data Not Collected y con **salida
-automática**.
-
-**TestFlight** (montado el 19 de noviembre): grupo interno **"Pruebas"** con distribución
-automática y Felipe como único tester. El **build 2** (hojas de la escuela) está en
-"Testing" desde el 19 de noviembre. El build 1.0 (1) pasó de "Ready to Submit" a
-**"Ready to Test"**. Subir un build no invita a nadie por sí solo: hasta que no existe un
-grupo con testers dentro, TestFlight no manda ningún correo. Con la distribución
-automática activada, los builds nuevos le llegan solos.
+**TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
+único tester. Las builds 1 y 2 están en "Testing". Un build recién procesado aparece
+como **"Missing Compliance"** y no se distribuye hasta contestarlo; desde la build 3 ya
+no debería pasar, porque el proyecto declara
+`INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO`.
 
 Lo aprendido antes, que sigue valiendo:
-- Las capturas de iPhone tienen que ser **1206 × 2622** (6.1"/6.3"). Las de 1320 × 2868
-  las rechaza.
+- Las capturas de iPhone tienen que ser **1206 × 2622** (6.1"/6.3").
 - **La descripción no admite emoji.**
 - El App ID hay que registrarlo a mano en developer.apple.com antes de crear la ficha.
-- Las notas del revisor en **inglés**: las lee App Review, no el usuario.
+- Las notas del revisor en **inglés**.
 
 ### Pendientes del deploy
-- [ ] Si Apple vuelve a pedir el vídeo: instalar desde TestFlight y grabarlo en el iPad.
+- [ ] **La build 2 se envió sin que nadie la ejecutara**: la Mac se quedó sin runtimes de
+      simulador. Probarla en TestFlight, sobre todo "limón" e "Irma" en Escribe, que
+      estrenan los glifos "ó" e "I".
+- [ ] Si Apple vuelve a pedir el vídeo: instalarla desde TestFlight y grabarla en el iPad.
 - [ ] Más capturas de iPad: solo hay la de inicio.
 - [ ] Subir `CURRENT_PROJECT_VERSION` antes de cada build nuevo.

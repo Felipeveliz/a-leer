@@ -104,11 +104,21 @@ En App Store Version Release dejar **"Automatically release this version"**. Nun
 "Manually release" salvo que Felipe lo pida. Si una versión quedó en manual y Apple la
 aprueba (estado **Pending Developer Release**), liberarla de inmediato sin preguntar.
 
+## 7bis. Si la versión está rechazada
+
+Responder en Resolution Center **no la devuelve a la cola de revisión**: se queda en
+"Rejected". Para reenviarla hay que **cancelar la submission** (botón "Cancel
+Submission" abajo del todo; queda como "Removed"), lo que devuelve la versión a
+*Prepare for Submission*. Desde ahí se puede cambiar el build —pasar el ratón por
+encima de la fila del build saca un "−" rojo para quitarlo— y enviar otra vez. Las
+notas del revisor, la salida automática y el resto de la ficha sobreviven.
+
 ## 8. Enviar
 
 "Add for Review" → panel de Draft Submission → **"Submit for Review"**. Confirmar que el
-estado queda en **Waiting for Review**, tanto en la página de la versión como en App
-Review. No dar por enviada una app sin verlo en la consola.
+estado queda en **Waiting for Review**. La comprobación buena es la **lista de apps**:
+en amarillo está en cola, en rojo está parada. No dar por enviada una app sin verla
+amarilla ahí.
 
 ## Si el navegador deja de responder
 
