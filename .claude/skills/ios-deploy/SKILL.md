@@ -76,6 +76,14 @@ El copy vive en `AppStoreMetadata/es-MX.md`. Dos trampas comprobadas:
 
 Ver el skill `capturas-app-store`. **1206 × 2622 para iPhone**, no 1320 × 2868.
 
+## 5bis. Cada build nuevo pide compliance de exportación
+
+Al terminar de procesarse, un build aparece como **"Missing Compliance"** y no se
+distribuye a los testers hasta contestarlo. Desde el 19 de noviembre el proyecto lleva
+`INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO` en las dos configuraciones del target
+de la app, así que **ya no debería preguntarlo**. Si vuelve a aparecer: TestFlight ›
+el build › Manage › "None of the algorithms mentioned above" › Save.
+
 ## 6. Cuestionarios
 
 Las respuestas están en `AppStoreMetadata/es-MX.md` y no cambian mientras la app no
@@ -107,6 +115,13 @@ Review. No dar por enviada una app sin verlo en la consola.
 Si las capturas fallan con timeout y los clics no entran, comprobar
 `innerWidth`/`innerHeight` de la pestaña: si son `0`, la ventana de Chrome está
 minimizada. No es un fallo de la página; hay que pedirle a Felipe que la levante.
+
+## Solo subir a TestFlight
+
+Cuando Felipe solo quiere probarla en su iPad ("súbela y yo la pruebo"), basta con los
+pasos 1 y 2 más el 5bis. El grupo interno **"Pruebas"** tiene distribución automática,
+así que el build entra solo y TestFlight le avisa. Confirmar en el grupo que el build
+queda en **"Testing"**: mientras diga "Ready to Submit" sin grupo, no le ha llegado.
 
 ## Después
 

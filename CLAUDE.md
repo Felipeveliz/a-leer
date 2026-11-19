@@ -117,6 +117,8 @@ Subir a App Store Connect **necesita que Xcode tenga la cuenta de Apple con sesi
 iniciada** (Xcode › Settings › Accounts). Sin ella, el archive falla con
 `No Accounts: Add a new account in Accounts settings`. Hay que subir
 `CURRENT_PROJECT_VERSION` en cada subida: App Store Connect rechaza un build repetido.
+El proyecto declara `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO`, así que los
+builds nuevos ya no se quedan en "Missing Compliance" esperando una respuesta a mano.
 
 `scripts/make_icon.swift` genera el icono de 1024 y `scripts/render_glyphs.swift` ayuda
 a revisar los trazos de la biblioteca de glifos.
@@ -351,7 +353,8 @@ La app sigue siendo gratis en 175 países, 4+, Data Not Collected y con **salida
 automática**.
 
 **TestFlight** (montado el 19 de noviembre): grupo interno **"Pruebas"** con distribución
-automática y Felipe como único tester. El build 1.0 (1) pasó de "Ready to Submit" a
+automática y Felipe como único tester. El **build 2** (hojas de la escuela) está en
+"Testing" desde el 19 de noviembre. El build 1.0 (1) pasó de "Ready to Submit" a
 **"Ready to Test"**. Subir un build no invita a nadie por sí solo: hasta que no existe un
 grupo con testers dentro, TestFlight no manda ningún correo. Con la distribución
 automática activada, los builds nuevos le llegan solos.
