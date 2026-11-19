@@ -308,30 +308,32 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 
 ### TestFlight y primer deploy
 
-Estado al 18 de noviembre de 2026: **Aprende 1.0 (build 1) está en "Waiting for
-Review"** en App Store Connect (Apple ID **6836391055**), enviada el 18 de noviembre.
+Estado al 19 de noviembre de 2026: **Apple rechazó la 1.0 con Guideline 2.1 —
+Information Needed — New App Submission** (submission `5721a9c8`). No es un defecto de
+la app ni de la ficha: es la petición de información que Apple hace a muchas apps nuevas.
+Pide seis cosas en las notas del revisor.
 
-- Precio: gratis en 175 países. Salida: **automática** en cuanto Apple apruebe
-  (estaba en manual; se cambió el 18 de noviembre por la regla de liberar ASAP).
-- Clasificación **4+**, privacidad **Data Not Collected** (publicada), sin cifrado,
-  sin contenido de terceros.
-- Categoría Educación, **sin** marcar "Made for Kids": por eso el enlace a X del pie
-  no necesita puerta parental. Si algún día se marca como Kids, hay que quitarlo.
-- Ficha y capturas en `AppStoreMetadata/`.
+- [x] Puntos 2 a 6 (propósito y público, cómo acceder a las funciones, servicios
+      externos —ninguno—, diferencias regionales —ninguna— y material de terceros
+      —ninguno—) escritos y guardados en App Review Information.
+- [ ] **Punto 1: un vídeo de pantalla grabado en un dispositivo físico**, empezando por
+      el lanzamiento de la app y mostrando el flujo típico. Solo lo puede hacer Felipe.
+      El enlace va en las notas, donde ahora dice `[PENDIENTE]`.
+- [ ] Reenviar con "Resubmit to App Review".
 
-Tres cosas que costaron un intento y conviene no repetir:
+La app sigue siendo gratis en 175 países, 4+, Data Not Collected y con **salida
+automática**. El build 1.0 (1) está en TestFlight como "Ready to Submit"; no hay grupo
+de pruebas internas creado todavía.
+
+Lo aprendido antes, que sigue valiendo:
 - Las capturas de iPhone tienen que ser **1206 × 2622** (6.1"/6.3"). Las de 1320 × 2868
-  (iPhone 17 Pro Max) las rechaza.
-- **La descripción no admite emoji.** Devuelve "This field contains one or more invalid
-  characters" sin decir dónde.
-- El App ID hay que registrarlo a mano en developer.apple.com antes de crear la ficha:
-  el archive con firma automática no lo dejó registrado, y sin él no aparece en el
-  desplegable de App Store Connect.
+  las rechaza.
+- **La descripción no admite emoji.**
+- El App ID hay que registrarlo a mano en developer.apple.com antes de crear la ficha.
+- Las notas del revisor en **inglés**: las lee App Review, no el usuario.
 
 ### Pendientes del deploy
-- [ ] Esperar la resolución de Apple (hasta 48 h; avisa por correo).
-- [ ] Confirmar que sale sola al aprobarse; si por lo que sea queda en
-      **Pending Developer Release**, liberarla de inmediato.
-- [ ] Más capturas de iPad: solo hay la de inicio. Hacen falta toques en el simulador y
-      el panel pide aprobar el acceso al dispositivo.
+- [ ] Grabar el vídeo en un iPad o iPhone físico y pegar el enlace en las notas.
+- [ ] Reenviar a revisión.
+- [ ] Más capturas de iPad: solo hay la de inicio.
 - [ ] Subir `CURRENT_PROJECT_VERSION` antes de cada build nuevo.
