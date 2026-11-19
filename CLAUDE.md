@@ -316,10 +316,19 @@ Pide seis cosas en las notas del revisor.
 - [x] Puntos 2 a 6 (propósito y público, cómo acceder a las funciones, servicios
       externos —ninguno—, diferencias regionales —ninguna— y material de terceros
       —ninguno—) escritos y guardados en App Review Information.
-- [ ] **Punto 1: un vídeo de pantalla grabado en un dispositivo físico**, empezando por
-      el lanzamiento de la app y mostrando el flujo típico. Solo lo puede hacer Felipe.
-      El enlace va en las notas, donde ahora dice `[PENDIENTE]`.
-- [ ] Reenviar con "Resubmit to App Review".
+- [x] Punto 1 contestado por escrito en vez de con vídeo (decisión de Felipe, 19 de
+      noviembre): la app no tiene cuentas, ni contenido de usuario, ni contenido de
+      pago, así que ninguno de los flujos que el vídeo busca enseñar existe, y todo es
+      accesible desde la pantalla de inicio sin configurar nada. Se ofrece grabarlo si
+      lo siguen pidiendo.
+- [x] Respondido en Resolution Center el 19 de noviembre a las 8:16 con los seis puntos.
+- [ ] Esperar la respuesta de Apple.
+
+**El botón "Resubmit to App Review" está deshabilitado** y lo sigue estando después de
+editar las notas y de responder. En un rechazo de tipo *Information Needed* el canal es
+la respuesta en Resolution Center, que es la que devuelve la submission a la cola de
+Apple; "Resubmit" se activa cuando cambias el build o metadata que necesita volver a
+revisarse.
 
 La app sigue siendo gratis en 175 países, 4+, Data Not Collected y con **salida
 automática**. El build 1.0 (1) está en TestFlight como "Ready to Submit"; no hay grupo
