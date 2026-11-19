@@ -23,6 +23,11 @@ sumas y escritura a mano con el dedo o con Apple Pencil. Interfaz en español me
   No inventar features.
 - No preguntar lo que se puede deducir del código.
 - No crear documentos, artefactos ni archivos adicionales sin que Felipe lo pida.
+- **Si el bloqueo es que se cayó su sesión** (App Store Connect, el portal de
+  desarrollador), la respuesta es una línea: *"inicia sesión y yo sigo"*. Sin hipótesis
+  de lo que puede haber pasado ni listas de causas probables: el análisis va después de
+  ver el dato. Esto no aplica cuando él tiene que **decidir** algo; ahí sí hace falta
+  el contexto.
 - Los errores de compilación se arreglan antes de seguir. No acumular warnings.
 - Si lo que se observa en el código contradice este archivo o el git log, **frenar y
   reconciliar** antes de afirmar nada: uno de los dos está desactualizado.
