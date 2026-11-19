@@ -4,6 +4,7 @@ import SwiftUI
 
 struct PalabrasEscribeListView: View {
     @ObservedObject private var progreso = ProgressStore.shared
+    @ObservedObject private var hojas = HojaStore.shared
 
     /// 2-3 columnas adaptativas según el ancho disponible.
     private let columnas = [GridItem(.adaptive(minimum: 150, maximum: 240), spacing: 14)]
@@ -17,8 +18,10 @@ struct PalabrasEscribeListView: View {
                 color: Palette.coral
             )
 
+            HojaPicker()
+
             LazyVGrid(columns: columnas, spacing: 14) {
-                ForEach(AppData.palabrasEscribe) { p in
+                ForEach(AppData.palabrasEscribe(en: hojas.seleccionadas)) { p in
                     NavigationLink {
                         PalabraEscribeFlowView(palabra: p)
                     } label: {

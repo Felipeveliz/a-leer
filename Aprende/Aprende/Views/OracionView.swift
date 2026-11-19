@@ -18,6 +18,8 @@ struct OracionView: View {
         }
     }
 
+    @ObservedObject private var hojas = HojaStore.shared
+
     @State private var pestana: Pestana = .silabas
     /// Índice del elemento actual (sílaba o palabra, según la pestaña).
     @State private var indice = 0
@@ -36,30 +38,45 @@ struct OracionView: View {
                 color: Palette.orange
             )
 
-            pestanas
+            HojaPicker()
 
-            switch pestana {
-            case .silabas:
-                tarjetaPaso(
-                    texto: Text(AppData.oracionSilabas[indice]).foregroundStyle(Palette.blue),
-                    total: AppData.oracionSilabas.count,
-                    pista: "Léela en voz alta 🙂"
-                )
-                navegacion(total: AppData.oracionSilabas.count)
+            if oracion.isEmpty {
+                SinContenido(que: "oración")
+            } else {
+                pestanas
 
-            case .palabras:
-                tarjetaPaso(
-                    texto: Text(AppData.oracion[indice].texto).foregroundStyle(Palette.blue),
-                    total: AppData.oracion.count,
-                    pista: "Sílabas: " + AppData.oracion[indice].silabas.joined(separator: " · ")
-                )
-                navegacion(total: AppData.oracion.count)
+                switch pestana {
+                case .silabas:
+                    tarjetaPaso(
+                        texto: Text(silabas[min(indice, silabas.count - 1)]).foregroundStyle(Palette.blue),
+                        total: silabas.count,
+                        pista: "Léela en voz alta 🙂"
+                    )
+                    navegacion(total: silabas.count)
 
-            case .oracion:
-                tarjetaOracion
+                case .palabras:
+                    let p = oracion[min(indice, oracion.count - 1)]
+                    tarjetaPaso(
+                        texto: Text(p.texto).foregroundStyle(Palette.blue),
+                        total: oracion.count,
+                        pista: "Sílabas: " + p.silabas.joined(separator: " · ")
+                    )
+                    navegacion(total: oracion.count)
+
+                case .oracion:
+                    tarjetaOracion
+                }
             }
         }
+        .onChange(of: hojas.clave) {
+            indice = 0
+            resaltada = nil
+        }
     }
+
+    /// La oración de las hojas marcadas. Hoy solo la hoja 2 trae oración.
+    private var oracion: [PalabraOracion] { AppData.oracion(en: hojas.seleccionadas) }
+    private var silabas: [String] { AppData.oracionSilabas(en: hojas.seleccionadas) }
 
     // MARK: Pestañas tipo pastilla
 
@@ -128,7 +145,7 @@ struct OracionView: View {
     private var tarjetaOracion: some View {
         Card {
             HStack(spacing: 2) {
-                ForEach(Array(AppData.oracion.enumerated()), id: \.offset) { i, palabra in
+                ForEach(Array(oracion.enumerated()), id: \.offset) { i, palabra in
                     Text(palabra.texto)
                         .font(.kid(40))
                         .foregroundStyle(resaltada == i ? cafe : Palette.ink)

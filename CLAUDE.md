@@ -136,6 +136,13 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 - **`AppData` (`Models.swift`)** — todo el contenido es estático y está en código:
   sílabas, palabras, oración, sumas, orden de dificultad de Escribe. No hay backend,
   ni archivos de datos, ni red.
+- **`Hoja`** — el contenido viene de las hojas que Eliab trae de la escuela. Cada
+  sílaba, palabra y palabra de la oración lleva un `Set<Hoja>`, **no una sola hoja**:
+  "pelota" y "rata" vienen en la 2 y en la 3, y si fuera una sola, al marcar solo la
+  hoja 3 faltarían palabras que sí están en su hoja. La hoja 1 se perdió.
+- **`HojaStore`** — singleton con las hojas marcadas, guardado en `UserDefaults`
+  (`aprende.hojas`). Nunca queda vacío: la última casilla marcada no se puede
+  desmarcar, porque una pantalla sin nada que practicar no le dice nada a un niño.
 - **`ProgressStore`** — singleton `ObservableObject` que guarda las estrellas ganadas
   en `UserDefaults` bajo la clave `aprende.progreso`, con logros `"palabra:<texto>"` y
   `"digito:<d>"`. Es lo único que persiste.
@@ -185,6 +192,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
         ├── TraceCanvasView.swift  PKCanvasView + DrawingGuard
         ├── LetterTraceView.swift  Glifo guiado: guías, demo, validación
         ├── ProgressStore.swift    Estrellas en UserDefaults
+        ├── HojaStore.swift         Hojas marcadas, en UserDefaults
         ├── PrivacyInfo.xcprivacy  Manifiesto de privacidad (UserDefaults, CA92.1)
         ├── Theme.swift            Paleta y componentes compartidos
         ├── Assets.xcassets/       AppIcon (1024) y AccentColor
@@ -225,7 +233,14 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   forma aproximada. Subirlas convierte el juego en frustración.
 - **Las estrellas solo existen en Escribe.** Español y Matemáticas no guardan progreso.
 - **Matemáticas siempre ofrece las mismas 5 opciones (2–6).** Es el rango que Eliab está
-  practicando.
+  practicando. **Las sumas no dependen de la hoja**: por eso Matemáticas no lleva
+  selector.
+- **Las casillas de hoja van en cuatro pantallas** (las tres de Español y la lista de
+  palabras de Escribe), compartiendo una sola selección. Por defecto están las dos
+  marcadas. Son casillas, no botones de opción: se puede practicar con las dos a la vez.
+- **Hoy la hoja 3 solo trae palabras.** Si alguien marca solo la hoja 3, Sílabas y
+  Oración enseñan `SinContenido` en vez de quedarse vacías. Cuando aparezcan las páginas
+  de sílabas y oración de la hoja 3, se etiquetan y ya.
 - **Sin red, sin cuentas, sin analítica.** Lo único que persiste es `UserDefaults`.
 
 ## 6. Convenciones de código
@@ -297,8 +312,10 @@ abrir el código, el cambio necesitaba actualizar el archivo.
       pantallas y no pronuncia nada. Es lo de mayor impacto pedagógico que falta.
 - [ ] Progreso (estrellas) también en Español y Matemáticas.
 - [ ] Matemáticas: restas, dificultad progresiva, racha.
-- [ ] Más glifos: hoy solo hay a, e, i, l, m, n, o, p, r, s, t, u, L, N, R y los dígitos.
-      En cuanto Eliab avance a b/c/d/g/ñ o vocales acentuadas, Escribe se queda corto.
+- [ ] Más glifos: hoy hay a, e, i, l, m, n, o, p, r, s, t, u, ó, I, L, N, R y los
+      dígitos. En cuanto Eliab avance a b/c/d/g/ñ, Escribe se queda corto.
+- [ ] **Faltan las páginas de sílabas y oración de la hoja 3**, si existen. Hoy la hoja 3
+      solo tiene las 20 palabras de "Lectura de palabras".
 - [ ] Zona de adultos: reiniciar el progreso, ver qué ha hecho.
 - [ ] Accesibilidad: los botones son puro emoji sin `accessibilityLabel` y las fuentes
       son de tamaño fijo (ignoran Dynamic Type).

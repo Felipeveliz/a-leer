@@ -7,7 +7,7 @@ import CoreGraphics
 final class GlyphLibraryTests: XCTestCase {
 
     func testTodaLetraDeEscribeTieneGlifo() {
-        for palabra in AppData.palabrasEscribe {
+        for palabra in AppData.palabrasEscribe(en: Set(Hoja.allCases)) {
             for letra in palabra.texto {
                 XCTAssertNotNil(GlyphLibrary.glyph(for: letra),
                                 "falta el glifo de '\(letra)' (palabra '\(palabra.texto)')")
@@ -19,6 +19,14 @@ final class GlyphLibraryTests: XCTestCase {
         for d in AppData.digitosEscribe {
             XCTAssertNotNil(GlyphLibrary.glyph(for: d), "falta el glifo del \(d)")
         }
+    }
+
+    /// Las letras que estrenó la hoja 3: la "ó" de "limón" y la "I" de "Irma".
+    func testLosGlifosNuevosDeLaHojaTres() {
+        XCTAssertNotNil(GlyphLibrary.glyph(for: "ó"))
+        XCTAssertNotNil(GlyphLibrary.glyph(for: "I"))
+        XCTAssertEqual(GlyphLibrary.glyph(for: "ó")?.strokes.count, 2,
+                       "la ó son dos trazos: el círculo y el acento")
     }
 
     func testHayCuatroEjerciciosDeCalentamiento() {

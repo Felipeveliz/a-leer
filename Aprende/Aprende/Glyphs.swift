@@ -172,7 +172,19 @@ enum GlyphLibrary {
             GlyphStroke(points: line(pt(0.44, 0.38), pt(0.44, 0.88))),
         ])
 
+        // La "ó" de "limón": el mismo círculo de la "o" y el acento aparte.
+        // El acento va de arriba-derecha a abajo-izquierda, como se escribe.
+        g["ó"] = Glyph(name: "ó", width: 0.56, strokes: [
+            GlyphStroke(points: arc(c: pt(0.28, 0.63), rx: 0.25, ry: 0.25, from: -90, to: -450, n: 44)),
+            GlyphStroke(points: line(pt(0.40, 0.14), pt(0.22, 0.30), n: 8)),
+        ])
+
         // ---------- MAYÚSCULAS (para nombres propios) ----------
+        // La "I" de "Irma": un solo palito, como la enseñan en imprenta.
+        g["I"] = Glyph(name: "I", width: 0.18, strokes: [
+            GlyphStroke(points: line(pt(0.09, 0.10), pt(0.09, 0.88))),
+        ])
+
         g["L"] = Glyph(name: "L", width: 0.54, strokes: [
             stroke([line(pt(0.08, 0.10), pt(0.08, 0.88)),
                     line(pt(0.08, 0.88), pt(0.48, 0.88), n: 10)]),

@@ -3,26 +3,25 @@ import SwiftUI
 // MARK: - Lectura de palabras
 // Palabra aleatoria (sin repetir la anterior) con historial para volver atrás
 // y modo "separado" que colorea las sílabas, igual que la versión web.
+// Las hojas marcadas deciden de dónde salen las palabras.
 
 struct PalabrasView: View {
-    /// Historial de índices de `AppData.palabras` ya mostrados.
-    @State private var historial: [Int]
+    @ObservedObject private var hojas = HojaStore.shared
+
+    /// Historial de palabras ya mostradas, por texto. Se guarda el texto y no
+    /// el índice porque la lista cambia de tamaño al marcar o desmarcar hojas.
+    @State private var historial: [String] = []
     /// Posición actual dentro del historial.
-    @State private var pos: Int
-    /// Último índice aleatorio elegido (para no repetirlo).
-    @State private var ultimo: Int
+    @State private var pos = 0
     /// ¿La palabra está separada en sílabas?
     @State private var separado = false
 
-    init() {
-        // Al aparecer la vista ya hay una palabra elegida.
-        let primero = RandomPick.next(count: AppData.palabras.count, avoiding: nil)
-        _historial = State(initialValue: [primero])
-        _pos = State(initialValue: 0)
-        _ultimo = State(initialValue: primero)
-    }
+    private var disponibles: [Palabra] { AppData.palabras(en: hojas.seleccionadas) }
 
-    private var palabra: Palabra { AppData.palabras[historial[pos]] }
+    private var palabra: Palabra? {
+        guard historial.indices.contains(pos) else { return disponibles.first }
+        return disponibles.first { $0.texto == historial[pos] } ?? disponibles.first
+    }
 
     var body: some View {
         ScreenScaffold {
@@ -33,44 +32,52 @@ struct PalabrasView: View {
                 color: Palette.coral
             )
 
-            Card {
-                TagPill(text: palabra.grupo)
+            HojaPicker()
 
-                textoPalabra
-                    .font(.kid(96))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.2)
-                    .id("\(palabra.id)-\(separado)")   // animación "pop" al cambiar
-                    .transition(.scale.combined(with: .opacity))
+            if let palabra {
+                Card {
+                    TagPill(text: palabra.grupo)
 
-                HintText(
-                    text: separado
-                        ? "Lee sílaba por sílaba: " + palabra.silabas.joined(separator: " · ")
-                        : "Lee la palabra en voz alta 🙂"
-                )
-            }
+                    textoPalabra(palabra)
+                        .font(.kid(96))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.2)
+                        .id("\(palabra.id)-\(separado)")   // animación "pop" al cambiar
+                        .transition(.scale.combined(with: .opacity))
 
-            BigButton(
-                title: separado ? "🔗 Juntar sílabas" : "✂️ Separar sílabas",
-                color: Palette.blue
-            ) {
-                withAnimation(.easeOut(duration: 0.25)) { separado.toggle() }
-            }
+                    HintText(
+                        text: separado
+                            ? "Lee sílaba por sílaba: " + palabra.silabas.joined(separator: " · ")
+                            : "Lee la palabra en voz alta 🙂"
+                    )
+                }
 
-            BigButton(title: "🔀 Otra palabra", color: Palette.green) {
-                withAnimation(.easeOut(duration: 0.25)) { siguientePalabra() }
-            }
+                BigButton(
+                    title: separado ? "🔗 Juntar sílabas" : "✂️ Separar sílabas",
+                    color: Palette.blue
+                ) {
+                    withAnimation(.easeOut(duration: 0.25)) { separado.toggle() }
+                }
 
-            BigButton(title: "⬅️ Palabra anterior", color: Palette.gray, isEnabled: pos > 0) {
-                withAnimation(.easeOut(duration: 0.25)) { palabraAnterior() }
+                BigButton(title: "🔀 Otra palabra", color: Palette.green) {
+                    withAnimation(.easeOut(duration: 0.25)) { siguientePalabra() }
+                }
+
+                BigButton(title: "⬅️ Palabra anterior", color: Palette.gray, isEnabled: pos > 0) {
+                    withAnimation(.easeOut(duration: 0.25)) { palabraAnterior() }
+                }
+            } else {
+                SinContenido(que: "palabras")
             }
         }
+        .onAppear { if historial.isEmpty { reiniciar() } }
+        .onChange(of: hojas.clave) { reiniciar() }
     }
 
     // MARK: Texto de la palabra (junta o separada)
 
     /// Un solo `Text` compuesto: así el ajuste de tamaño escala TODO por igual.
-    private var textoPalabra: Text {
+    private func textoPalabra(_ palabra: Palabra) -> Text {
         guard separado else {
             return Text(palabra.texto).foregroundStyle(Palette.blue)
         }
@@ -84,16 +91,26 @@ struct PalabrasView: View {
         return resultado
     }
 
-    // MARK: Lógica (igual que la web)
+    // MARK: Lógica
+
+    /// Al cambiar de hojas se empieza de cero: el historial viejo puede tener
+    /// palabras que ya no están en las hojas marcadas.
+    private func reiniciar() {
+        separado = false
+        pos = 0
+        guard !disponibles.isEmpty else { historial = []; return }
+        historial = [disponibles[RandomPick.next(count: disponibles.count, avoiding: nil)].texto]
+    }
 
     private func siguientePalabra() {
+        guard !disponibles.isEmpty else { return }
         if pos < historial.count - 1 {
             // Si volvimos atrás, avanzamos por el historial ya visto.
             pos += 1
         } else {
-            let i = RandomPick.next(count: AppData.palabras.count, avoiding: ultimo)
-            ultimo = i
-            historial.append(i)
+            let ultimo = historial.last.flatMap { t in disponibles.firstIndex { $0.texto == t } }
+            let i = RandomPick.next(count: disponibles.count, avoiding: ultimo)
+            historial.append(disponibles[i].texto)
             pos = historial.count - 1
         }
         separado = false

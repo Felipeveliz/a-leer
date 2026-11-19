@@ -8,23 +8,45 @@ final class AppDataTests: XCTestCase {
 
     // MARK: Escribe: la lista de palabras
 
+    private let todasLasHojas = Set(Hoja.allCases)
+
     func testPalabrasEscribeTieneExactamenteLasMismasPalabras() {
-        let enEscribe = Set(AppData.palabrasEscribe.map(\.texto))
+        let enEscribe = Set(AppData.palabrasEscribe(en: todasLasHojas).map(\.texto))
         let todas = Set(AppData.palabras.map(\.texto))
         XCTAssertEqual(enEscribe, todas,
                        "sobra o falta alguna palabra en palabrasEscribe")
-        XCTAssertEqual(AppData.palabrasEscribe.count, AppData.palabras.count)
     }
 
     func testPalabrasEscribeNoRepite() {
-        let textos = AppData.palabrasEscribe.map(\.texto)
-        XCTAssertEqual(Set(textos).count, textos.count, "hay una palabra duplicada")
+        for hojas in [Set([Hoja.dos]), Set([Hoja.tres]), todasLasHojas] {
+            let textos = AppData.palabrasEscribe(en: hojas).map(\.texto)
+            XCTAssertEqual(Set(textos).count, textos.count,
+                           "hay una palabra duplicada con \(hojas)")
+        }
+    }
+
+    /// Una palabra que está en las dos hojas ("pelota", "rata") sale una sola vez
+    /// cuando las dos están marcadas, pero tiene que salir si se marca cualquiera
+    /// de las dos por separado.
+    func testPalabrasEnDosHojasSalenEnAmbasYSinDuplicar() {
+        let enDosHojas = AppData.palabras.filter { $0.hojas.count > 1 }.map(\.texto)
+        XCTAssertFalse(enDosHojas.isEmpty, "se esperaba al menos una palabra compartida")
+        for texto in enDosHojas {
+            for hoja in Hoja.allCases {
+                let textos = AppData.palabrasEscribe(en: [hoja]).map(\.texto)
+                XCTAssertTrue(textos.contains(texto),
+                              "'\(texto)' debería estar en la hoja \(hoja.rawValue)")
+            }
+            let juntas = AppData.palabrasEscribe(en: todasLasHojas).map(\.texto)
+            XCTAssertEqual(juntas.filter { $0 == texto }.count, 1,
+                           "'\(texto)' sale dos veces al marcar las dos hojas")
+        }
     }
 
     /// El síntoma exacto del bug: "remo" faltaba en la lista de orden y el bucle de
     /// respaldo lo empujaba al final, después de "maleta".
     func testRemoNoCaeAlFinal() {
-        let textos = AppData.palabrasEscribe.map(\.texto)
+        let textos = AppData.palabrasEscribe(en: [.dos]).map(\.texto)
         let remo = textos.firstIndex(of: "remo")
         XCTAssertNotNil(remo)
         XCTAssertLessThan(remo!, textos.count - 1,
@@ -32,18 +54,47 @@ final class AppDataTests: XCTestCase {
     }
 
     /// La promesa de la lista es "de la más fácil de trazar a la más difícil":
-    /// las de tres sílabas van al final.
-    func testLasPalabrasLargasVanAlFinal() {
-        let largas = AppData.palabrasEscribe.enumerated()
-            .filter { $0.element.silabas.count >= 3 }
-            .map(\.offset)
-        XCTAssertFalse(largas.isEmpty)
-        let primeraLarga = largas.min()!
-        let ultimaCorta = AppData.palabrasEscribe.enumerated()
-            .filter { $0.element.silabas.count < 3 }
-            .map(\.offset).max()!
-        XCTAssertGreaterThan(primeraLarga, ultimaCorta,
-                             "una palabra de 3 sílabas se coló antes de las cortas")
+    /// dentro de cada hoja, las largas van al final.
+    func testLasPalabrasLargasVanAlFinalDeCadaHoja() {
+        for hoja in Hoja.allCases {
+            let lista = AppData.palabrasEscribe(en: [hoja])
+            let largas = lista.enumerated().filter { $0.element.silabas.count >= 3 }.map(\.offset)
+            let cortas = lista.enumerated().filter { $0.element.silabas.count < 3 }.map(\.offset)
+            guard let primeraLarga = largas.min(), let ultimaCorta = cortas.max() else { continue }
+            XCTAssertGreaterThan(primeraLarga, ultimaCorta,
+                                 "en la hoja \(hoja.rawValue) una palabra larga se coló antes de las cortas")
+        }
+    }
+
+    // MARK: Hojas
+
+    /// La hoja 3 es la foto que trajo Eliab: "Lectura de palabras", 20 palabras.
+    func testLaHojaTresTieneVeintePalabras() {
+        XCTAssertEqual(AppData.palabras(en: [.tres]).count, 20)
+    }
+
+    func testCadaPalabraPerteneceAAlgunaHoja() {
+        for p in AppData.palabras {
+            XCTAssertFalse(p.hojas.isEmpty, "'\(p.texto)' no está en ninguna hoja")
+        }
+    }
+
+    /// Filtrar por todas las hojas no puede perder nada.
+    func testFiltrarPorTodasLasHojasDevuelveTodo() {
+        XCTAssertEqual(AppData.palabras(en: todasLasHojas).count, AppData.palabras.count)
+        XCTAssertEqual(AppData.silabas(en: todasLasHojas).count, AppData.silabas.count)
+        XCTAssertEqual(AppData.oracion(en: todasLasHojas).count, AppData.oracion.count)
+    }
+
+    /// Cada orden de Escribe tiene que cubrir exactamente su hoja: si sobra o
+    /// falta una entrada, `palabrasEscribe` dispara `assertionFailure`.
+    func testElOrdenDeCadaHojaCubreSuHoja() {
+        for hoja in Hoja.allCases {
+            let enLaHoja = Set(AppData.palabras.filter { $0.hojas.contains(hoja) }.map(\.texto))
+            let enElOrden = Set(AppData.ordenEscribe[hoja] ?? [])
+            XCTAssertEqual(enElOrden, enLaHoja,
+                           "el orden de la hoja \(hoja.rawValue) no cuadra con sus palabras")
+        }
     }
 
     func testTextoDeUnaPalabraEsSusSilabasUnidas() {
@@ -93,8 +144,9 @@ final class AppDataTests: XCTestCase {
     }
 
     func testOracionSilabasVanEnOrden() {
-        XCTAssertEqual(AppData.oracionSilabas, AppData.oracion.flatMap(\.silabas))
-        XCTAssertFalse(AppData.oracionSilabas.isEmpty)
+        let todas = Set(Hoja.allCases)
+        XCTAssertEqual(AppData.oracionSilabas(en: todas), AppData.oracion.flatMap(\.silabas))
+        XCTAssertFalse(AppData.oracionSilabas(en: todas).isEmpty)
     }
 
     // MARK: Sílabas

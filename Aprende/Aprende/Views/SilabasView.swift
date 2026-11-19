@@ -2,16 +2,15 @@ import SwiftUI
 
 // MARK: - Lectura de sílabas
 // Muestra una sílaba aleatoria (sin repetir la anterior) para leerla en voz alta.
+// Las hojas marcadas deciden de dónde salen.
 
 struct SilabasView: View {
-    /// Índice de la sílaba actual; al aparecer ya hay una elegida.
-    @State private var indice: Int
+    @ObservedObject private var hojas = HojaStore.shared
 
-    init() {
-        _indice = State(initialValue: RandomPick.next(count: AppData.silabas.count, avoiding: nil))
-    }
+    /// Índice de la sílaba actual dentro de `disponibles`.
+    @State private var indice = 0
 
-    private var silaba: Silaba { AppData.silabas[indice] }
+    private var disponibles: [Silaba] { AppData.silabas(en: hojas.seleccionadas) }
 
     var body: some View {
         ScreenScaffold {
@@ -22,26 +21,45 @@ struct SilabasView: View {
                 color: Palette.purple
             )
 
-            Card {
-                TagPill(text: silaba.grupo)
+            HojaPicker()
 
-                Text(silaba.texto)
-                    .font(.kid(110))
-                    .foregroundStyle(Palette.blue)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.3)
-                    .id(indice)   // reinicia la animación "pop" al cambiar
-                    .transition(.scale.combined(with: .opacity))
+            if let silaba = silabaActual {
+                Card {
+                    TagPill(text: silaba.grupo)
 
-                HintText(text: "Lee la sílaba en voz alta 🙂")
-            }
+                    Text(silaba.texto)
+                        .font(.kid(110))
+                        .foregroundStyle(Palette.blue)
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.3)
+                        .id(silaba.id)   // reinicia la animación "pop" al cambiar
+                        .transition(.scale.combined(with: .opacity))
 
-            BigButton(title: "🔀 Otra sílaba", color: Palette.green) {
-                withAnimation(.easeOut(duration: 0.25)) {
-                    indice = RandomPick.next(count: AppData.silabas.count, avoiding: indice)
+                    HintText(text: "Lee la sílaba en voz alta 🙂")
                 }
+
+                BigButton(title: "🔀 Otra sílaba", color: Palette.green) {
+                    withAnimation(.easeOut(duration: 0.25)) {
+                        indice = RandomPick.next(count: disponibles.count, avoiding: indice)
+                    }
+                }
+            } else {
+                SinContenido(que: "sílabas")
             }
         }
+        .onAppear { empezarEnUnaAlAzar() }
+        .onChange(of: hojas.clave) { empezarEnUnaAlAzar() }
+    }
+
+    private var silabaActual: Silaba? {
+        disponibles.indices.contains(indice) ? disponibles[indice] : disponibles.first
+    }
+
+    /// Al entrar, y cada vez que cambian las hojas, se empieza por una al azar
+    /// y se deja el índice dentro de rango.
+    private func empezarEnUnaAlAzar() {
+        guard !disponibles.isEmpty else { indice = 0; return }
+        indice = RandomPick.next(count: disponibles.count, avoiding: nil)
     }
 }
 

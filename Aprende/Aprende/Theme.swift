@@ -133,6 +133,58 @@ struct BigButton: View {
     }
 }
 
+/// Las dos casillas para elegir con qué hojas de la escuela practicar.
+/// Va en las cuatro pantallas de práctica y todas comparten la misma selección.
+struct HojaPicker: View {
+    @ObservedObject private var hojas = HojaStore.shared
+
+    var body: some View {
+        HStack(spacing: 10) {
+            ForEach(Hoja.allCases) { hoja in
+                let marcada = hojas.seleccionadas.contains(hoja)
+                Button {
+                    withAnimation(.easeOut(duration: 0.2)) { hojas.alterna(hoja) }
+                } label: {
+                    HStack(spacing: 8) {
+                        Image(systemName: marcada ? "checkmark.square.fill" : "square")
+                            .font(.system(size: 20, weight: .bold))
+                        Text(hoja.nombre)
+                            .font(.kid(17))
+                    }
+                    .foregroundStyle(marcada ? .white : Palette.gray)
+                    .padding(.vertical, 10)
+                    .padding(.horizontal, 16)
+                    .background(
+                        Capsule()
+                            .fill(marcada ? Palette.purple : Palette.card)
+                            .shadow(color: .black.opacity(0.10), radius: 6, y: 3)
+                    )
+                }
+                .buttonStyle(PressDownButtonStyle())
+                .accessibilityLabel(marcada ? "\(hoja.nombre), marcada" : "\(hoja.nombre), sin marcar")
+            }
+        }
+    }
+}
+
+/// Lo que se ve cuando la hoja elegida no tiene nada de esta pantalla.
+/// Pasa, por ejemplo, con la oración: solo está en la hoja 2.
+struct SinContenido: View {
+    let que: String
+
+    var body: some View {
+        Card {
+            Text("📄")
+                .font(.system(size: 52))
+            Text("Esta hoja no trae \(que).")
+                .font(.kid(20))
+                .foregroundStyle(Palette.ink)
+                .multilineTextAlignment(.center)
+            HintText(text: "Marca la otra hoja aquí arriba 👆")
+        }
+    }
+}
+
 /// Deshace el último trazo del lienzo libre. Cuadrado y angosto para que
 /// quepa al lado de "Borrar" y "¡Listo!" incluso en iPhone.
 struct UndoButton: View {
