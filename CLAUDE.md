@@ -331,8 +331,13 @@ Apple; "Resubmit" se activa cuando cambias el build o metadata que necesita volv
 revisarse.
 
 La app sigue siendo gratis en 175 países, 4+, Data Not Collected y con **salida
-automática**. El build 1.0 (1) está en TestFlight como "Ready to Submit"; no hay grupo
-de pruebas internas creado todavía.
+automática**.
+
+**TestFlight** (montado el 19 de noviembre): grupo interno **"Pruebas"** con distribución
+automática y Felipe como único tester. El build 1.0 (1) pasó de "Ready to Submit" a
+**"Ready to Test"**. Subir un build no invita a nadie por sí solo: hasta que no existe un
+grupo con testers dentro, TestFlight no manda ningún correo. Con la distribución
+automática activada, los builds nuevos le llegan solos.
 
 Lo aprendido antes, que sigue valiendo:
 - Las capturas de iPhone tienen que ser **1206 × 2622** (6.1"/6.3"). Las de 1320 × 2868
@@ -342,7 +347,6 @@ Lo aprendido antes, que sigue valiendo:
 - Las notas del revisor en **inglés**: las lee App Review, no el usuario.
 
 ### Pendientes del deploy
-- [ ] Grabar el vídeo en un iPad o iPhone físico y pegar el enlace en las notas.
-- [ ] Reenviar a revisión.
+- [ ] Si Apple vuelve a pedir el vídeo: instalar desde TestFlight y grabarlo en el iPad.
 - [ ] Más capturas de iPad: solo hay la de inicio.
 - [ ] Subir `CURRENT_PROJECT_VERSION` antes de cada build nuevo.
