@@ -66,9 +66,9 @@ struct PalabrasView: View {
                 BigButton(title: "⬅️ Palabra anterior", color: Palette.gray, isEnabled: pos > 0) {
                     withAnimation(.easeOut(duration: 0.25)) { palabraAnterior() }
                 }
-            } else {
-                SinContenido(que: "palabras")
             }
+            // No hay rama vacía: las dos hojas traen palabras y la selección
+            // nunca se queda sin ninguna marcada.
         }
         .onAppear { if historial.isEmpty { reiniciar() } }
         .onChange(of: hojas.clave) { reiniciar() }

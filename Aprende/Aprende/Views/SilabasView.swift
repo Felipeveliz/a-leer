@@ -10,7 +10,16 @@ struct SilabasView: View {
     /// Índice de la sílaba actual dentro de `disponibles`.
     @State private var indice = 0
 
-    private var disponibles: [Silaba] { AppData.silabas(en: hojas.seleccionadas) }
+    /// Las sílabas de las hojas marcadas. Si esas hojas no traen ninguna —la 3
+    /// solo trae palabras—, se enseñan todas en vez de dejar la pantalla muerta:
+    /// a un niño que entra a "Lectura de sílabas" hay que darle sílabas.
+    private var disponibles: [Silaba] {
+        let deLasHojas = AppData.silabas(en: hojas.seleccionadas)
+        return deLasHojas.isEmpty ? AppData.silabas : deLasHojas
+    }
+
+    /// ¿Se está enseñando el respaldo porque la hoja marcada no trae sílabas?
+    private var esRespaldo: Bool { AppData.silabas(en: hojas.seleccionadas).isEmpty }
 
     var body: some View {
         ScreenScaffold {
@@ -22,6 +31,10 @@ struct SilabasView: View {
             )
 
             HojaPicker()
+
+            if esRespaldo {
+                AvisoRespaldo(hojas: hojas.seleccionadas, que: "sílabas")
+            }
 
             if let silaba = silabaActual {
                 Card {
@@ -43,8 +56,6 @@ struct SilabasView: View {
                         indice = RandomPick.next(count: disponibles.count, avoiding: indice)
                     }
                 }
-            } else {
-                SinContenido(que: "sílabas")
             }
         }
         .onAppear { empezarEnUnaAlAzar() }

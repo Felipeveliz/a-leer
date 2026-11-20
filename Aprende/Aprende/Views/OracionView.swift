@@ -40,9 +40,11 @@ struct OracionView: View {
 
             HojaPicker()
 
-            if oracion.isEmpty {
-                SinContenido(que: "oración")
-            } else {
+            if esRespaldo {
+                AvisoRespaldo(hojas: hojas.seleccionadas, que: "oración")
+            }
+
+            if !oracion.isEmpty {
                 pestanas
 
                 switch pestana {
@@ -74,9 +76,18 @@ struct OracionView: View {
         }
     }
 
-    /// La oración de las hojas marcadas. Hoy solo la hoja 2 trae oración.
-    private var oracion: [PalabraOracion] { AppData.oracion(en: hojas.seleccionadas) }
-    private var silabas: [String] { AppData.oracionSilabas(en: hojas.seleccionadas) }
+    /// La oración de las hojas marcadas. Hoy solo la hoja 2 trae oración, así que
+    /// si la hoja elegida no la tiene se enseña la que hay: quien entra a "Leer una
+    /// oración" viene a leer una oración, no a que le digan que no hay.
+    private var oracion: [PalabraOracion] {
+        let deLasHojas = AppData.oracion(en: hojas.seleccionadas)
+        return deLasHojas.isEmpty ? AppData.oracion : deLasHojas
+    }
+
+    private var silabas: [String] { oracion.flatMap(\.silabas) }
+
+    /// ¿Se está enseñando el respaldo porque la hoja marcada no trae oración?
+    private var esRespaldo: Bool { AppData.oracion(en: hojas.seleccionadas).isEmpty }
 
     // MARK: Pestañas tipo pastilla
 

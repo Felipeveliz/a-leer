@@ -167,21 +167,34 @@ struct HojaPicker: View {
     }
 }
 
-/// Lo que se ve cuando la hoja elegida no tiene nada de esta pantalla.
-/// Pasa, por ejemplo, con la oración: solo está en la hoja 2.
-struct SinContenido: View {
+/// Aviso pequeño cuando la hoja marcada no trae este tipo de contenido y se
+/// está enseñando el de las demás. No es un error: la pantalla sigue siendo
+/// útil, solo explica de dónde sale lo que se ve.
+struct AvisoRespaldo: View {
+    let hojas: Set<Hoja>
     let que: String
 
+    private var nombres: String {
+        let ordenadas = hojas.sorted { $0.rawValue < $1.rawValue }.map(\.nombre)
+        guard ordenadas.count > 1 else { return ordenadas.first ?? "" }
+        return ordenadas.dropLast().joined(separator: ", ") + " y " + ordenadas[ordenadas.count - 1]
+    }
+
     var body: some View {
-        Card {
-            Text("📄")
-                .font(.system(size: 52))
-            Text("Esta hoja no trae \(que).")
-                .font(.kid(20))
-                .foregroundStyle(Palette.ink)
-                .multilineTextAlignment(.center)
-            HintText(text: "Marca la otra hoja aquí arriba 👆")
+        HStack(spacing: 10) {
+            Text("📄").font(.system(size: 22))
+            Text("\(nombres) no trae \(que), así que estas son de las otras.")
+                .font(.kid(15, .semibold))
+                .foregroundStyle(Color(hex: 0x6B4E00))
+                .fixedSize(horizontal: false, vertical: true)
+            Spacer(minLength: 0)
         }
+        .padding(.vertical, 12)
+        .padding(.horizontal, 16)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Palette.yellow.opacity(0.55))
+        )
     }
 }
 

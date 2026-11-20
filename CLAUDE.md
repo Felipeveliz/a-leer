@@ -240,9 +240,12 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
 - **Las casillas de hoja van en cuatro pantallas** (las tres de Español y la lista de
   palabras de Escribe), compartiendo una sola selección. Por defecto están las dos
   marcadas. Son casillas, no botones de opción: se puede practicar con las dos a la vez.
-- **Hoy la hoja 3 solo trae palabras.** Si alguien marca solo la hoja 3, Sílabas y
-  Oración enseñan `SinContenido` en vez de quedarse vacías. Cuando aparezcan las páginas
-  de sílabas y oración de la hoja 3, se etiquetan y ya.
+- **Hoy la hoja 3 solo trae palabras.** Si se marca solo la hoja 3, Sílabas y Oración
+  **enseñan las de la hoja 2** con un aviso amarillo (`AvisoRespaldo`) que explica de
+  dónde salen. Nunca una pantalla muerta: quien entra a "Lectura de sílabas" viene a
+  leer sílabas. Antes salía un mensaje de "esta hoja no trae sílabas" y Felipe lo leyó
+  como un error de la app, con razón. Cuando aparezcan las páginas de sílabas y oración
+  de la hoja 3, se etiquetan y el respaldo deja de usarse solo.
 - **Sin red, sin cuentas, sin analítica.** Lo único que persiste es `UserDefaults`.
 
 ## 6. Convenciones de código
