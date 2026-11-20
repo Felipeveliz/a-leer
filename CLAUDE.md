@@ -363,8 +363,16 @@ la cancelación.
 **El color de la lista de apps es el indicador fiable**: rojo = parada, amarillo = en
 cola. Si después de una acción no se pone amarilla, no está en revisión.
 
+**Decisión de Felipe (19 de noviembre):** los arreglos van **solo a TestFlight**;
+producción espera a que Apple resuelva la submission pendiente, que lleva la **build
+2**. Esa build todavía tiene el mensaje de hoja vacía y la "m" que no acepta el trazo
+continuo. Se avisó del riesgo de 2.1 y aun así se mantiene: **no cambiar el build de la
+revisión sin que Felipe lo pida.** Cuando aprueben la 1.0, la siguiente versión sale
+con la build más nueva.
+
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
-único tester. Las builds 1 y 2 están en "Testing". Un build recién procesado aparece
+único tester. Builds 1 a 5 en "Testing"; la **5** es la buena (hojas + respaldo +
+trazo continuo + modelo dibujado). Un build recién procesado aparece
 como **"Missing Compliance"** y no se distribuye hasta contestarlo; desde la build 3 ya
 no debería pasar, porque el proyecto declara
 `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO`.
