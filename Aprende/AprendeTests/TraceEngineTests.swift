@@ -107,6 +107,49 @@ final class TraceEngineTests: XCTestCase {
         XCTAssertFalse(r.passed)
     }
 
+    // MARK: Escribir sin despegar el lápiz
+
+    /// Un niño escribe la "m" de un tirón: baja el palito, vuelve a subir por él
+    /// y de ahí salen las dos montañitas. La app define la "m" en tres trazos,
+    /// y antes rechazaba ese movimiento por completo.
+    func testLaEmeDeUnTironCuadraConSusTresTrazos() {
+        guard let eme = GlyphLibrary.glyph(for: "m") else { return XCTFail("sin glifo de m") }
+        let tramos = eme.scaledStrokes(height: alto)
+        XCTAssertEqual(tramos.count, 3, "la m se define en tres trazos")
+
+        let objetivo = TraceEngine.joinStrokes(tramos)
+        let r = TraceEngine.validate(user: objetivo, target: objetivo, height: alto, isDot: false)
+        XCTAssertTrue(r.passed, "el movimiento continuo de la m tiene que valer")
+    }
+
+    /// El tramo de vuelta importa: sin él, el objetivo unido es mucho más corto
+    /// que lo que el niño dibuja y la validación falla por longitud.
+    func testUnirTrazosMeteElRecorridoDeVuelta() {
+        let a = [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 100)]
+        let b = [CGPoint(x: 0, y: 50), CGPoint(x: 50, y: 50)]
+        let unido = TraceEngine.joinStrokes([a, b])
+
+        XCTAssertEqual(unido.first!, a.first!)
+        XCTAssertEqual(unido.last!, b.last!)
+        // 100 de bajada + 50 de vuelta + 50 de travesía
+        XCTAssertEqual(TraceEngine.pathLength(unido), 200, accuracy: 1)
+    }
+
+    func testUnirUnSoloTrazoLoDejaIgual() {
+        let a = [CGPoint(x: 0, y: 0), CGPoint(x: 0, y: 100)]
+        XCTAssertEqual(TraceEngine.joinStrokes([a]), a)
+    }
+
+    /// Pero un movimiento de un tirón que no se parece a la letra sigue fallando.
+    func testUnTironQueNoEsLaLetraFalla() {
+        guard let eme = GlyphLibrary.glyph(for: "m") else { return XCTFail("sin glifo de m") }
+        let objetivo = TraceEngine.joinStrokes(eme.scaledStrokes(height: alto))
+        let rayaHorizontal = linea(desde: CGPoint(x: 20, y: 200), hasta: CGPoint(x: 260, y: 200))
+        let r = TraceEngine.validate(user: rayaHorizontal, target: objetivo,
+                                     height: alto, isDot: false)
+        XCTAssertFalse(r.passed)
+    }
+
     // MARK: El punto de la "i"
 
     func testPuntoConToqueCortoPasa() {

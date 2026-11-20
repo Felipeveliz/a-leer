@@ -155,6 +155,10 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 - **`TraceEngine`** — valida el trazo del niño contra el del glifo: inicio, final, forma
   (distancia media punto a punto tras re-muestrear a 48 puntos) y longitud. Las
   tolerancias son **generosas a propósito**; es pedagogía, no caligrafía.
+  `joinStrokes` une varios trazos del glifo en un camino continuo **metiendo el
+  recorrido de vuelta** entre uno y otro: al escribir la "m" sin despegar el lápiz se
+  vuelve a subir por el palito, y ese tramo está en el trazo del niño aunque no esté en
+  la definición del glifo.
 - **`TraceCanvasView`** — `UIViewRepresentable` sobre `PKCanvasView`. Captura la tinta y
   entrega los puntos de cada trazo. Soporta borrar (`clearTrigger`) y deshacer el último
   trazo (`undoTrigger`), ambos por contador que se incrementa.
@@ -229,6 +233,11 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   enseña 3 segundos. La idea es recordar, no copiar.
 - **Al pulsar "¡Listo!" el trazo del niño NO se borra.** Se queda en el lienzo junto al
   modelo para que pueda compararlos. Es el punto pedagógico de la fase.
+- **Un movimiento del niño puede valer por varios trazos del glifo.** La "m" está
+  definida en tres trazos, pero se escribe de un tirón; `LetterTraceView` prueba el
+  trazo suelto y luego va uniendo los siguientes. Exigir que levante el lápiz entre
+  parte y parte es exigir algo que nadie hace al escribir. El punto de la "i" es la
+  excepción: va aparte y no se une a nada.
 - **Feedback amable, nunca tache rojo.** Un fallo da "¡Casi! Otra vez 🙂", háptica suave y
   limpia el lienzo; a los 3 intentos se vuelve a demostrar el trazo.
 - **Las tolerancias de `TraceEngine` son generosas a propósito.** Se valida dirección y

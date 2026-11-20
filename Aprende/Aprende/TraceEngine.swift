@@ -71,6 +71,31 @@ enum TraceEngine {
                            startOK: startOK, meanDistance: mean)
     }
 
+    /// Une varios trazos del glifo en un solo camino continuo, metiendo el
+    /// recorrido que hace el lápiz de uno al siguiente.
+    ///
+    /// Es lo que de verdad dibuja un niño cuando escribe la "m" sin despegar el
+    /// lápiz: baja el palito, **vuelve a subir por él** y de ahí sale la primera
+    /// montañita. Ese tramo de vuelta no está en la definición del glifo, pero sí
+    /// está en el trazo del niño, así que hay que añadirlo o las longitudes no
+    /// cuadran y el trazo bueno se rechaza.
+    static func joinStrokes(_ tramos: [[CGPoint]]) -> [CGPoint] {
+        var out: [CGPoint] = []
+        for tramo in tramos {
+            guard let primero = tramo.first else { continue }
+            if let ultimo = out.last, dist(ultimo, primero) > 0.001 {
+                let n = 10
+                for i in 1..<n {
+                    let t = CGFloat(i) / CGFloat(n)
+                    out.append(CGPoint(x: ultimo.x + (primero.x - ultimo.x) * t,
+                                       y: ultimo.y + (primero.y - ultimo.y) * t))
+                }
+            }
+            out.append(contentsOf: tramo)
+        }
+        return out
+    }
+
     // MARK: Utilidades geométricas
 
     static func dist(_ a: CGPoint, _ b: CGPoint) -> CGFloat {

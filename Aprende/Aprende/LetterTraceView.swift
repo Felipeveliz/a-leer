@@ -196,17 +196,29 @@ struct LetterTraceView: View {
 
     private func handleStroke(_ points: [CGPoint], strokes: [[CGPoint]], height: CGFloat) {
         guard !glyphDone, completed < strokes.count else { return }
-        let result = TraceEngine.validate(
-            user: points,
-            target: strokes[completed],
-            height: height,
-            isDot: glyph.strokes[completed].isDot
-        )
 
-        if result.passed {
+        // El niño no levanta el lápiz: la "m" la hace de un tirón, no en tres
+        // tiempos. Se prueba primero el trazo suelto y, si no cuadra, se van
+        // uniendo los siguientes hasta ver si el movimiento cubre varios.
+        guard let hasta = primerTramoQueCuadra(points, strokes: strokes, height: height) else {
+            UINotificationFeedbackGenerator().notificationOccurred(.warning)
+            attempts += 1
+            withAnimation { retryVisible = true }
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
+                clearTrigger += 1
+                withAnimation { retryVisible = false }
+            }
+            if attempts >= 3 {
+                attempts = 0
+                startDemo(after: 0.9)
+            }
+            return
+        }
+
+        do {
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             withAnimation(.easeOut(duration: 0.2)) {
-                completed += 1
+                completed = hasta + 1
                 retryVisible = false
             }
             attempts = 0
@@ -221,18 +233,31 @@ struct LetterTraceView: View {
             } else if showsDemo {
                 startDemo(after: 0.3)
             }
-        } else {
-            UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            attempts += 1
-            withAnimation { retryVisible = true }
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
-                clearTrigger += 1
-                withAnimation { retryVisible = false }
-            }
-            if attempts >= 3 {
-                attempts = 0
-                startDemo(after: 0.9)
-            }
         }
+    }
+
+    /// Índice del último trazo del glifo que cubre este movimiento, o `nil` si
+    /// no cuadra con ninguno. Prueba primero el trazo suelto y luego va uniendo
+    /// los siguientes, porque un solo movimiento del niño puede valer por
+    /// varios trazos de la definición.
+    private func primerTramoQueCuadra(_ points: [CGPoint], strokes: [[CGPoint]],
+                                      height: CGFloat) -> Int? {
+        let empiezaEnPunto = glyph.strokes[completed].isDot
+
+        for fin in completed..<strokes.count {
+            // El punto de la "i" es un toque aparte: ni se une a lo anterior ni
+            // arrastra lo que venga después.
+            if fin > completed && (empiezaEnPunto || glyph.strokes[fin].isDot) { break }
+
+            let objetivo = fin == completed
+                ? strokes[completed]
+                : TraceEngine.joinStrokes(Array(strokes[completed...fin]))
+
+            let r = TraceEngine.validate(user: points, target: objetivo,
+                                         height: height,
+                                         isDot: fin == completed && empiezaEnPunto)
+            if r.passed { return fin }
+        }
+        return nil
     }
 }
