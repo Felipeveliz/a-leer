@@ -79,7 +79,7 @@ struct PalabraEscribeFlowView: View {
     private var encabezadoModelo: some View {
         HStack {
             if fase != .tuSolo || modeloVisible || terminado {
-                modeloTexto
+                modeloDibujado
                     .padding(.vertical, 8)
                     .padding(.horizontal, 16)
                     .background(
@@ -103,19 +103,12 @@ struct PalabraEscribeFlowView: View {
         }
     }
 
-    /// La palabra modelo en gris; en fase 1 la letra actual en coral y negrita.
-    private var modeloTexto: Text {
-        var t = Text("")
-        for (i, ch) in Array(letras.enumerated()) {
-            var parte = Text(String(ch))
-            if fase == .letras && i == actual {
-                parte = parte.foregroundStyle(Palette.coral).fontWeight(.heavy)
-            } else {
-                parte = parte.foregroundStyle(Palette.gray)
-            }
-            t = t + parte
+    /// La palabra modelo, dibujada con los mismos trazos que el niño tiene que
+    /// hacer (ver `GlyphText`). En fase 1 la letra actual va en coral.
+    private var modeloDibujado: some View {
+        GlyphText(texto: palabra.texto, alto: 34) { i in
+            fase == .letras && i == actual ? Palette.coral : Palette.gray
         }
-        return t.font(.kid(30))
     }
 
     /// Muestra el modelo 3 segundos y lo vuelve a ocultar.
@@ -244,13 +237,13 @@ struct PalabraEscribeFlowView: View {
                 )
                 .frame(width: ancho, height: alto)
             } else {
-                // Las demás solo acompañan. Antes eran LetterTraceView
-                // deshabilitadas: un PKCanvasView y una guía punteada por letra
-                // para algo que nadie puede tocar.
-                Text(String(ch))
-                    .font(.kid(alto * 0.76))
-                    .foregroundStyle(i < actual ? acento : Palette.grayLight)
-                    .frame(width: ancho, height: alto)
+                // Las demás solo acompañan, pero con los trazos del glifo: si la
+                // letra ya lograda se dibujara con la fuente, el niño vería una
+                // forma distinta de la que acaba de trazar.
+                GlyphText(texto: String(ch), alto: alto) { _ in
+                    i < actual ? acento : Palette.grayLight
+                }
+                .frame(width: ancho, height: alto)
             }
         } else {
             // Sin glifo (no debería pasar): se muestra sólida y se salta.

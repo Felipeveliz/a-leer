@@ -167,6 +167,10 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
   se convierta en scroll.
 - **`LetterTraceView`** — junta glifo + guías + demo animada + lienzo + validación.
   Es el componente central del módulo Escribe.
+- **`GlyphText`** — dibuja una palabra con los trazos de `GlyphLibrary` en vez de con
+  la fuente. En Escribe el modelo, las letras ya logradas y la lista usan esto, no
+  `Text`: la fuente del sistema escribe la "a" de dos pisos y lo que el niño aprende a
+  trazar es la de bola y palito. Enseñarle una forma y pedirle la otra lo confunde.
 - **`Theme.swift`** — paleta, tipografía redondeada y los componentes compartidos
   (`Card`, `MenuCard`, `BigButton`, `UndoButton`, `TagPill`, `HintText`, `ScreenHeader`,
   `StarBadge`, `ScreenScaffold`).
@@ -199,6 +203,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
         ├── LetterTraceView.swift  Glifo guiado: guías, demo, validación
         ├── ProgressStore.swift    Estrellas en UserDefaults
         ├── HojaStore.swift         Hojas marcadas, en UserDefaults
+        ├── GlyphText.swift         Palabra dibujada con los trazos del glifo
         ├── PrivacyInfo.xcprivacy  Manifiesto de privacidad (UserDefaults, CA92.1)
         ├── Theme.swift            Paleta y componentes compartidos
         ├── Assets.xcassets/       AppIcon (1024) y AccentColor
@@ -233,6 +238,9 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   enseña 3 segundos. La idea es recordar, no copiar.
 - **Al pulsar "¡Listo!" el trazo del niño NO se borra.** Se queda en el lienzo junto al
   modelo para que pueda compararlos. Es el punto pedagógico de la fase.
+- **En Escribe las letras se dibujan, no se escriben con la fuente.** El modelo tiene
+  que enseñar exactamente la forma que se le pide al niño. Fuera de Escribe (Español,
+  Matemáticas) se usa la fuente normal: ahí se lee, no se copia.
 - **Un movimiento del niño puede valer por varios trazos del glifo.** La "m" está
   definida en tres trazos, pero se escribe de un tirón; `LetterTraceView` prueba el
   trazo suelto y luego va uniendo los siguientes. Exigir que levante el lápiz entre

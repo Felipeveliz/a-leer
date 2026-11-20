@@ -26,9 +26,7 @@ struct PalabrasEscribeListView: View {
                         PalabraEscribeFlowView(palabra: p)
                     } label: {
                         VStack(spacing: 8) {
-                            Text(p.texto)
-                                .font(.kid(26))
-                                .foregroundStyle(Palette.ink)
+                            GlyphText(texto: p.texto, alto: 30)
                             StarBadge(earned: progreso.isWordDone(p))
                         }
                         .frame(maxWidth: .infinity)
