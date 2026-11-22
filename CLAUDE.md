@@ -264,6 +264,10 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   como un error de la app, con razón. Cuando aparezcan las páginas de sílabas y oración
   de la hoja 3, se etiquetan y el respaldo deja de usarse solo.
 - **Sin red, sin cuentas, sin analítica.** Lo único que persiste es `UserDefaults`.
+- **Solo en países hispanohablantes** (decisión de Felipe, 22 de noviembre): los 18
+  territorios de habla hispana con App Store propia. Cuba y Guinea Ecuatorial no están
+  en la lista de Apple, y Puerto Rico usa la tienda de Estados Unidos. Estados Unidos
+  **no** está incluido.
 
 ## 6. Convenciones de código
 
@@ -347,9 +351,17 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 
 ### TestFlight y primer deploy
 
-Estado al 19 de noviembre de 2026, por la tarde: **Aprende 1.0 con la build 2 está en
-"Waiting for Review"** (Apple ID 6836391055), gratis en 175 países, 4+, Data Not
-Collected y con **salida automática**.
+Estado al 22 de noviembre de 2026: **Apple aprobó Aprende 1.0 (build 2)** a las 7:43 y
+quedó en "Ready for Distribution" (Apple ID 6836391055). Gratis, 4+, Data Not Collected,
+salida automática. Disponibilidad configurada el 22 de noviembre en los **18 países
+hispanohablantes**; ese día quedó "En proceso: 18".
+
+**Precio y disponibilidad son dos cosas distintas** en *Precio y disponibilidad*. La
+tabla de precios decía "175 países o regiones" y se anotó como si la app estuviera
+disponible ahí, pero la sección **"Disponibilidad de la app"** seguía vacía, con el
+botón "Configurar disponibilidad". Una versión aprobada sin ningún país disponible sale
+en la lista de apps como **"Removed from App Store"**, aunque nadie la haya retirado y
+sin que llegue ningún correo. Se comprueba en esa sección, no en la de precios.
 
 Historia corta: Apple rechazó la primera submission con **Guideline 2.1 — Information
 Needed** y se contestaron los seis puntos por escrito, sin vídeo (decisión de Felipe).
@@ -363,12 +375,9 @@ la cancelación.
 **El color de la lista de apps es el indicador fiable**: rojo = parada, amarillo = en
 cola. Si después de una acción no se pone amarilla, no está en revisión.
 
-**Decisión de Felipe (19 de noviembre):** los arreglos van **solo a TestFlight**;
-producción espera a que Apple resuelva la submission pendiente, que lleva la **build
-2**. Esa build todavía tiene el mensaje de hoja vacía y la "m" que no acepta el trazo
-continuo. Se avisó del riesgo de 2.1 y aun así se mantiene: **no cambiar el build de la
-revisión sin que Felipe lo pida.** Cuando aprueben la 1.0, la siguiente versión sale
-con la build más nueva.
+**La 1.0 salió con la build 2**, que todavía tiene el mensaje de hoja vacía y la "m"
+que no acepta el trazo continuo (decisión de Felipe del 19 de noviembre: no cambiar el
+build de la revisión). Los arreglos están en TestFlight y van en la siguiente versión.
 
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
 único tester. Builds 1 a 5 en "Testing"; la **5** es la buena (hojas + respaldo +
@@ -384,6 +393,11 @@ Lo aprendido antes, que sigue valiendo:
 - Las notas del revisor en **inglés**.
 
 ### Pendientes del deploy
+- [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
+      aparece en la App Store de México.
+- [ ] Mandar la siguiente versión con la build más nueva (la 5 o posterior).
+- [ ] App Store Connect pide revisar las **nuevas preguntas de clasificación por edad**
+      (aviso en la lista de apps, sección "Información de la app").
 - [ ] **La build 2 se envió sin que nadie la ejecutara**: la Mac se quedó sin runtimes de
       simulador. Probarla en TestFlight, sobre todo "limón" e "Irma" en Escribe, que
       estrenan los glifos "ó" e "I".

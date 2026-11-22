@@ -94,6 +94,16 @@ solo guardar— y cumplimiento de exportación **sin cifrado**.
 Dos campos más no se piden hasta que pulsas "Add for Review", y entonces te frenan:
 **precio** (gratis) y **copyright**.
 
+**La disponibilidad NO se pide y es obligatoria.** En *Precio y disponibilidad*, la tabla
+de precios dice "175 países o regiones" aunque la app no esté disponible en ninguno. La
+sección **"Disponibilidad de la app"** tiene que mostrar un resumen por estado ("En
+proceso", "Disponible"). Si solo enseña el botón "Configurar disponibilidad", está
+vacía: Apple aprueba la versión igual, y la lista de apps la muestra como **"Removed
+from App Store"** sin mandar ningún correo. Configurarla antes de enviar: "Determinados
+países o regiones" con los 18 hispanohablantes (ver la sección 5 de `CLAUDE.md`).
+Los checkboxes del diálogo no tienen nombre accesible; hay que localizarlos por la
+etiqueta del DOM.
+
 También hay que **desmarcar "Sign-in required"** (la app no tiene cuentas) y rellenar el
 contacto de App Review: nombre, correo y teléfono. **Esos datos se le piden a Felipe en
 el momento**; no viven en el repo.
