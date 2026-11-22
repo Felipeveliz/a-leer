@@ -1,5 +1,8 @@
 // Renderiza todos los glifos de Glyphs.swift a un HTML con SVGs para revisión visual.
-// Uso: swiftc Aprende/Aprende/Glyphs.swift scripts/render_glyphs.swift -o /tmp/render_glyphs && /tmp/render_glyphs <salida.html>
+// Uso (swiftc multi-archivo exige que el que lleva código suelto se llame main.swift):
+//   cp scripts/render_glyphs.swift /tmp/main.swift
+//   swiftc Aprende/Aprende/Glyphs.swift /tmp/main.swift -o /tmp/render_glyphs
+//   /tmp/render_glyphs glyphs.html
 import Foundation
 import CoreGraphics
 
@@ -39,10 +42,16 @@ extension CGFloat {
     }
 }
 
-let order = "aeilmnoprstu".map { $0 } + "LNR".map { $0 } + "0123456789".map { $0 }
-var html = "<html><head><meta charset='utf-8'><style>body{font-family:sans-serif;background:#fef6e4;padding:20px}.g{display:inline-block;margin:10px;padding:10px;background:white;border-radius:10px;text-align:center;vertical-align:top}</style></head><body><h2>Glifos — trazo 1 azul, trazo 2 coral, trazo 3 verde; punto verde = inicio</h2>"
-for ch in order {
-    if let g = GlyphLibrary.glyph(for: ch) { html += svg(for: g) }
+var html = "<html><head><meta charset='utf-8'><style>body{font-family:sans-serif;background:#fef6e4;padding:20px}.g{display:inline-block;margin:10px;padding:10px;background:white;border-radius:10px;text-align:center;vertical-align:top;font-size:20px}</style></head><body><h2>Glifos — trazo 1 azul, trazo 2 coral, trazo 3 verde; punto verde = inicio</h2>"
+// Todos los glifos, ordenados por nombre (minúsculas, mayúsculas, dígitos).
+let glifos: [Glyph] = GlyphLibrary.all.values.sorted { a, b in
+    let la = a.name.lowercased()
+    let lb = b.name.lowercased()
+    if la != lb { return la < lb }
+    return a.name > b.name
+}
+for g in glifos {
+    html += svg(for: g)
 }
 html += "<h2>Calentamiento</h2>"
 for g in GlyphLibrary.warmups { html += svg(for: g) }

@@ -179,6 +179,107 @@ enum GlyphLibrary {
             GlyphStroke(points: line(pt(0.40, 0.14), pt(0.22, 0.30), n: 8)),
         ])
 
+        // ---------- MINÚSCULAS: resto del abecedario (para nombres) ----------
+        // Comparten piezas con las de arriba: el círculo de la "o", los arcos de
+        // la "n", el palito de la "l". El primer punto de cada trazo es por donde
+        // el niño empieza, y el orden de los puntos marca la dirección.
+
+        g["b"] = Glyph(name: "b", width: 0.57, strokes: [
+            // palito largo y pancita a la derecha (la "p" al revés).
+            GlyphStroke(points: line(pt(0.08, 0.08), pt(0.08, 0.88))),
+            GlyphStroke(points: arc(c: pt(0.30, 0.63), rx: 0.235, ry: 0.25, from: -150, to: 150, n: 40)),
+        ])
+
+        g["c"] = Glyph(name: "c", width: 0.50, strokes: [
+            // como la "o" pero abierta a la derecha.
+            GlyphStroke(points: arc(c: pt(0.28, 0.63), rx: 0.25, ry: 0.25, from: -58, to: -302, n: 40)),
+        ])
+
+        g["d"] = Glyph(name: "d", width: 0.56, strokes: [
+            // círculo a la izquierda y palito largo a la derecha.
+            GlyphStroke(points: arc(c: pt(0.26, 0.63), rx: 0.24, ry: 0.25, from: -45, to: -405, n: 44)),
+            GlyphStroke(points: line(pt(0.50, 0.08), pt(0.50, 0.88))),
+        ])
+
+        g["f"] = Glyph(name: "f", width: 0.44, strokes: [
+            // bastón: gancho arriba, baja, y cruce al medio.
+            stroke([quad(pt(0.42, 0.16), pt(0.16, 0.07), pt(0.14, 0.34), n: 18),
+                    line(pt(0.14, 0.34), pt(0.14, 0.88))]),
+            GlyphStroke(points: line(pt(0.02, 0.42), pt(0.34, 0.42), n: 10)),
+        ])
+
+        g["g"] = Glyph(name: "g", width: 0.58, strokes: [
+            // círculo y palito que baja al sótano con gancho a la izquierda.
+            GlyphStroke(points: arc(c: pt(0.28, 0.63), rx: 0.25, ry: 0.25, from: -45, to: -405, n: 44)),
+            stroke([line(pt(0.53, 0.38), pt(0.53, 0.90), n: 10),
+                    quad(pt(0.53, 0.90), pt(0.52, 1.01), pt(0.30, 0.985), n: 18)]),
+        ])
+
+        g["h"] = Glyph(name: "h", width: 0.54, strokes: [
+            // palito largo y un arco (la "n" con el palo alto).
+            GlyphStroke(points: line(pt(0.08, 0.08), pt(0.08, 0.88))),
+            stroke([arc(c: pt(0.26, 0.635), rx: 0.18, ry: 0.255, from: 180, to: 360, n: 24),
+                    line(pt(0.44, 0.635), pt(0.44, 0.88), n: 8)]),
+        ])
+
+        g["j"] = Glyph(name: "j", width: 0.30, strokes: [
+            stroke([line(pt(0.24, 0.38), pt(0.24, 0.90), n: 10),
+                    quad(pt(0.24, 0.90), pt(0.23, 1.02), pt(0.07, 0.98), n: 16)]),
+            GlyphStroke(points: [pt(0.24, 0.20)], isDot: true),
+        ])
+
+        g["k"] = Glyph(name: "k", width: 0.50, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.08), pt(0.08, 0.88))),
+            // brazo de arriba hacia el palito
+            GlyphStroke(points: line(pt(0.44, 0.42), pt(0.12, 0.66))),
+            // pierna hacia abajo-derecha
+            GlyphStroke(points: line(pt(0.18, 0.60), pt(0.46, 0.88))),
+        ])
+
+        g["q"] = Glyph(name: "q", width: 0.56, strokes: [
+            // círculo y palito recto que baja al sótano.
+            GlyphStroke(points: arc(c: pt(0.26, 0.63), rx: 0.24, ry: 0.25, from: -45, to: -405, n: 44)),
+            GlyphStroke(points: line(pt(0.50, 0.38), pt(0.50, 1.00))),
+        ])
+
+        g["v"] = Glyph(name: "v", width: 0.54, strokes: [
+            stroke([line(pt(0.06, 0.38), pt(0.27, 0.88)),
+                    line(pt(0.27, 0.88), pt(0.48, 0.38))]),
+        ])
+
+        g["w"] = Glyph(name: "w", width: 0.76, strokes: [
+            stroke([line(pt(0.05, 0.38), pt(0.20, 0.88)),
+                    line(pt(0.20, 0.88), pt(0.37, 0.50)),
+                    line(pt(0.37, 0.50), pt(0.54, 0.88)),
+                    line(pt(0.54, 0.88), pt(0.71, 0.38))]),
+        ])
+
+        g["x"] = Glyph(name: "x", width: 0.54, strokes: [
+            GlyphStroke(points: line(pt(0.07, 0.38), pt(0.47, 0.88))),
+            GlyphStroke(points: line(pt(0.47, 0.38), pt(0.07, 0.88))),
+        ])
+
+        g["y"] = Glyph(name: "y", width: 0.54, strokes: [
+            // pata corta que baja, y pata larga que cruza hasta el sótano.
+            GlyphStroke(points: line(pt(0.07, 0.38), pt(0.30, 0.73))),
+            GlyphStroke(points: line(pt(0.49, 0.38), pt(0.14, 1.00))),
+        ])
+
+        g["z"] = Glyph(name: "z", width: 0.50, strokes: [
+            stroke([line(pt(0.06, 0.40), pt(0.44, 0.40), n: 10),
+                    line(pt(0.44, 0.40), pt(0.07, 0.88)),
+                    line(pt(0.07, 0.88), pt(0.46, 0.88), n: 10)]),
+        ])
+
+        g["ñ"] = Glyph(name: "ñ", width: 0.56, strokes: [
+            // la "n" y la tilde ondulada encima, de izquierda a derecha.
+            GlyphStroke(points: line(pt(0.08, 0.38), pt(0.08, 0.88))),
+            stroke([arc(c: pt(0.26, 0.635), rx: 0.18, ry: 0.255, from: 180, to: 360, n: 24),
+                    line(pt(0.44, 0.635), pt(0.44, 0.88), n: 8)]),
+            stroke([quad(pt(0.10, 0.26), pt(0.20, 0.15), pt(0.28, 0.22), n: 14),
+                    quad(pt(0.28, 0.22), pt(0.37, 0.29), pt(0.46, 0.19), n: 14)]),
+        ])
+
         // ---------- MAYÚSCULAS (para nombres propios) ----------
         // La "I" de "Irma": un solo palito, como la enseñan en imprenta.
         g["I"] = Glyph(name: "I", width: 0.18, strokes: [
@@ -203,6 +304,164 @@ enum GlyphLibrary {
             // patita diagonal
             GlyphStroke(points: line(pt(0.12, 0.49), pt(0.50, 0.88))),
         ])
+
+        // ---------- MAYÚSCULAS: resto del abecedario (para nombres) ----------
+        // Caja de mayúscula: de la línea alta (y≈0.10) a la base (0.88).
+
+        g["A"] = Glyph(name: "A", width: 0.66, strokes: [
+            GlyphStroke(points: line(pt(0.33, 0.10), pt(0.06, 0.88))),
+            GlyphStroke(points: line(pt(0.33, 0.10), pt(0.60, 0.88))),
+            GlyphStroke(points: line(pt(0.16, 0.58), pt(0.50, 0.58), n: 10)),
+        ])
+
+        g["B"] = Glyph(name: "B", width: 0.56, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            GlyphStroke(points: arc(c: pt(0.10, 0.32), rx: 0.34, ry: 0.22, from: -90, to: 90, n: 24)),
+            GlyphStroke(points: arc(c: pt(0.10, 0.66), rx: 0.38, ry: 0.22, from: -90, to: 90, n: 24)),
+        ])
+
+        g["C"] = Glyph(name: "C", width: 0.56, strokes: [
+            GlyphStroke(points: arc(c: pt(0.33, 0.49), rx: 0.27, ry: 0.39, from: -55, to: -305, n: 44)),
+        ])
+
+        g["D"] = Glyph(name: "D", width: 0.58, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            GlyphStroke(points: arc(c: pt(0.08, 0.49), rx: 0.46, ry: 0.39, from: -90, to: 90, n: 30)),
+        ])
+
+        g["E"] = Glyph(name: "E", width: 0.52, strokes: [
+            stroke([line(pt(0.08, 0.10), pt(0.08, 0.88)),
+                    line(pt(0.08, 0.88), pt(0.46, 0.88), n: 10)]),
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.46, 0.10), n: 10)),
+            GlyphStroke(points: line(pt(0.08, 0.49), pt(0.38, 0.49), n: 8)),
+        ])
+
+        g["F"] = Glyph(name: "F", width: 0.50, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.46, 0.10), n: 10)),
+            GlyphStroke(points: line(pt(0.08, 0.49), pt(0.38, 0.49), n: 8)),
+        ])
+
+        g["G"] = Glyph(name: "G", width: 0.60, strokes: [
+            GlyphStroke(points: arc(c: pt(0.33, 0.49), rx: 0.27, ry: 0.39, from: -55, to: -305, n: 44)),
+            // barrita hacia adentro en la boca de la "C".
+            GlyphStroke(points: line(pt(0.33, 0.52), pt(0.52, 0.52), n: 8)),
+        ])
+
+        g["H"] = Glyph(name: "H", width: 0.60, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            GlyphStroke(points: line(pt(0.52, 0.10), pt(0.52, 0.88))),
+            GlyphStroke(points: line(pt(0.08, 0.49), pt(0.52, 0.49), n: 10)),
+        ])
+
+        g["J"] = Glyph(name: "J", width: 0.46, strokes: [
+            stroke([line(pt(0.40, 0.10), pt(0.40, 0.72)),
+                    quad(pt(0.40, 0.72), pt(0.40, 0.90), pt(0.21, 0.90), n: 16),
+                    quad(pt(0.21, 0.90), pt(0.05, 0.90), pt(0.05, 0.70), n: 14)]),
+        ])
+
+        g["K"] = Glyph(name: "K", width: 0.58, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            GlyphStroke(points: line(pt(0.52, 0.10), pt(0.10, 0.52))),
+            GlyphStroke(points: line(pt(0.20, 0.44), pt(0.54, 0.88))),
+        ])
+
+        g["M"] = Glyph(name: "M", width: 0.74, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            stroke([line(pt(0.08, 0.10), pt(0.37, 0.60)),
+                    line(pt(0.37, 0.60), pt(0.66, 0.10))]),
+            GlyphStroke(points: line(pt(0.66, 0.10), pt(0.66, 0.88))),
+        ])
+
+        g["O"] = Glyph(name: "O", width: 0.64, strokes: [
+            GlyphStroke(points: arc(c: pt(0.32, 0.49), rx: 0.26, ry: 0.39, from: -90, to: -450, n: 48)),
+        ])
+
+        g["P"] = Glyph(name: "P", width: 0.52, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            GlyphStroke(points: arc(c: pt(0.10, 0.30), rx: 0.34, ry: 0.20, from: -90, to: 90, n: 24)),
+        ])
+
+        g["Q"] = Glyph(name: "Q", width: 0.64, strokes: [
+            GlyphStroke(points: arc(c: pt(0.32, 0.49), rx: 0.26, ry: 0.39, from: -90, to: -450, n: 48)),
+            GlyphStroke(points: line(pt(0.40, 0.66), pt(0.58, 0.92))),
+        ])
+
+        g["S"] = Glyph(name: "S", width: 0.54, strokes: [
+            stroke([arc(c: pt(0.29, 0.33), rx: 0.19, ry: 0.17, from: -35, to: -255, n: 28),
+                    arc(c: pt(0.27, 0.66), rx: 0.20, ry: 0.19, from: -105, to: 155, n: 30)]),
+        ])
+
+        g["T"] = Glyph(name: "T", width: 0.54, strokes: [
+            GlyphStroke(points: line(pt(0.05, 0.12), pt(0.49, 0.12), n: 10)),
+            GlyphStroke(points: line(pt(0.27, 0.12), pt(0.27, 0.88))),
+        ])
+
+        g["U"] = Glyph(name: "U", width: 0.60, strokes: [
+            stroke([line(pt(0.08, 0.10), pt(0.08, 0.62), n: 8),
+                    arc(c: pt(0.30, 0.62), rx: 0.22, ry: 0.24, from: 180, to: 360, n: 26),
+                    line(pt(0.52, 0.62), pt(0.52, 0.10), n: 8)]),
+        ])
+
+        g["V"] = Glyph(name: "V", width: 0.60, strokes: [
+            stroke([line(pt(0.06, 0.10), pt(0.30, 0.88)),
+                    line(pt(0.30, 0.88), pt(0.54, 0.10))]),
+        ])
+
+        g["W"] = Glyph(name: "W", width: 0.82, strokes: [
+            stroke([line(pt(0.05, 0.10), pt(0.22, 0.88)),
+                    line(pt(0.22, 0.88), pt(0.41, 0.30)),
+                    line(pt(0.41, 0.30), pt(0.60, 0.88)),
+                    line(pt(0.60, 0.88), pt(0.77, 0.10))]),
+        ])
+
+        g["X"] = Glyph(name: "X", width: 0.58, strokes: [
+            GlyphStroke(points: line(pt(0.07, 0.10), pt(0.51, 0.88))),
+            GlyphStroke(points: line(pt(0.51, 0.10), pt(0.07, 0.88))),
+        ])
+
+        g["Y"] = Glyph(name: "Y", width: 0.58, strokes: [
+            GlyphStroke(points: line(pt(0.07, 0.10), pt(0.30, 0.49))),
+            stroke([line(pt(0.53, 0.10), pt(0.30, 0.49)),
+                    line(pt(0.30, 0.49), pt(0.30, 0.88))]),
+        ])
+
+        g["Z"] = Glyph(name: "Z", width: 0.56, strokes: [
+            stroke([line(pt(0.06, 0.12), pt(0.50, 0.12), n: 10),
+                    line(pt(0.50, 0.12), pt(0.07, 0.88)),
+                    line(pt(0.07, 0.88), pt(0.52, 0.88), n: 10)]),
+        ])
+
+        g["Ñ"] = Glyph(name: "Ñ", width: 0.62, strokes: [
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
+            GlyphStroke(points: line(pt(0.08, 0.10), pt(0.54, 0.88))),
+            GlyphStroke(points: line(pt(0.54, 0.88), pt(0.54, 0.10))),
+            stroke([quad(pt(0.14, 0.08), pt(0.24, 0.00), pt(0.33, 0.05), n: 12),
+                    quad(pt(0.33, 0.05), pt(0.42, 0.10), pt(0.50, 0.02), n: 12)]),
+        ])
+
+        // ---------- VOCALES ACENTUADAS Y DIÉRESIS (nombres) ----------
+        // Se arman sobre la vocal ya definida, añadiéndole el acento. La "í" no
+        // reusa la "i" porque lleva acento EN LUGAR del punto, no los dos.
+        let acuteBaja = GlyphStroke(points: line(pt(0.40, 0.12), pt(0.22, 0.28), n: 8))
+        if let b = g["a"] { g["á"] = Glyph(name: "á", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.42, 0.12), pt(0.24, 0.28), n: 8))]) }
+        if let b = g["e"] { g["é"] = Glyph(name: "é", width: b.width, strokes: b.strokes + [acuteBaja]) }
+        g["í"] = Glyph(name: "í", width: 0.18, strokes: [
+            GlyphStroke(points: line(pt(0.09, 0.38), pt(0.09, 0.88))),
+            GlyphStroke(points: line(pt(0.20, 0.14), pt(0.03, 0.30), n: 8)),
+        ])
+        if let b = g["u"] { g["ú"] = Glyph(name: "ú", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.38, 0.12), pt(0.20, 0.28), n: 8))]) }
+        if let b = g["u"] { g["ü"] = Glyph(name: "ü", width: b.width, strokes: b.strokes + [
+            GlyphStroke(points: [pt(0.18, 0.22)], isDot: true),
+            GlyphStroke(points: [pt(0.36, 0.22)], isDot: true),
+        ]) }
+
+        let acuteAlta = GlyphStroke(points: line(pt(0.44, 0.00), pt(0.26, 0.07), n: 8))
+        if let b = g["A"] { g["Á"] = Glyph(name: "Á", width: b.width, strokes: b.strokes + [acuteAlta]) }
+        if let b = g["E"] { g["É"] = Glyph(name: "É", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.40, 0.00), pt(0.22, 0.07), n: 8))]) }
+        if let b = g["I"] { g["Í"] = Glyph(name: "Í", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.22, 0.00), pt(0.04, 0.07), n: 8))]) }
+        if let b = g["O"] { g["Ó"] = Glyph(name: "Ó", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.46, 0.00), pt(0.28, 0.07), n: 8))]) }
+        if let b = g["U"] { g["Ú"] = Glyph(name: "Ú", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.42, 0.00), pt(0.24, 0.07), n: 8))]) }
 
         // ---------- NÚMEROS ----------
         g["0"] = Glyph(name: "0", width: 0.58, strokes: [

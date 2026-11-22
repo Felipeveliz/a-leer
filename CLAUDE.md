@@ -157,7 +157,11 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 - **`GlyphLibrary` (`Glyphs.swift`)** — los trazos de cada letra y dígito en una caja
   unitaria con Y hacia abajo (ascendentes 0.08, x-height 0.38, línea base 0.88,
   descendentes 1.00). El **orden de los puntos codifica la dirección correcta** de
-  escritura: por eso el motor puede castigar trazar al revés.
+  escritura: por eso el motor puede castigar trazar al revés. Cubre el **abecedario
+  completo** —minúsculas, mayúsculas, acentos (á é í ó ú, Á É Í Ó Ú, ü) y ñ/Ñ— para que
+  "Escribir mi nombre" funcione con cualquier nombre. `scripts/render_glyphs.swift`
+  los vuelca a un HTML con SVGs (con punto de inicio y dirección) para revisarlos sin
+  simulador.
 - **`TraceEngine`** — valida el trazo del niño contra el del glifo: inicio, final, forma
   (distancia media punto a punto tras re-muestrear a 48 puntos) y longitud. Las
   tolerancias son **generosas a propósito**; es pedagogía, no caligrafía.
@@ -349,8 +353,10 @@ abrir el código, el cambio necesitaba actualizar el archivo.
       pantallas y no pronuncia nada. Es lo de mayor impacto pedagógico que falta.
 - [ ] Progreso (estrellas) también en Español y Matemáticas.
 - [ ] Matemáticas: restas, dificultad progresiva, racha.
-- [ ] Más glifos: hoy hay a, e, i, l, m, n, o, p, r, s, t, u, ó, I, L, N, R y los
-      dígitos. En cuanto Eliab avance a b/c/d/g/ñ, Escribe se queda corto.
+- [x] Más glifos: ya está el **abecedario completo** (minúsculas, mayúsculas, acentos y
+      ñ/Ñ), dibujado para que "Escribir mi nombre" sirva con cualquier nombre. Verificado
+      con `render_glyphs.swift` (forma) y un check de invariantes; **falta QA visual en
+      el simulador** cuando se pueda (esta Mac no tiene `Simulator.app`).
 - [ ] **Faltan las páginas de sílabas y oración de la hoja 3**, si existen. Hoy la hoja 3
       solo tiene las 20 palabras de "Lectura de palabras".
 - [ ] Zona de adultos: reiniciar el progreso, ver qué ha hecho.

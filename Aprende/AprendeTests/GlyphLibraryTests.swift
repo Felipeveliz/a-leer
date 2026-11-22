@@ -33,6 +33,16 @@ final class GlyphLibraryTests: XCTestCase {
         XCTAssertEqual(GlyphLibrary.warmups.count, 4)
     }
 
+    /// Para "Escribir mi nombre" cualquier letra de un nombre tiene que poder
+    /// trazarse: el abecedario completo, con acentos y ñ, en minúscula y mayúscula.
+    func testAbecedarioCompletoParaNombres() {
+        let requeridos = "abcdefghijklmnopqrstuvwxyzñáéíóúü"
+            + "ABCDEFGHIJKLMNOPQRSTUVWXYZÑÁÉÍÓÚ"
+        for ch in requeridos {
+            XCTAssertNotNil(GlyphLibrary.glyph(for: ch), "falta el glifo de '\(ch)'")
+        }
+    }
+
     // MARK: Invariantes de cada glifo
 
     private var todos: [Glyph] { Array(GlyphLibrary.all.values) + GlyphLibrary.warmups }
