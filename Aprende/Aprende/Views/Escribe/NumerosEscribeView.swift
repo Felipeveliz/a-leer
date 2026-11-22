@@ -46,7 +46,7 @@ struct NumerosEscribeView: View {
 // MARK: - Flujo de un dígito (2 pasos)
 //
 // Paso 1: trazado guiado. Paso 2: "¡Tú solo!" en el lienzo libre,
-// con el dígito modelo arriba a la izquierda (ocultable).
+// con el dígito modelo arriba, del lado que no tapa la mano (ver PerfilStore).
 
 struct DigitoEscribeFlowView: View {
     let digito: Character
@@ -56,6 +56,7 @@ struct DigitoEscribeFlowView: View {
     }
 
     @ObservedObject private var progreso = ProgressStore.shared
+    @ObservedObject private var perfil = PerfilStore.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var paso: Paso = .guiado
@@ -124,8 +125,10 @@ struct DigitoEscribeFlowView: View {
 
     private var pasoTuSolo: some View {
         VStack(spacing: 16) {
-            // Modelo arriba a la IZQUIERDA (mano derecha no lo tapa).
+            // Modelo arriba, del lado que la mano del niño no tapa: izquierda si
+            // es diestro, derecha si es zurdo.
             HStack {
+                if perfil.mano.esZurdo { Spacer() }
                 if modeloVisible || terminado {
                     Text(String(digito))
                         .font(.kid(72, .heavy))
@@ -149,7 +152,7 @@ struct DigitoEscribeFlowView: View {
                     }
                     .buttonStyle(PressDownButtonStyle())
                 }
-                Spacer()
+                if !perfil.mano.esZurdo { Spacer() }
             }
 
             if terminado {

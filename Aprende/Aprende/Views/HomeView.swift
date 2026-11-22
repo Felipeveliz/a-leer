@@ -2,6 +2,8 @@ import SwiftUI
 
 // Pantalla de inicio: raíz de navegación con los tres módulos.
 struct HomeView: View {
+    @ObservedObject private var perfil = PerfilStore.shared
+
     var body: some View {
         NavigationStack {
             ZStack {
@@ -66,6 +68,12 @@ struct HomeView: View {
                 }
             }
             .toolbar(.hidden, for: .navigationBar)
+        }
+        // Primer arranque: sin nombre no se puede pasar. En cuanto un adulto lo
+        // captura, `perfil.configurado` pasa a true y el cover se cierra solo.
+        .fullScreenCover(isPresented: .init(get: { !perfil.configurado },
+                                            set: { _ in })) {
+            CapturaNombreView(esPrimerArranque: true)
         }
     }
 

@@ -148,6 +148,12 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 - **`ProgressStore`** — singleton `ObservableObject` que guarda las estrellas ganadas
   en `UserDefaults` bajo la clave `aprende.progreso`, con logros `"palabra:<texto>"` y
   `"digito:<d>"`. Es lo único que persiste.
+- **`PerfilStore`** — singleton `ObservableObject` con lo que la app no puede adivinar y
+  un adulto captura una vez: el **nombre** del niño (`aprende.nombre`) y su **mano**
+  dominante (`aprende.mano`, diestro/zurdo). Antes la app era de un solo niño y esto
+  estaba fijo en código; con un salón entero cada niño trae el suyo. Se pregunta en el
+  primer arranque (`CapturaNombreView` sobre `HomeView` mientras `!configurado`) y se
+  corrige desde "Escribir mi nombre". La mano decide de qué lado va el modelo en Escribe.
 - **`GlyphLibrary` (`Glyphs.swift`)** — los trazos de cada letra y dígito en una caja
   unitaria con Y hacia abajo (ascendentes 0.08, x-height 0.38, línea base 0.88,
   descendentes 1.00). El **orden de los puntos codifica la dirección correcta** de
@@ -203,12 +209,14 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
         ├── LetterTraceView.swift  Glifo guiado: guías, demo, validación
         ├── ProgressStore.swift    Estrellas en UserDefaults
         ├── HojaStore.swift         Hojas marcadas, en UserDefaults
+        ├── PerfilStore.swift       Nombre y mano del niño, en UserDefaults
         ├── GlyphText.swift         Palabra dibujada con los trazos del glifo
         ├── PrivacyInfo.xcprivacy  Manifiesto de privacidad (UserDefaults, CA92.1)
         ├── Theme.swift            Paleta y componentes compartidos
         ├── Assets.xcassets/       AppIcon (1024) y AccentColor
         └── Views/
-            ├── HomeView.swift          Raíz de navegación (3 módulos)
+            ├── HomeView.swift          Raíz de navegación (3 módulos) + primer arranque
+            ├── CapturaNombreView.swift Captura de nombre y mano (teclado de un adulto)
             ├── EspanolMenuView.swift
             ├── SilabasView.swift       Sílaba aleatoria
             ├── PalabrasView.swift      Palabra aleatoria + separar sílabas
@@ -232,8 +240,11 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
 - **Esquema claro siempre.** La paleta es fija y cálida; `AprendeApp` fuerza
   `.preferredColorScheme(.light)` para que la barra de navegación y los controles del
   sistema no se vayan a negro contra tarjetas blancas.
-- **El modelo de la palabra va arriba a la IZQUIERDA.** Eliab es diestro: a la derecha
-  su propia mano lo taparía.
+- **El modelo va arriba, del lado que NO tapa la mano del niño.** Diestro: a la
+  izquierda; zurdo: a la derecha. La mano se elige en el primer arranque y se guarda en
+  `PerfilStore`. Antes estaba fijo a la izquierda porque la app era de un solo niño
+  diestro (Eliab); al bajarla un salón entero dejó de poder asumirse, igual que el
+  nombre.
 - **En "¡Tú solo!" el modelo empieza oculto**, con un botón "👀 Ver otra vez" que lo
   enseña 3 segundos. La idea es recordar, no copiar.
 - **Al pulsar "¡Listo!" el trazo del niño NO se borra.** Se queda en el lienzo junto al

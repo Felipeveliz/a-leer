@@ -6,7 +6,8 @@ import UIKit
 // Fase 1 "Las letras": traza cada letra guiada, una por una, en orden.
 // Fase 2 "La palabra completa": toda la palabra a la vista, letra por letra.
 // Fase 3 "¡Tú solo!": lienzo libre sin guías, con el modelo ocultable.
-// El modelo va SIEMPRE arriba a la IZQUIERDA (niño diestro: su mano no lo tapa).
+// El modelo va arriba, del lado que NO tapa la mano del niño: a la izquierda si
+// es diestro, a la derecha si es zurdo (ver PerfilStore / encabezadoModelo).
 
 struct PalabraEscribeFlowView: View {
     let palabra: Palabra
@@ -16,6 +17,7 @@ struct PalabraEscribeFlowView: View {
     }
 
     @ObservedObject private var progreso = ProgressStore.shared
+    @ObservedObject private var perfil = PerfilStore.shared
     @Environment(\.dismiss) private var dismiss
 
     @State private var fase: Fase = .letras
@@ -78,6 +80,9 @@ struct PalabraEscribeFlowView: View {
     @ViewBuilder
     private var encabezadoModelo: some View {
         HStack {
+            // Zurdo: el modelo va a la DERECHA; diestro: a la IZQUIERDA. En los
+            // dos casos del lado que su propia mano no tapa al escribir debajo.
+            if perfil.mano.esZurdo { Spacer() }
             if fase != .tuSolo || modeloVisible || terminado {
                 modeloDibujado
                     .padding(.vertical, 8)
@@ -99,7 +104,7 @@ struct PalabraEscribeFlowView: View {
                 }
                 .buttonStyle(PressDownButtonStyle())
             }
-            Spacer()
+            if !perfil.mano.esZurdo { Spacer() }
         }
     }
 
