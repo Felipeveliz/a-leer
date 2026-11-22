@@ -30,6 +30,18 @@ struct EscribeMenuView: View {
             .buttonStyle(PressDownButtonStyle())
 
             NavigationLink {
+                MiNombreView()
+            } label: {
+                MenuCard(
+                    emoji: "🙂",
+                    title: "Mi nombre",
+                    subtitle: "Aprende a escribir tu nombre",
+                    colors: [Palette.purple, Palette.purpleDark]
+                )
+            }
+            .buttonStyle(PressDownButtonStyle())
+
+            NavigationLink {
                 NumerosEscribeView()
             } label: {
                 MenuCard(

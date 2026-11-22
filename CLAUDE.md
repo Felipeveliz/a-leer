@@ -228,6 +228,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
             ├── MatematicasView.swift   Sumas con 5 opciones
             └── Escribe/
                 ├── EscribeMenuView.swift
+                ├── MiNombreView.swift            Partes del nombre + nombre completo
                 ├── PalabrasEscribeListView.swift
                 ├── PalabraEscribeFlowView.swift  3 fases + FreeWritePad
                 ├── NumerosEscribeView.swift      Lista + flujo de 2 pasos por dígito
@@ -278,6 +279,13 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   leer sílabas. Antes salía un mensaje de "esta hoja no trae sílabas" y Felipe lo leyó
   como un error de la app, con razón. Cuando aparezcan las páginas de sílabas y oración
   de la hoja 3, se etiquetan y el respaldo deja de usarse solo.
+- **El nombre lo captura un adulto, una vez.** "Escribir mi nombre" (en Escribe) enseña
+  a trazar el nombre del niño: primero cada parte (nombre y apellidos), luego el nombre
+  completo, con el mismo flujo de 3 fases de las palabras. La app no puede adivinar el
+  nombre, así que lo teclea un adulto en el primer arranque (`CapturaNombreView`) y lo
+  corrige con "Modificar nombre"; **es el único teclado de la app** y el niño nunca
+  escribe en él. El nombre se parte por espacios: una "palabra" trazable por parte. Por
+  eso `GlyphLibrary` tuvo que crecer al abecedario completo.
 - **Sin red, sin cuentas, sin analítica.** Lo único que persiste es `UserDefaults`.
 - **Solo en países hispanohablantes** (decisión de Felipe, 22 de noviembre): los 18
   territorios de habla hispana con App Store propia. Cuba y Guinea Ecuatorial no están
