@@ -116,4 +116,36 @@ final class GlyphLibraryTests: XCTestCase {
         XCTAssertLessThan(l.width, GlyphLibrary.minBoxFactor)
         XCTAssertEqual(l.boxFactor, GlyphLibrary.minBoxFactor, accuracy: 0.0001)
     }
+
+    // MARK: Forma
+
+    /// La "U" salió al revés (∩) por un arco de 180° a 360°, que con Y hacia abajo
+    /// pasa por ARRIBA. Pasaba todos los tests porque ninguno miraba la forma.
+    func testLaUTieneLaCurvaAbajo() {
+        for ch: Character in ["U", "u", "Ú", "ú"] {
+            guard let g = GlyphLibrary.glyph(for: ch) else { return XCTFail("sin glifo de \(ch)") }
+            let cuerpo = g.strokes[0].points
+            let centro = g.width / 2
+            guard let medio = cuerpo.min(by: { abs($0.x - centro) < abs($1.x - centro) }) else {
+                return XCTFail("\(ch) sin puntos")
+            }
+            XCTAssertGreaterThan(medio.y, 0.75,
+                                 "\(ch): el punto central del trazo debería estar abajo, en la línea base")
+        }
+    }
+
+    /// Con la guía gruesa, un acento a menos de ~0.055 de su letra se pega a ella y
+    /// el niño ve un solo garabato. Pasó con Á, É, Í y Ó.
+    func testLosAcentosNoTocanSuLetra() {
+        for ch: Character in ["á", "é", "í", "ó", "ú", "Á", "É", "Í", "Ó", "Ú"] {
+            guard let g = GlyphLibrary.glyph(for: ch), let acento = g.strokes.last else {
+                return XCTFail("sin glifo de \(ch)")
+            }
+            let cuerpo = g.strokes.dropLast().flatMap(\.points)
+            let minima = acento.points.flatMap { a in
+                cuerpo.map { hypot(a.x - $0.x, a.y - $0.y) }
+            }.min() ?? 0
+            XCTAssertGreaterThanOrEqual(minima, 0.055, "\(ch): el acento está pegado a la letra")
+        }
+    }
 }

@@ -316,6 +316,16 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   construcción lleva `assertionFailure` en los casos imposibles: un dedazo ahí se salta
   en silencio y nadie lo nota.
 
+### Glifos
+- **Todo glifo nuevo o tocado se mira dibujado** con `scripts/render_glyphs.swift`
+  antes de commitear. Los tests comprueban que existe y que cae en la caja, no su
+  forma: la "U" salió al revés (∩) con todos los tests en verde.
+- En los arcos, **Y va hacia abajo**: 90° es el fondo y -90° (o 270°) la cima. Un arco
+  de 180° a 0° pasa por abajo (∪); de 180° a 360°, por arriba (∩).
+- Los acentos de las mayúsculas caben solo entre y = 0 y 0.04 (la letra empieza en
+  0.10), con la punta de abajo fuera de la parte más alta de la letra.
+  `testLosAcentosNoTocanSuLetra` lo vigila.
+
 ## 7. Protocolo de actualización de este archivo
 
 Cada cambio que toque arquitectura, estructura, decisiones, stack o estado **actualiza

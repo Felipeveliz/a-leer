@@ -398,8 +398,10 @@ enum GlyphLibrary {
         ])
 
         g["U"] = Glyph(name: "U", width: 0.60, strokes: [
+            // De 180° a 0° pasando por 90°, que con Y hacia abajo es el FONDO.
+            // De 180° a 360° pasaría por arriba y la U saldría al revés (∩).
             stroke([line(pt(0.08, 0.10), pt(0.08, 0.62), n: 8),
-                    arc(c: pt(0.30, 0.62), rx: 0.22, ry: 0.24, from: 180, to: 360, n: 26),
+                    arc(c: pt(0.30, 0.62), rx: 0.22, ry: 0.24, from: 180, to: 0, n: 26),
                     line(pt(0.52, 0.62), pt(0.52, 0.10), n: 8)]),
         ])
 
@@ -456,12 +458,18 @@ enum GlyphLibrary {
             GlyphStroke(points: [pt(0.36, 0.22)], isDot: true),
         ]) }
 
-        let acuteAlta = GlyphStroke(points: line(pt(0.44, 0.00), pt(0.26, 0.07), n: 8))
-        if let b = g["A"] { g["Á"] = Glyph(name: "Á", width: b.width, strokes: b.strokes + [acuteAlta]) }
-        if let b = g["E"] { g["É"] = Glyph(name: "É", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.40, 0.00), pt(0.22, 0.07), n: 8))]) }
-        if let b = g["I"] { g["Í"] = Glyph(name: "Í", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.22, 0.00), pt(0.04, 0.07), n: 8))]) }
-        if let b = g["O"] { g["Ó"] = Glyph(name: "Ó", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.46, 0.00), pt(0.28, 0.07), n: 8))]) }
-        if let b = g["U"] { g["Ú"] = Glyph(name: "Ú", width: b.width, strokes: b.strokes + [GlyphStroke(points: line(pt(0.42, 0.00), pt(0.24, 0.07), n: 8))]) }
+        // Las mayúsculas llegan a y = 0.10 y la caja empieza en 0: el acento solo
+        // cabe entre 0 y 0.04, y con la punta de abajo fuera de la parte más alta de
+        // la letra (la cúspide de la A, la cima de la O). Si no, el trazo grueso de la
+        // guía lo pega a la letra y el niño ve un solo garabato.
+        func acuteAlta(_ x: CGFloat) -> GlyphStroke {
+            GlyphStroke(points: line(pt(x, 0.00), pt(x - 0.12, 0.04), n: 8))
+        }
+        if let b = g["A"] { g["Á"] = Glyph(name: "Á", width: b.width, strokes: b.strokes + [acuteAlta(0.52)]) }
+        if let b = g["E"] { g["É"] = Glyph(name: "É", width: b.width, strokes: b.strokes + [acuteAlta(0.46)]) }
+        if let b = g["I"] { g["Í"] = Glyph(name: "Í", width: b.width, strokes: b.strokes + [acuteAlta(0.20)]) }
+        if let b = g["O"] { g["Ó"] = Glyph(name: "Ó", width: b.width, strokes: b.strokes + [acuteAlta(0.50)]) }
+        if let b = g["U"] { g["Ú"] = Glyph(name: "Ú", width: b.width, strokes: b.strokes + [acuteAlta(0.42)]) }
 
         // ---------- NÚMEROS ----------
         g["0"] = Glyph(name: "0", width: 0.58, strokes: [
