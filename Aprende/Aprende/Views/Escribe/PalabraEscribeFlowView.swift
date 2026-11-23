@@ -82,7 +82,7 @@ struct PalabraEscribeFlowView: View {
         HStack {
             // Zurdo: el modelo va a la DERECHA; diestro: a la IZQUIERDA. En los
             // dos casos del lado que su propia mano no tapa al escribir debajo.
-            if perfil.mano.esZurdo { Spacer() }
+            if perfil.esZurdo { Spacer() }
             if fase != .tuSolo || modeloVisible || terminado {
                 modeloDibujado
                     .padding(.vertical, 8)
@@ -107,7 +107,7 @@ struct PalabraEscribeFlowView: View {
                 }
                 .buttonStyle(PressDownButtonStyle())
             }
-            if !perfil.mano.esZurdo { Spacer() }
+            if !perfil.esZurdo { Spacer() }
         }
     }
 

@@ -40,10 +40,6 @@ struct OracionView: View {
 
             HojaPicker()
 
-            if esRespaldo {
-                AvisoRespaldo(hojas: hojas.seleccionadas, que: "oración")
-            }
-
             if !oracion.isEmpty {
                 pestanas
 
@@ -85,9 +81,6 @@ struct OracionView: View {
     }
 
     private var silabas: [String] { oracion.flatMap(\.silabas) }
-
-    /// ¿Se está enseñando el respaldo porque la hoja marcada no trae oración?
-    private var esRespaldo: Bool { AppData.oracion(en: hojas.seleccionadas).isEmpty }
 
     // MARK: Pestañas tipo pastilla
 
@@ -153,29 +146,53 @@ struct OracionView: View {
 
     // MARK: Pestaña Oración (frase completa en UNA sola línea)
 
+    /// Tamaño de la frase completa. Antes se encogía hasta caber y en iPhone acababa
+    /// en ~18 pt: pasar de una sílaba de 110 pt a eso era un salto feo. Este tamaño
+    /// no baja nunca; si no cabe, la frase se desliza.
+    private static let tamanoFrase: CGFloat = 34
+
     private var tarjetaOracion: some View {
         Card {
-            HStack(spacing: 2) {
-                ForEach(Array(oracion.enumerated()), id: \.offset) { i, palabra in
-                    Text(palabra.texto)
-                        .font(.kid(40))
-                        .foregroundStyle(resaltada == i ? cafe : Palette.ink)
-                        .padding(.vertical, 3)
-                        .padding(.horizontal, 8)
-                        .background(
-                            RoundedRectangle(cornerRadius: 12, style: .continuous)
-                                .fill(resaltada == i ? Palette.yellow : .clear)
-                        )
-                        .onTapGesture {
-                            withAnimation(.easeOut(duration: 0.15)) { resaltada = i }
-                        }
+            // Siempre en UNA línea. `ViewThatFits` toma el primer tamaño que quepa; si
+            // ni con el mínimo cabe (iPhone angosto), la última opción deja que la
+            // frase se deslice de lado en vez de seguir encogiéndola.
+            // Siempre en UNA línea y a un tamaño fijo cómodo: en iPad la frase entra
+            // completa y queda centrada; en iPhone no cabe y se desliza de lado, en
+            // vez de encogerse hasta quedar diminuta. Se probó `ViewThatFits` con
+            // varios tamaños y elegía siempre el mayor, dejando la frase cortada.
+            GeometryReader { geo in
+                ScrollView(.horizontal, showsIndicators: false) {
+                    frase(tamano: Self.tamanoFrase)
+                        .frame(minWidth: geo.size.width, alignment: .center)
                 }
             }
-            .lineLimit(1)
-            .minimumScaleFactor(0.15)
+            .frame(height: Self.tamanoFrase * 1.9)
 
             HintText(text: "Lee la oración completa. Toca una palabra para señalarla 🙂")
         }
+    }
+
+    /// La frase completa a un tamaño dado. `fixedSize` es lo que permite a
+    /// `ViewThatFits` comparar el ancho natural de cada tamaño.
+    private func frase(tamano: CGFloat) -> some View {
+        HStack(spacing: 2) {
+            ForEach(Array(oracion.enumerated()), id: \.offset) { i, palabra in
+                Text(palabra.texto)
+                    .font(.kid(tamano))
+                    .foregroundStyle(resaltada == i ? cafe : Palette.ink)
+                    .padding(.vertical, 3)
+                    .padding(.horizontal, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 12, style: .continuous)
+                            .fill(resaltada == i ? Palette.yellow : .clear)
+                    )
+                    .onTapGesture {
+                        withAnimation(.easeOut(duration: 0.15)) { resaltada = i }
+                    }
+            }
+        }
+        .lineLimit(1)
+        .fixedSize(horizontal: true, vertical: false)
     }
 }
 

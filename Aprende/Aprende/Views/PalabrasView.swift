@@ -28,7 +28,6 @@ struct PalabrasView: View {
             ScreenHeader(
                 emoji: "📖",
                 title: "Lectura de palabras",
-                subtitle: "Lee la palabra en voz alta · separa en sílabas · pasa a la siguiente",
                 color: Palette.coral
             )
 
@@ -36,8 +35,6 @@ struct PalabrasView: View {
 
             if let palabra {
                 Card {
-                    TagPill(text: palabra.grupo)
-
                     textoPalabra(palabra)
                         .font(.kid(96))
                         .lineLimit(1)

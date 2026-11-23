@@ -16,6 +16,9 @@ struct MatematicasView: View {
     @State private var incorrecta: Int? = nil        // respuesta fallida mostrada en coral
     @State private var sacudida: CGFloat = 0         // offset x de la sacudida
     @State private var pista = "Elige el número 🙂"
+    /// ¿Se está mostrando el ábaco? Apoyo que el niño pide cuando no le sale,
+    /// igual que "Separar sílabas" en palabras.
+    @State private var abaco = false
 
     private var suma: Suma { AppData.sumas[indice] }
 
@@ -36,6 +39,10 @@ struct MatematicasView: View {
                     .lineLimit(1)
                     .minimumScaleFactor(0.4)
 
+                if abaco {
+                    cuentasDelAbaco
+                }
+
                 HintText(text: pista)
             }
 
@@ -46,10 +53,55 @@ struct MatematicasView: View {
                 }
             }
 
+            BigButton(
+                title: abaco ? "🙈 Quitar el ábaco" : "🧮 Ábaco",
+                color: Palette.blue
+            ) {
+                withAnimation(.easeOut(duration: 0.25)) { abaco.toggle() }
+            }
+
             BigButton(title: "🔀 Otra suma", color: Palette.green) {
                 otraSuma()
             }
         }
+    }
+
+    // MARK: - Ábaco
+
+    /// Las cuentas de la suma: el primer sumando en azul y el segundo en coral, en
+    /// una sola fila. Los dos grupos van separados a propósito — la idea es "juntar
+    /// grupos", y en una fila de cuentas iguales se pierde de dónde salió cada parte.
+    /// El niño las cuenta en voz alta; la app no le da el resultado.
+    private var cuentasDelAbaco: some View {
+        // Hasta 7 cuentas (6+0 es la suma más larga): caben en una fila en iPhone.
+        HStack(spacing: 10) {
+            grupoDeCuentas(suma.a, color: Palette.blue)
+            if suma.a > 0 && suma.b > 0 {
+                Text("+")
+                    .font(.kid(28))
+                    .foregroundStyle(Palette.grayLight)
+            }
+            grupoDeCuentas(suma.b, color: Palette.coral)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .fill(Palette.bg)
+        )
+        .transition(.scale.combined(with: .opacity))
+    }
+
+    private func grupoDeCuentas(_ cuantas: Int, color: Color) -> some View {
+        HStack(spacing: 6) {
+            ForEach(0..<max(cuantas, 0), id: \.self) { _ in
+                Circle()
+                    .fill(color)
+                    .frame(width: 26, height: 26)
+                    .overlay(Circle().stroke(.white.opacity(0.6), lineWidth: 2))
+            }
+        }
+        .accessibilityLabel("\(cuantas)")
     }
 
     // MARK: - Botón de respuesta
@@ -126,6 +178,7 @@ struct MatematicasView: View {
             resuelta = false
             incorrecta = nil
             sacudida = 0
+            abaco = false          // cada suma empieza sin apoyo, como "Separar sílabas"
             pista = "Elige el número 🙂"
         }
     }

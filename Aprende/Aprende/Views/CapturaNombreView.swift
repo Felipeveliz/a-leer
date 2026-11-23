@@ -14,12 +14,16 @@ struct CapturaNombreView: View {
     var esPrimerArranque: Bool = false
 
     @State private var nombre = ""
-    @State private var mano: Mano = .derecha
+    /// Arranca en nil: el adulto tiene que elegir mano a fuerza. Ver `PerfilStore.mano`.
+    @State private var mano: Mano? = nil
     @FocusState private var enfocado: Bool
 
     private var nombreValido: Bool {
         !nombre.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
+
+    /// Hacen falta las dos cosas para poder salir.
+    private var listoParaGuardar: Bool { nombreValido && mano != nil }
 
     /// Letras del nombre que todavía no tienen glifo: el flujo de Escribe se las
     /// salta, así que el adulto tiene que saberlo. NO bloquea "Listo": en el primer
@@ -63,13 +67,15 @@ struct CapturaNombreView: View {
 
             VStack(spacing: 12) {
                 HintText(text: "¿Con qué mano escribe?")
+                // Cada botón del lado que le toca: el adulto los asocia con su propia
+                // mano sin leer, y puesto al revés invitaba a equivocarse.
                 HStack(spacing: 12) {
-                    botonMano(.derecha, emoji: "✋", titulo: "Derecha")
                     botonMano(.izquierda, emoji: "🤚", titulo: "Izquierda")
+                    botonMano(.derecha, emoji: "✋", titulo: "Derecha")
                 }
             }
 
-            BigButton(title: "Listo ✅", color: Palette.green, isEnabled: nombreValido) {
+            BigButton(title: "Listo ✅", color: Palette.green, isEnabled: listoParaGuardar) {
                 guardar()
             }
 

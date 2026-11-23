@@ -79,11 +79,40 @@ final class AppDataTests: XCTestCase {
         }
     }
 
-    /// Filtrar por todas las hojas no puede perder nada.
+    /// Filtrar por todas las hojas no puede perder nada. Las sílabas son el caso
+    /// distinto: `silabas(en:)` devuelve las de la lista **más** las que salen de las
+    /// palabras, así que con todas las hojas da más que la lista sola.
     func testFiltrarPorTodasLasHojasDevuelveTodo() {
         XCTAssertEqual(AppData.palabras(en: todasLasHojas).count, AppData.palabras.count)
-        XCTAssertEqual(AppData.silabas(en: todasLasHojas).count, AppData.silabas.count)
         XCTAssertEqual(AppData.oracion(en: todasLasHojas).count, AppData.oracion.count)
+
+        let todasLasSilabas = AppData.silabas(en: todasLasHojas).map(\.texto)
+        for s in AppData.silabas {
+            XCTAssertTrue(todasLasSilabas.contains(s.texto), "se perdió la sílaba '\(s.texto)'")
+        }
+        XCTAssertGreaterThan(todasLasSilabas.count, AppData.silabas.count,
+                             "las sílabas de las palabras deberían sumar a la lista")
+        XCTAssertEqual(Set(todasLasSilabas).count, todasLasSilabas.count, "hay sílabas repetidas")
+    }
+
+    /// El punto del pedido: la hoja 3 no trae página de sílabas, pero sus palabras sí
+    /// se descomponen. Antes esto daba 0 y la pantalla caía al respaldo de la hoja 2.
+    func testLaHojaTresSacaSusSilabasDeSusPalabras() {
+        let silabas = AppData.silabas(en: [.tres])
+        XCTAssertFalse(silabas.isEmpty, "la hoja 3 se quedó sin sílabas")
+
+        let textos = Set(silabas.map(\.texto))
+        // Las 8 que no estaban en ninguna parte, una por palabra de la hoja 3.
+        for s in ["ir", "is", "mue", "món", "o", "pas", "rre", "sol"] {
+            XCTAssertTrue(textos.contains(s), "falta la sílaba '\(s)' de la hoja 3")
+        }
+        // Toda sílaba de una palabra de la hoja 3 tiene que estar, en minúscula.
+        for p in AppData.palabras(en: [.tres]) {
+            for trozo in p.silabas {
+                XCTAssertTrue(textos.contains(trozo.lowercased()),
+                              "'\(p.texto)' aporta '\(trozo)' y no aparece")
+            }
+        }
     }
 
     /// Cada orden de Escribe tiene que cubrir exactamente su hoja: si sobra o

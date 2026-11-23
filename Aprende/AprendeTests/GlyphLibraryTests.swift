@@ -158,6 +158,69 @@ final class GlyphLibraryTests: XCTestCase {
         XCTAssertLessThanOrEqual(fondoArriba, topeAbajo + 0.001, "las pancitas de la B se traslapan")
     }
 
+    // MARK: Reglas de trazo (ver CLAUDE.md sección 6)
+    //
+    // La app enseña la convención estándar, no el método de una escuela concreta.
+    // Estas tres reglas son la forma de que eso sea verificable y no una opinión.
+
+    /// Área con signo. Con Y hacia ABAJO, negativa = el trazo gira contra reloj
+    /// en pantalla, que es como se enseña a hacer los redondeles.
+    private func areaConSigno(_ p: [CGPoint]) -> CGFloat {
+        guard p.count > 2 else { return 0 }
+        var s: CGFloat = 0
+        for i in 0..<p.count {
+            let a = p[i], b = p[(i + 1) % p.count]
+            s += a.x * b.y - b.x * a.y
+        }
+        return s / 2
+    }
+
+    private func largo(_ p: [CGPoint]) -> CGFloat {
+        guard p.count > 1 else { return 0 }
+        var t: CGFloat = 0
+        for i in 1..<p.count { t += hypot(p[i].x - p[i - 1].x, p[i].y - p[i - 1].y) }
+        return t
+    }
+
+    /// Regla: los redondeles se trazan **contra reloj**, empezando arriba a la derecha
+    /// (como a las 2). Es la convención de todos los métodos de caligrafía.
+    func testLasLetrasRedondasGiranContraReloj() {
+        for ch: Character in ["a", "c", "d", "g", "o", "q", "O", "C", "Q", "G", "0"] {
+            guard let g = GlyphLibrary.glyph(for: ch), let cuerpo = g.strokes.first else {
+                return XCTFail("sin glifo de \(ch)")
+            }
+            XCTAssertLessThan(areaConSigno(cuerpo.points), 0,
+                              "\(ch): el redondel debería girar contra reloj")
+        }
+    }
+
+    /// Regla: todo trazo horizontal va **de izquierda a derecha**, nunca al revés.
+    func testLosTrazosHorizontalesVanDeIzquierdaADerecha() {
+        for g in todos {
+            for (i, s) in g.strokes.enumerated() where !s.isDot {
+                guard let a = s.points.first, let b = s.points.last else { continue }
+                let dx = b.x - a.x, dy = b.y - a.y
+                guard abs(dy) < 0.10, abs(dx) > 0.20 else { continue }   // solo los horizontales
+                XCTAssertGreaterThan(dx, 0,
+                                     "\(g.name) trazo \(i): un trazo horizontal va de derecha a izquierda")
+            }
+        }
+    }
+
+    /// Regla: primero el cuerpo y al final la barra, el punto o el acento — y esa
+    /// marca final siempre es más corta que el cuerpo.
+    func testLaMarcaFinalVaAlFinalYEsMasCorta() {
+        for ch: Character in ["t", "i", "j", "4", "5", "á", "é", "í", "ó", "ú",
+                              "Á", "É", "Í", "Ó", "Ú", "ñ", "Ñ"] {
+            guard let g = GlyphLibrary.glyph(for: ch), g.strokes.count > 1,
+                  let primero = g.strokes.first, let ultimo = g.strokes.last else {
+                return XCTFail("\(ch) debería tener más de un trazo")
+            }
+            XCTAssertLessThan(largo(ultimo.points), largo(primero.points),
+                              "\(ch): la marca final debería ser más corta que el cuerpo")
+        }
+    }
+
     /// Con la guía gruesa, un acento a menos de ~0.055 de su letra se pega a ella y
     /// el niño ve un solo garabato. Pasó con Á, É, Í y Ó.
     func testLosAcentosNoTocanSuLetra() {

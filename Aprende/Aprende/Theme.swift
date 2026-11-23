@@ -167,37 +167,6 @@ struct HojaPicker: View {
     }
 }
 
-/// Aviso pequeño cuando la hoja marcada no trae este tipo de contenido y se
-/// está enseñando el de las demás. No es un error: la pantalla sigue siendo
-/// útil, solo explica de dónde sale lo que se ve.
-struct AvisoRespaldo: View {
-    let hojas: Set<Hoja>
-    let que: String
-
-    private var nombres: String {
-        let ordenadas = hojas.sorted { $0.rawValue < $1.rawValue }.map(\.nombre)
-        guard ordenadas.count > 1 else { return ordenadas.first ?? "" }
-        return ordenadas.dropLast().joined(separator: ", ") + " y " + ordenadas[ordenadas.count - 1]
-    }
-
-    var body: some View {
-        HStack(spacing: 10) {
-            Text("📄").font(.system(size: 22))
-            Text("\(nombres) no trae \(que), así que estas son de las otras.")
-                .font(.kid(15, .semibold))
-                .foregroundStyle(Color(hex: 0x6B4E00))
-                .fixedSize(horizontal: false, vertical: true)
-            Spacer(minLength: 0)
-        }
-        .padding(.vertical, 12)
-        .padding(.horizontal, 16)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Palette.yellow.opacity(0.55))
-        )
-    }
-}
-
 /// Deshace el último trazo del lienzo libre. Cuadrado y angosto para que
 /// quepa al lado de "Borrar" y "¡Listo!" incluso en iPhone.
 struct UndoButton: View {
@@ -259,7 +228,9 @@ struct HintText: View {
 struct ScreenHeader: View {
     let emoji: String
     let title: String
-    let subtitle: String
+    /// Opcional: las pantallas de lectura no llevan instrucciones, porque la tarjeta
+    /// y los botones ya dicen qué hacer y repetirlo arriba era ruido.
+    var subtitle: String? = nil
     var color: Color = Palette.coral
 
     var body: some View {
@@ -267,10 +238,12 @@ struct ScreenHeader: View {
             Text("\(emoji) \(title)")
                 .font(.kid(32))
                 .foregroundStyle(color)
-            Text(subtitle)
-                .font(.kid(15, .semibold))
-                .foregroundStyle(Palette.gray)
-                .multilineTextAlignment(.center)
+            if let subtitle, !subtitle.isEmpty {
+                Text(subtitle)
+                    .font(.kid(15, .semibold))
+                    .foregroundStyle(Palette.gray)
+                    .multilineTextAlignment(.center)
+            }
         }
     }
 }

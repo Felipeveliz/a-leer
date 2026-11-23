@@ -58,7 +58,9 @@ enum AppData {
         .init(grupo: "Ss", texto: "sa"), .init(grupo: "Ss", texto: "se"), .init(grupo: "Ss", texto: "si"), .init(grupo: "Ss", texto: "so"), .init(grupo: "Ss", texto: "su"),
         .init(grupo: "Tt", texto: "ta"), .init(grupo: "Tt", texto: "te"), .init(grupo: "Tt", texto: "ti"), .init(grupo: "Tt", texto: "to"), .init(grupo: "Tt", texto: "tu"),
         .init(grupo: "Pp", texto: "pa"), .init(grupo: "Pp", texto: "pe"), .init(grupo: "Pp", texto: "pi"), .init(grupo: "Pp", texto: "po"), .init(grupo: "Pp", texto: "pu"),
-        .init(grupo: "Repaso", texto: "am"), .init(grupo: "Repaso", texto: "amo"), .init(grupo: "Repaso", texto: "mo"), .init(grupo: "Repaso", texto: "mor"),
+        // Trozos de "amor", que a Eliab le costaba. "mo" no se repite aquí: ya está
+        // arriba en Mm, y repetirla solo la hacía salir el doble de seguido.
+        .init(grupo: "Repaso", texto: "am"), .init(grupo: "Repaso", texto: "amo"), .init(grupo: "Repaso", texto: "mor"),
     ]
 
     // MARK: Lectura de palabras (también son las palabras del módulo Escribe)
@@ -119,8 +121,29 @@ enum AppData {
 
     // MARK: Filtros por hoja
 
+    /// Las sílabas de unas hojas: las de la lista marcadas con esas hojas **más las
+    /// que salen de descomponer las palabras de esas mismas hojas**. La hoja 3 no trae
+    /// página de sílabas, pero sus 20 palabras sí se parten en sílabas; si no se
+    /// derivaran, "Lectura de sílabas" se quedaría sin nada que enseñar con solo la 3
+    /// marcada, que es justo lo que pasaba antes.
+    ///
+    /// Las derivadas van en minúscula y sin repetir: en sílabas se lee el sonido, y
+    /// "Lo" de Lola y "lo" de loma son la misma sílaba. Las mayúsculas se practican
+    /// en las palabras, donde sí tienen sentido.
     static func silabas(en hojas: Set<Hoja>) -> [Silaba] {
-        silabas.filter { !$0.hojas.isDisjoint(with: hojas) }
+        let deLaLista = silabas.filter { !$0.hojas.isDisjoint(with: hojas) }
+        var vistas = Set(deLaLista.map { $0.texto.lowercased() })
+        var resultado = deLaLista
+
+        for palabra in palabras(en: hojas) {
+            for trozo in palabra.silabas {
+                let texto = trozo.lowercased()
+                guard !vistas.contains(texto) else { continue }
+                vistas.insert(texto)
+                resultado.append(Silaba(grupo: palabra.grupo, texto: texto, hojas: palabra.hojas))
+            }
+        }
+        return resultado
     }
 
     static func palabras(en hojas: Set<Hoja>) -> [Palabra] {

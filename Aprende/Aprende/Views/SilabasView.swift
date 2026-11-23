@@ -10,36 +10,26 @@ struct SilabasView: View {
     /// Índice de la sílaba actual dentro de `disponibles`.
     @State private var indice = 0
 
-    /// Las sílabas de las hojas marcadas. Si esas hojas no traen ninguna —la 3
-    /// solo trae palabras—, se enseñan todas en vez de dejar la pantalla muerta:
-    /// a un niño que entra a "Lectura de sílabas" hay que darle sílabas.
+    /// Las sílabas de las hojas marcadas. `AppData.silabas(en:)` ya deriva las de las
+    /// palabras de cada hoja, así que ninguna hoja se queda sin sílabas; el `?:` es
+    /// solo un seguro por si algún día se agrega una hoja sin nada.
     private var disponibles: [Silaba] {
         let deLasHojas = AppData.silabas(en: hojas.seleccionadas)
         return deLasHojas.isEmpty ? AppData.silabas : deLasHojas
     }
-
-    /// ¿Se está enseñando el respaldo porque la hoja marcada no trae sílabas?
-    private var esRespaldo: Bool { AppData.silabas(en: hojas.seleccionadas).isEmpty }
 
     var body: some View {
         ScreenScaffold {
             ScreenHeader(
                 emoji: "🔤",
                 title: "Lectura de sílabas",
-                subtitle: "Lee la sílaba en voz alta · pasa a la siguiente",
                 color: Palette.purple
             )
 
             HojaPicker()
 
-            if esRespaldo {
-                AvisoRespaldo(hojas: hojas.seleccionadas, que: "sílabas")
-            }
-
             if let silaba = silabaActual {
                 Card {
-                    TagPill(text: silaba.grupo)
-
                     Text(silaba.texto)
                         .font(.kid(110))
                         .foregroundStyle(Palette.blue)

@@ -285,15 +285,14 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
 - **Las casillas de hoja van en cuatro pantallas** (las tres de Español y la lista de
   palabras de Escribe), compartiendo una sola selección. Por defecto están las dos
   marcadas. Son casillas, no botones de opción: se puede practicar con las dos a la vez.
-- **OJO, esto está mal y hay que corregirlo** (ver el primer pendiente de la sección 8):
-  la hoja 3 **sí** tiene sílabas, las de sus propias palabras. Lo de abajo describe cómo
-  se comporta hoy, no cómo debe quedar.
-- **Hoy la hoja 3 solo trae palabras.** Si se marca solo la hoja 3, Sílabas y Oración
-  **enseñan las de la hoja 2** con un aviso amarillo (`AvisoRespaldo`) que explica de
-  dónde salen. Nunca una pantalla muerta: quien entra a "Lectura de sílabas" viene a
-  leer sílabas. Antes salía un mensaje de "esta hoja no trae sílabas" y Felipe lo leyó
-  como un error de la app, con razón. Cuando aparezcan las páginas de sílabas y oración
-  de la hoja 3, se etiquetan y el respaldo deja de usarse solo.
+- **Las sílabas de una hoja salen de sus palabras.** Una hoja sin página de sílabas (la 3)
+  igual las tiene: las de descomponer sus propias palabras. Lo hace `AppData.silabas(en:)`
+  y por eso Sílabas nunca se queda vacía. Las derivadas van en minúscula y sin repetir:
+  en sílabas se lee el sonido, y las mayúsculas se practican en las palabras.
+- **La hoja 3 no trae oración.** Si se marca sola, "Leer una oración" enseña la de la
+  hoja 2, **sin avisar**: quien entra viene a leer una oración, no a que le expliquen de
+  dónde salió. El aviso amarillo que lo explicaba se quitó porque Felipe lo leyó tres
+  veces como un error de la app, con razón.
 - **El nombre lo captura un adulto, una vez.** "Escribir mi nombre" (en Escribe) enseña
   a trazar el nombre del niño: primero cada parte (nombre y apellidos), luego el nombre
   completo, con el mismo flujo de 3 fases de las palabras. La app no puede adivinar el
@@ -341,6 +340,19 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   0.10), con la punta de abajo fuera de la parte más alta de la letra.
   `testLosAcentosNoTocanSuLetra` lo vigila.
 
+**Reglas de trazo (decisión de Felipe, 23 de noviembre).** La app enseña la **convención
+estándar**, no el método de la escuela de Eliab. No hay un estándar mundial único, así
+que la forma de que esto sea verificable y no una opinión es que estas reglas estén
+escritas y **las cumplan los 75 glifos sin excepción**:
+1. De **arriba abajo**.
+2. De **izquierda a derecha** (`testLosTrazosHorizontalesVanDeIzquierdaADerecha`).
+3. Los redondeles **contra reloj**, empezando como a las 2
+   (`testLasLetrasRedondasGiranContraReloj`).
+4. Primero el **cuerpo** y al final la **barra, el punto o el acento**, que siempre es más
+   corto (`testLaMarcaFinalVaAlFinalYEsMasCorta`).
+Un glifo nuevo pasa esos tres tests o no entra. Hoy 0, 1, 2, 3, 6, 7 y 8 van en 1 trazo;
+4, 5 y 9 en 2 (el 5: cuerpo y luego el sombrerito).
+
 ## 7. Protocolo de actualización de este archivo
 
 Cada cambio que toque arquitectura, estructura, decisiones, stack o estado **actualiza
@@ -367,87 +379,35 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 
 ## 8. Pendientes
 
-### Pedidos de Felipe (decididos, por hacer)
+### Pedidos de Felipe (hechos en la 1.1 build 7, 23 de noviembre)
 
-Numerados como él los dictó, para poder referirse a ellos por número.
+Los nueve que dictó el 23 de noviembre, ya implementados y probados:
 
-- [ ] **1. Captura de nombre (primer arranque y "Modificar nombre"):** el botón de mano
-      **izquierda va a la izquierda** y el de **derecha a la derecha** (hoy están al revés).
-      **Ninguno seleccionado por defecto** (hoy viene marcada "Derecha"): el adulto tiene
-      que elegir uno a la fuerza, y "Listo" no se activa hasta que haya nombre **y** mano.
-      Toca `CapturaNombreView` y, si `Mano` deja de tener valor por defecto,
-      `PerfilStore`.
-- [ ] **2. Las sílabas de una hoja salen de las palabras de esa hoja.** Hoy `AppData.silabas`
-      es una lista escrita a mano, aparte de `palabras` y etiquetada solo con la hoja 2.
-      Por eso, con solo la hoja 3 marcada, Sílabas la da por vacía y sale el aviso
-      "Hoja 3 no trae sílabas" — y es falso: sus 20 palabras se descomponen en **26
-      sílabas**. De esas, 18 ya están en la lista (pero como hoja 2) y **8 faltan**:
-      `ir`, `is`, `mue`, `món`, `o`, `pas`, `rre`, `sol` (Irma, isla, muela, limón,
-      osa/oso, pasto, torre, sol). Hay que derivar las sílabas de las palabras de cada
-      hoja en vez de mantener dos listas sueltas. Con eso el aviso `AvisoRespaldo`
-      desaparece solo en Sílabas (en Oración sigue aplicando: la hoja 3 no trae oración).
-- [ ] **3. Quitar la pastilla del grupo** (`TagPill(text: silaba.grupo)` en `SilabasView`
-      y la equivalente de `PalabrasView`). Reflejaba los encabezados Ll/Rr/Nn de las
-      primeras hojas, pero la hoja 3 es solo una lista de palabras y esos grupos se los
-      pusimos nosotros: salen cosas como "sol" en **Ss** o "Irma" en **Repaso**. Y a un
-      niño de 5 años saber el grupo no le aporta nada; es dato de adulto en la pantalla
-      del niño. **Las pastillas de progreso ("3 / 11") se quedan.** Al quitarla, ver si
-      el campo `grupo` de `Silaba`/`Palabra` sigue haciendo falta para algo.
-- [ ] **4. Quitar los subtítulos de instrucciones** (el `subtitle` del `ScreenHeader`) en
-      `SilabasView` ("Lee la sílaba en voz alta · pasa a la siguiente") y en
-      `PalabrasView` ("Lee la palabra en voz alta · separa en sílabas · pasa a la
-      siguiente"). Las dos pantallas ya repiten lo mismo en el `HintText` de la tarjeta,
-      y los botones dicen solos lo que hacen. El `ScreenHeader` se queda, solo sin
-      subtítulo (ver si acepta `subtitle` vacío o hace falta un init sin él).
-- [ ] **5. "Leer una oración": el salto de tamaño entre pestañas.** Sílabas y Palabras
-      muestran el elemento a `.kid(110)`; la pestaña Oración arranca en `.kid(40)` con
-      `minimumScaleFactor(0.15)`, así que en iPhone la frase se encoge a unos 18 pt para
-      caber en una línea (en iPad sí entra casi a 40). A Felipe no le gusta pasar de una
-      letra enorme a una diminuta. **Choca con su pedido anterior de "la oración en una
-      sola línea"**: 7 palabras en un teléfono solo caben encogiéndolas.
-      **Decisión de Felipe (23 de noviembre):** la oración se queda en **una sola línea**
-      pero con un **tamaño mínimo** (≈24 pt, en vez del 15% de 40 que da ~18 pt al que
-      llega hoy); si con ese mínimo no cabe, la frase **se desliza de lado** con el dedo
-      en vez de encogerse más. Las pestañas de Sílabas y Palabras no se tocan.
-- [ ] **6. Quitar el aviso `AvisoRespaldo`** ("Hoja 3 no trae oración, así que estas son
-      de las otras"): el componente en `Theme.swift` y sus dos usos, en `SilabasView` y
-      `OracionView`. Felipe lo leyó como error de la app tres veces; explicarle al niño de
-      dónde salió el contenido no le sirve a nadie. **El respaldo en sí se queda**: nunca
-      una pantalla vacía, solo que ahora es silencioso. Con el punto 2 hecho, Sílabas ya
-      no necesitará respaldo; Oración sí seguirá usándolo mientras la hoja 3 no traiga
-      oración. Esto deja sin efecto la parte de la sección 5 que describe el aviso.
-- [ ] **7. Botón "Ábaco" en Matemáticas.** Mismo papel que "Separar sílabas" en palabras:
-      un apoyo que el niño pide cuando no le sale. Al tocarlo, la suma se muestra en
-      cuentas para contarlas; al tocarlo otra vez se esconde (como Separar ↔ Juntar).
-      Propuesta a confirmar con Felipe: **los dos sumandos en grupos y colores distintos**
-      (3 + 2 = tres cuentas azules y dos coral en la misma fila), que es justo la idea de
-      "juntar grupos" de la que hablamos; no una sola fila de 5, porque ahí se pierde de
-      dónde salió cada parte. Sin audio. Las respuestas siguen siendo los botones 2–6.
-- [ ] **8. La demo del trazo se repite en CADA error, no a los 3 intentos.** En
-      `LetterTraceView.handleStroke`, la rama de fallo hace `attempts += 1` y solo llama a
-      `startDemo` con `attempts >= 3`. Felipe falló una o dos veces y pensó que no se
-      repetía nunca. Debe volver a demostrar el trazo cada vez que el trazo no cuadra.
-      Al hacerlo: la demo dura ~1.1 s más el retardo, así que hay que cuidar que no se
-      sienta lento entre intento e intento, y revisar si `attempts` sigue sirviendo para
-      algo. Ojo con la fase 2, que hoy va con `showsDemo: false` pero aun así demuestra
-      al tercer fallo (la rama de fallo no mira `showsDemo`): dejar las dos fases
-      coherentes y preguntar a Felipe si en fase 2 también quiere la demo en cada error.
-
-- [ ] **9. Los trazos siguen la convención estándar, NO la escuela de Eliab.** Decisión de
-      Felipe (23 de noviembre), preguntando por el **5** (hoy: 2 trazos, cuerpo y luego el
-      sombrerito): *"no me importa como lo enseña la escuela, quiero que la app lo enseñe
-      correctamente a como el mundo necesita aprender"*. **Deja sin efecto** el criterio
-      anterior de copiar la letra de su escuela: la referencia ya no es el cuaderno de
-      Eliab, y ya no hay que contrastar nada con la maestra.
-      Aviso honesto: **no existe un estándar mundial único** (Zaner-Bloser, D'Nealian y los
-      cuadernos de caligrafía en español difieren en algunas letras). Así que esto se
-      vuelve accionable de una sola forma: **escribir las reglas en este archivo y que los
-      75 trazos las cumplan sin excepción**. Reglas propuestas, a confirmar con Felipe:
-      de arriba abajo; de izquierda a derecha; los círculos en contra del reloj
-      (a, c, d, g, o, q: empezar como a las 2 y girar a la izquierda); primero el cuerpo y
-      al final la barra o el punto (t, i, j, 4, 5). Después, auditar los 75 contra esas
-      reglas, como se hizo con la "U", los acentos, la "G" y la "B". Hoy 0, 1, 2, 3, 6, 7
-      y 8 van en 1 trazo, y 4, 5 y 9 en 2.
+- [x] **1.** Captura de nombre: mano **izquierda a la izquierda**, **derecha a la derecha**,
+      y **ninguna marcada por defecto** (`PerfilStore.mano` es `Mano?`). "Listo" no se
+      activa hasta que haya nombre **y** mano, y `configurado` exige las dos cosas.
+- [x] **2.** **Las sílabas de una hoja salen de sus palabras.** `AppData.silabas(en:)`
+      devuelve las de la lista marcadas con esas hojas **más** las de descomponer sus
+      palabras (en minúscula y sin repetir). Con eso la hoja 3 pasó de 0 a 26 sílabas,
+      incluidas las 8 que no existían (`ir`, `is`, `mue`, `món`, `o`, `pas`, `rre`, `sol`).
+      De paso salió un duplicado viejo: "mo" estaba en Mm y otra vez en Repaso.
+- [x] **3.** Fuera la pastilla del grupo (Ll, Rr, Repaso…) en Sílabas y Palabras. El campo
+      `grupo` se queda en los datos como procedencia, pero **ya no se muestra**.
+- [x] **4.** Fuera los subtítulos de instrucciones en Sílabas y Palabras. `ScreenHeader`
+      ahora acepta `subtitle` opcional.
+- [x] **5.** La oración va en **una línea a tamaño fijo (34 pt)** dentro de un carril
+      horizontal: en iPad entra completa y centrada, en iPhone **se desliza de lado**.
+      Antes se encogía hasta ~18 pt. Se intentó con `ViewThatFits` y no sirve: elegía
+      siempre el tamaño mayor y dejaba la frase cortada.
+- [x] **6.** Fuera el aviso `AvisoRespaldo` ("Hoja 3 no trae oración…"), componente y usos.
+      El respaldo sigue, pero silencioso.
+- [x] **7.** Botón **🧮 Ábaco** en Matemáticas, que alterna como "Separar sílabas": muestra
+      los dos sumandos en cuentas de colores distintos separadas por un "+", para contar.
+      Se esconde solo al pasar a otra suma.
+- [x] **8.** La demo del trazo se repite **en cada error**, no a los 3 intentos.
+- [x] **9.** Los trazos siguen la **convención estándar**, no la escuela de Eliab (decisión
+      de Felipe). Las reglas están en la sección 6 y las vigilan tres tests; la auditoría
+      de los 75 glifos salió limpia.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
@@ -517,7 +477,8 @@ que no acepta el trazo continuo (decisión de Felipe del 19 de noviembre: no cam
 build de la revisión). Los arreglos están en TestFlight y van en la siguiente versión.
 
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
-único tester. La más nueva es la **1.1 (6)**, subida el 23 de noviembre: lleva lo de la
+único tester. La más nueva es la **1.1 (7)**, subida el 23 de noviembre: la 1.1 (6) más
+los nueve pedidos de Felipe de ese día (ver la sección 8). La 1.1 (6) llevaba lo de la
 build 5 (hojas + respaldo + trazo continuo + modelo dibujado) más el perfil del niño
 (nombre y mano), el abecedario completo y "Escribir mi nombre". Un build recién procesado aparece
 como **"Missing Compliance"** y no se distribuye hasta contestarlo; desde la build 3 ya
@@ -533,8 +494,11 @@ Lo aprendido antes, que sigue valiendo:
 ### Pendientes del deploy
 - [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
       aparece en la App Store de México.
-- [ ] Probar la **1.1 (6)** en el iPad desde TestFlight y, si está bien, mandarla a
+- [ ] Probar la **1.1 (7)** en el iPad desde TestFlight y, si está bien, mandarla a
       revisión como siguiente versión de la App Store.
+- [ ] De los nueve pedidos, el **8** (demo del trazo en cada error) se revisó en código
+      pero **no se vio fallar en pantalla**: el trazo sintético caía fuera del lienzo
+      angosto de la "r". Confirmarlo en el iPad.
 - [ ] App Store Connect pide revisar las **nuevas preguntas de clasificación por edad**
       (aviso en la lista de apps, sección "Información de la app").
 - [ ] **La build 2 se envió sin que nadie la ejecutara**: la Mac se quedó sin runtimes de

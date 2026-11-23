@@ -25,19 +25,27 @@ final class PerfilStore: ObservableObject {
         didSet { UserDefaults.standard.set(nombre, forKey: Self.claveNombre) }
     }
 
-    @Published var mano: Mano {
-        didSet { UserDefaults.standard.set(mano.rawValue, forKey: Self.claveMano) }
+    /// Opcional a propósito: **no hay mano por defecto**. Si viniera marcada "derecha",
+    /// un adulto distraído la dejaría así y a un niño zurdo el modelo le quedaría
+    /// tapado por su propia mano. Nil = todavía nadie la eligió.
+    @Published var mano: Mano? {
+        didSet { UserDefaults.standard.set(mano?.rawValue, forKey: Self.claveMano) }
     }
 
     private init() {
         nombre = UserDefaults.standard.string(forKey: Self.claveNombre) ?? ""
         mano = UserDefaults.standard.string(forKey: Self.claveMano)
-            .flatMap(Mano.init(rawValue:)) ?? .derecha
+            .flatMap(Mano.init(rawValue:))
     }
 
-    /// ¿Ya configuró un adulto el perfil? Si no, el primer arranque lo pregunta.
+    /// Mientras no se elija, se coloca como diestro (el caso más común), pero la
+    /// pantalla de captura no deja salir sin elegir.
+    var esZurdo: Bool { mano == .izquierda }
+
+    /// ¿Ya configuró un adulto el perfil? Hacen falta las dos cosas: sin mano, Escribe
+    /// no sabe de qué lado poner el modelo.
     var configurado: Bool {
-        !nombre.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        !nombre.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && mano != nil
     }
 
     /// El nombre partido en sus partes (nombre de pila y apellidos), para

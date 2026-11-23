@@ -128,7 +128,7 @@ struct DigitoEscribeFlowView: View {
             // Modelo arriba, del lado que la mano del niño no tapa: izquierda si
             // es diestro, derecha si es zurdo.
             HStack {
-                if perfil.mano.esZurdo { Spacer() }
+                if perfil.esZurdo { Spacer() }
                 if modeloVisible || terminado {
                     Text(String(digito))
                         .font(.kid(72, .heavy))
@@ -152,7 +152,7 @@ struct DigitoEscribeFlowView: View {
                     }
                     .buttonStyle(PressDownButtonStyle())
                 }
-                if !perfil.mano.esZurdo { Spacer() }
+                if !perfil.esZurdo { Spacer() }
             }
 
             if terminado {

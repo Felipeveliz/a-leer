@@ -10,7 +10,8 @@ import UIKit
 //  - captura con PencilKit y validación con TraceEngine
 //  - al validar, el trazo se "pinta" perfecto en el color de tinta
 //
-// Pedagogía: feedback amable (nunca tache rojo), re-demostración tras 3 intentos.
+// Pedagogía: feedback amable (nunca tache rojo) y se vuelve a demostrar el trazo
+// en cada error, no tras varios intentos.
 
 struct LetterTraceView: View {
     let glyph: Glyph
@@ -21,7 +22,6 @@ struct LetterTraceView: View {
 
     @State private var completed = 0
     @State private var clearTrigger = 0
-    @State private var attempts = 0
     @State private var retryVisible = false
     @State private var successVisible = false
     @State private var demoStart: Date?
@@ -202,16 +202,17 @@ struct LetterTraceView: View {
         // uniendo los siguientes hasta ver si el movimiento cubre varios.
         guard let hasta = primerTramoQueCuadra(points, strokes: strokes, height: height) else {
             UINotificationFeedbackGenerator().notificationOccurred(.warning)
-            attempts += 1
             withAnimation { retryVisible = true }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 clearTrigger += 1
                 withAnimation { retryVisible = false }
             }
-            if attempts >= 3 {
-                attempts = 0
-                startDemo(after: 0.9)
-            }
+            // Se vuelve a demostrar el trazo en CADA error, no después de tres: un niño
+            // que falla necesita ver cómo se hace ahí mismo, y esperar tres intentos
+            // parecía que la animación simplemente no se repetía. Va aunque la pantalla
+            // no demuestre al entrar (fase 2): si falló, hay que enseñarle.
+            // El 0.9 cae justo después de que se limpia el lienzo (0.8).
+            startDemo(after: 0.9)
             return
         }
 
@@ -221,7 +222,6 @@ struct LetterTraceView: View {
                 completed = hasta + 1
                 retryVisible = false
             }
-            attempts = 0
             clearTrigger += 1
             if completed == strokes.count {
                 glyphDone = true
