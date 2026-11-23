@@ -23,7 +23,7 @@ struct EscribeMenuView: View {
                 MenuCard(
                     emoji: "🔤",
                     title: "Palabras",
-                    subtitle: "Lola · lima · pelota …",
+                    subtitle: "DISEÑADO PARA IPAD Y PENCIL",
                     colors: [Palette.coral, Palette.orangeLight]
                 )
             }
@@ -35,7 +35,7 @@ struct EscribeMenuView: View {
                 MenuCard(
                     emoji: "🙂",
                     title: "Mi nombre",
-                    subtitle: "Aprende a escribir tu nombre",
+                    subtitle: "DISEÑADO PARA IPAD Y PENCIL",
                     colors: [Palette.purple, Palette.purpleDark]
                 )
             }
@@ -47,7 +47,7 @@ struct EscribeMenuView: View {
                 MenuCard(
                     emoji: "🔢",
                     title: "Números",
-                    subtitle: "del 0 al 9",
+                    subtitle: "DISEÑADO PARA IPAD Y PENCIL",
                     colors: [Palette.teal, Palette.tealDark]
                 )
             }

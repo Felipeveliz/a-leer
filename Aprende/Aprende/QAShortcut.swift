@@ -12,7 +12,7 @@ import SwiftUI
 // No existe en Release: el `#if DEBUG` envuelve el archivo entero.
 
 enum QAShortcut: String {
-    case adultos, menu, avance, acerca, cafe, idea
+    case adultos, menu, avance, acerca, cafe, idea, escribe
 
     /// La pantalla pedida por argumento de lanzamiento, si hay alguna.
     static var pedida: QAShortcut? {
@@ -30,6 +30,7 @@ enum QAShortcut: String {
             case .acerca:  AcercaDeView()
             case .cafe:    CafeView()
             case .idea:    IdeaView()
+            case .escribe: EscribeMenuView()
             }
         }
     }
