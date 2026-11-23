@@ -399,6 +399,13 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       siguiente"). Las dos pantallas ya repiten lo mismo en el `HintText` de la tarjeta,
       y los botones dicen solos lo que hacen. El `ScreenHeader` se queda, solo sin
       subtítulo (ver si acepta `subtitle` vacío o hace falta un init sin él).
+- [ ] **5. "Leer una oración": el salto de tamaño entre pestañas.** Sílabas y Palabras
+      muestran el elemento a `.kid(110)`; la pestaña Oración arranca en `.kid(40)` con
+      `minimumScaleFactor(0.15)`, así que en iPhone la frase se encoge a unos 18 pt para
+      caber en una línea (en iPad sí entra casi a 40). A Felipe no le gusta pasar de una
+      letra enorme a una diminuta. **Choca con su pedido anterior de "la oración en una
+      sola línea"**: 7 palabras en un teléfono solo caben encogiéndolas. Falta que él
+      decida qué prefiere (ver la pregunta abierta abajo).
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
