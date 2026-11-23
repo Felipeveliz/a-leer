@@ -285,6 +285,9 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
 - **Las casillas de hoja van en cuatro pantallas** (las tres de Español y la lista de
   palabras de Escribe), compartiendo una sola selección. Por defecto están las dos
   marcadas. Son casillas, no botones de opción: se puede practicar con las dos a la vez.
+- **OJO, esto está mal y hay que corregirlo** (ver el primer pendiente de la sección 8):
+  la hoja 3 **sí** tiene sílabas, las de sus propias palabras. Lo de abajo describe cómo
+  se comporta hoy, no cómo debe quedar.
 - **Hoy la hoja 3 solo trae palabras.** Si se marca solo la hoja 3, Sílabas y Oración
   **enseñan las de la hoja 2** con un aviso amarillo (`AvisoRespaldo`) que explica de
   dónde salen. Nunca una pantalla muerta: quien entra a "Lectura de sílabas" viene a
@@ -365,6 +368,15 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 ## 8. Pendientes
 
 ### Pedidos de Felipe (decididos, por hacer)
+- [ ] **Las sílabas de una hoja salen de las palabras de esa hoja.** Hoy `AppData.silabas`
+      es una lista escrita a mano, aparte de `palabras` y etiquetada solo con la hoja 2.
+      Por eso, con solo la hoja 3 marcada, Sílabas la da por vacía y sale el aviso
+      "Hoja 3 no trae sílabas" — y es falso: sus 20 palabras se descomponen en **26
+      sílabas**. De esas, 18 ya están en la lista (pero como hoja 2) y **8 faltan**:
+      `ir`, `is`, `mue`, `món`, `o`, `pas`, `rre`, `sol` (Irma, isla, muela, limón,
+      osa/oso, pasto, torre, sol). Hay que derivar las sílabas de las palabras de cada
+      hoja en vez de mantener dos listas sueltas. Con eso el aviso `AvisoRespaldo`
+      desaparece solo en Sílabas (en Oración sigue aplicando: la hoja 3 no trae oración).
 - [ ] **Captura de nombre (primer arranque y "Modificar nombre"):** el botón de mano
       **izquierda va a la izquierda** y el de **derecha a la derecha** (hoy están al revés).
       **Ninguno seleccionado por defecto** (hoy viene marcada "Derecha"): el adulto tiene
