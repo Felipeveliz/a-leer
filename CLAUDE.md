@@ -393,6 +393,11 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       niño de 5 años saber el grupo no le aporta nada; es dato de adulto en la pantalla
       del niño. **Las pastillas de progreso ("3 / 11") se quedan.** Al quitarla, ver si
       el campo `grupo` de `Silaba`/`Palabra` sigue haciendo falta para algo.
+- [ ] **4. Quitar el subtítulo "Lee la sílaba en voz alta · pasa a la siguiente"** de
+      `SilabasView` (el `subtitle` del `ScreenHeader`). Dentro de la tarjeta ya está el
+      `HintText` "Lee la sílaba en voz alta 🙂", así que lo dice dos veces. Preguntar a
+      Felipe si también va fuera el de `PalabrasView` ("Lee la palabra en voz alta ·
+      separa en sílabas · pasa a la siguiente"), que tiene el mismo problema.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
