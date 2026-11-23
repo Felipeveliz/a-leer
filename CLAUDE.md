@@ -629,10 +629,17 @@ que no acepta el trazo continuo (decisión de Felipe del 19 de noviembre: no cam
 build de la revisión). Los arreglos están en TestFlight y van en la siguiente versión.
 
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
-único tester. La más nueva es la **1.1 (10)**, subida el 23 de noviembre: los
+único tester. La más nueva es la **1.1 (11)**, subida el 23 de noviembre: los
 cuatro arreglos de la ronda de prueba de ese día, la zona de adultos con las cuatro
-utilidades de Toss, el crédito de X también en "Acerca de" y los tres subtítulos de
-Escribe con "DISEÑADO PARA IPAD Y PENCIL".
+utilidades de Toss, el crédito de X también en "Acerca de", los tres subtítulos de
+Escribe con "DISEÑADO PARA IPAD Y PENCIL" y el candado de versión.
+
+**La 1.1 (11) se envió a revisión el 23 de noviembre**, junto con las cuatro propinas:
+cinco ítems en una sola entrega, con salida automática. Las notas del revisor se
+reescribieron: las de la 1.0 decían "no paid content or features", que con las propinas
+dentro ya era falso, y ahora explican la puerta de adultos (con ejemplos de los números
+escritos con letra, que si no un revisor que no lee español no entra), las propinas, el
+formulario anónimo y el candado de versión.
 
 Dos tropiezos de esa subida, por si se repiten:
 
@@ -659,8 +666,8 @@ Lo aprendido antes, que sigue valiendo:
 ### Pendientes del deploy
 - [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
       aparece en la App Store de México.
-- [ ] Probar la **1.1 (10)** en el iPad desde TestFlight y, si está bien, mandarla a
-      revisión como siguiente versión de la App Store.
+- [ ] Seguir la revisión de la **1.1 (11)**. Si Apple la rechaza por la captura de las
+      propinas (ver abajo), se cancela la submission, se cambia la captura y se reenvía.
 - [ ] **Las propinas necesitan el contrato de Paid Applications** firmado en App Store
       Connect, con datos fiscales y bancarios. Aprende siempre fue gratis, así que lo más
       probable es que no esté: sin él no se pueden dar de alta los consumibles. Solo lo
@@ -679,10 +686,17 @@ Lo aprendido antes, que sigue valiendo:
 - [x] Las cuatro propinas están dadas de alta (23 de noviembre). El contrato de
       **Paid Applications estaba activo** desde el 17 de noviembre y la cuenta bancaria
       configurada, así que no hizo falta nada de eso.
-- [ ] **Cambiar la captura de revisión de las cuatro propinas.** La que está puesta es
-      la pantalla del café **sin opciones** (era la única que existía: los productos no
-      existían todavía). Antes de mandar la versión a revisión hay que sustituirla por
-      una con las cuatro filas visibles, desde el iPad.
+- [ ] **Cambiar la captura de revisión de las cuatro propinas** en cuanto haya una del
+      iPad con las cuatro filas. Se enviaron con la pantalla del café **sin opciones**,
+      que era la única captura que existía cuando se dieron de alta (los productos no
+      existían todavía, así que StoreKit no devolvía ninguno). Es el riesgo conocido de
+      esta entrega.
+- [ ] **Las páginas web se actualizaron el 23 de noviembre** (privacidad y soporte):
+      decían que la app no se conecta a internet y que no tiene compras, las dos cosas
+      falsas desde la 1.1. Viven en este mismo repo y se publican solas en
+      `felipeveliz.github.io/a-leer`. **Cada cambio de la app que toque red, compras o
+      datos guardados tiene que llegar también a esas dos páginas**: el revisor de Apple
+      las lee.
 - [ ] **Cambiar "Compras dentro de la app" de "Ninguna" a propinas** en la ficha
       (`AppStoreMetadata/es-MX.md` línea 16) cuando los productos estén dados de alta.
 - [ ] Confirmar que las respuestas de privacidad siguen siendo "Data Not Collected": el
