@@ -423,6 +423,15 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       (3 + 2 = tres cuentas azules y dos coral en la misma fila), que es justo la idea de
       "juntar grupos" de la que hablamos; no una sola fila de 5, porque ahí se pierde de
       dónde salió cada parte. Sin audio. Las respuestas siguen siendo los botones 2–6.
+- [ ] **8. La demo del trazo se repite en CADA error, no a los 3 intentos.** En
+      `LetterTraceView.handleStroke`, la rama de fallo hace `attempts += 1` y solo llama a
+      `startDemo` con `attempts >= 3`. Felipe falló una o dos veces y pensó que no se
+      repetía nunca. Debe volver a demostrar el trazo cada vez que el trazo no cuadra.
+      Al hacerlo: la demo dura ~1.1 s más el retardo, así que hay que cuidar que no se
+      sienta lento entre intento e intento, y revisar si `attempts` sigue sirviendo para
+      algo. Ojo con la fase 2, que hoy va con `showsDemo: false` pero aun así demuestra
+      al tercer fallo (la rama de fallo no mira `showsDemo`): dejar las dos fases
+      coherentes y preguntar a Felipe si en fase 2 también quiere la demo en cada error.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
