@@ -404,8 +404,11 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       `minimumScaleFactor(0.15)`, así que en iPhone la frase se encoge a unos 18 pt para
       caber en una línea (en iPad sí entra casi a 40). A Felipe no le gusta pasar de una
       letra enorme a una diminuta. **Choca con su pedido anterior de "la oración en una
-      sola línea"**: 7 palabras en un teléfono solo caben encogiéndolas. Falta que él
-      decida qué prefiere (ver la pregunta abierta abajo).
+      sola línea"**: 7 palabras en un teléfono solo caben encogiéndolas.
+      **Decisión de Felipe (23 de noviembre):** la oración se queda en **una sola línea**
+      pero con un **tamaño mínimo** (≈24 pt, en vez del 15% de 40 que da ~18 pt al que
+      llega hoy); si con ese mínimo no cabe, la frase **se desliza de lado** con el dedo
+      en vez de encogerse más. Las pestañas de Sílabas y Palabras no se tocan.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
