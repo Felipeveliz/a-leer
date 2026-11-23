@@ -114,9 +114,12 @@ struct IdeaView: View {
     private var recibido: some View {
         Card {
             Text("¡Recibido! 🙌").font(.kid(28)).foregroundStyle(Palette.green)
+            // Con wifi la subida tarda un segundo, así que al confirmar la cola
+            // casi siempre sigue llena: decir "en cuanto haya internet" ahí
+            // suena a que no hay. El texto tiene que ser cierto en los dos casos.
             Text(servicio.pendientes.isEmpty
                  ? "Ya se envió. Gracias."
-                 : "Se enviará en cuanto haya internet. Puedes cerrar la app sin problema.")
+                 : "Se está enviando. Puedes cerrar la app: si ahora no hay internet, sale después.")
                 .font(.kid(16, .semibold))
                 .foregroundStyle(Palette.gray)
                 .multilineTextAlignment(.center)

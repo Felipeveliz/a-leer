@@ -220,6 +220,10 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
   Toss. `DriveCredentials.swift` tiene las credenciales reales y **está en
   `.gitignore`** (este repo es público); lo versionado es `DriveCredentials.sample.swift`,
   envuelto en `#if false` para que no colisione al compilar.
+  El token de Drive viaja dentro del binario, así que quien descargue la app puede
+  sacarlo: el scope `drive.file` acota el daño a los archivos que creó ese cliente, y es
+  el mismo trato que ya se aceptó en Toss. Si algún día estorba, el camino es un
+  endpoint propio en vez de credenciales embebidas.
 - **`UpdateChecker`** — la **única llamada de red** de la app: pregunta al iTunes Lookup
   qué versión está publicada. No manda nada del niño ni del dispositivo.
 - **`QAShortcut` (solo DEBUG)** — abre una pantalla de dentro al arrancar
@@ -608,8 +612,11 @@ que no acepta el trazo continuo (decisión de Felipe del 19 de noviembre: no cam
 build de la revisión). Los arreglos están en TestFlight y van en la siguiente versión.
 
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
-único tester. La más nueva es la **1.1 (7)**, subida el 23 de noviembre: la 1.1 (6) más
-los nueve pedidos de Felipe de ese día (ver la sección 8). La 1.1 (6) llevaba lo de la
+único tester. La **1.1 (8)** está archivada y lista para subir (los cuatro arreglos de
+la ronda de prueba del 23 de noviembre más la zona de adultos con las cuatro utilidades);
+**la subida se quedó bloqueada en `Failed to Use Accounts`**: Xcode necesita la sesión de
+la cuenta de Apple. La última que sí llegó a TestFlight es la **1.1 (7)**, con los nueve
+pedidos del 23 de noviembre. La 1.1 (6) llevaba lo de la
 build 5 (hojas + respaldo + trazo continuo + modelo dibujado) más el perfil del niño
 (nombre y mano), el abecedario completo y "Escribir mi nombre". Un build recién procesado aparece
 como **"Missing Compliance"** y no se distribuye hasta contestarlo; desde la build 3 ya
@@ -625,8 +632,12 @@ Lo aprendido antes, que sigue valiendo:
 ### Pendientes del deploy
 - [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
       aparece en la App Store de México.
-- [ ] Probar la **1.1 (7)** en el iPad desde TestFlight y, si está bien, mandarla a
-      revisión como siguiente versión de la App Store.
+- [ ] Subir la **1.1 (8)** (el archive está hecho en `Aprende/build/`), probarla en el
+      iPad y, si está bien, mandarla a revisión como siguiente versión de la App Store.
+- [ ] **Las propinas necesitan el contrato de Paid Applications** firmado en App Store
+      Connect, con datos fiscales y bancarios. Aprende siempre fue gratis, así que lo más
+      probable es que no esté: sin él no se pueden dar de alta los consumibles. Solo lo
+      puede hacer Felipe.
 - [ ] De los nueve pedidos, el **8** (demo del trazo en cada error) se revisó en código
       pero **no se vio fallar en pantalla**: el trazo sintético caía fuera del lienzo
       angosto de la "r". Confirmarlo en el iPad.
