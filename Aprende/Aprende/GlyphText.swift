@@ -29,7 +29,14 @@ struct GlyphText: View {
     }
 
     var body: some View {
-        Canvas { ctx, _ in
+        Canvas { ctx, size in
+            // Un nombre completo puede no caber a lo ancho ("José Luis García
+            // García" mide unos 440 pt a 34 de alto y el iPhone deja 362). Se encoge
+            // entero, centrado en su alto, en vez de salirse de la pantalla.
+            let escala = min(1, size.width / max(anchoTotal, 1))
+            ctx.translateBy(x: 0, y: alto * (1 - escala) / 2)
+            ctx.scaleBy(x: escala, y: escala)
+
             var x: CGFloat = 0
             for (i, ch) in letras.enumerated() {
                 let anchoLetra = ancho(de: ch)
@@ -63,7 +70,9 @@ struct GlyphText: View {
                 }
             }
         }
-        .frame(width: anchoTotal, height: alto)
+        // Ancho natural = el de la palabra, pero puede recibir menos (y encogerse).
+        .frame(idealWidth: anchoTotal, maxWidth: anchoTotal)
+        .frame(height: alto)
         .accessibilityLabel(texto)
     }
 }

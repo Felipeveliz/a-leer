@@ -21,6 +21,17 @@ struct CapturaNombreView: View {
         !nombre.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
     }
 
+    /// Letras del nombre que todavía no tienen glifo: el flujo de Escribe se las
+    /// salta, así que el adulto tiene que saberlo. NO bloquea "Listo": en el primer
+    /// arranque esta pantalla es obligatoria y bloquearla dejaría la app cerrada.
+    private var letrasSinGlifo: [Character] {
+        var vistas: [Character] = []
+        for ch in nombre where !ch.isWhitespace && GlyphLibrary.glyph(for: ch) == nil && !vistas.contains(ch) {
+            vistas.append(ch)
+        }
+        return vistas
+    }
+
     var body: some View {
         ScreenScaffold {
             ScreenHeader(
@@ -44,6 +55,11 @@ struct CapturaNombreView: View {
                         .fill(Palette.card)
                         .shadow(color: .black.opacity(0.10), radius: 8, y: 4)
                 )
+
+            if !letrasSinGlifo.isEmpty {
+                HintText(text: "Estas letras todavía no se pueden trazar y se saltarán: "
+                         + letrasSinGlifo.map(String.init).joined(separator: " "))
+            }
 
             VStack(spacing: 12) {
                 HintText(text: "¿Con qué mano escribe?")

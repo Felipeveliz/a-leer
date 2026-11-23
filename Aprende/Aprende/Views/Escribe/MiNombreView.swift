@@ -40,9 +40,12 @@ struct MiNombreView: View {
                         PalabraEscribeFlowView(palabra: p)
                     } label: {
                         VStack(spacing: 8) {
+                            // Un nombre completo no cabe a 30 de alto en la tarjeta:
+                            // GlyphText se encoge hasta el ancho que le toca.
                             GlyphText(texto: p.texto, alto: 30)
                             StarBadge(earned: progreso.isWordDone(p))
                         }
+                        .padding(.horizontal, 12)
                         .frame(maxWidth: .infinity)
                         .padding(.vertical, 20)
                         .background(

@@ -134,6 +134,30 @@ final class GlyphLibraryTests: XCTestCase {
         }
     }
 
+    /// La barrita de la "G" sale de donde termina el arco y va HACIA ADENTRO. Antes
+    /// flotaba en la boca de la C y se trazaba hacia afuera.
+    func testLaGCierraConBarritaHaciaAdentro() {
+        guard let g = GlyphLibrary.glyph(for: "G"), g.strokes.count == 2,
+              let finArco = g.strokes[0].points.last,
+              let inicioBarra = g.strokes[1].points.first,
+              let finBarra = g.strokes[1].points.last else { return XCTFail("G mal formada") }
+        XCTAssertLessThan(hypot(finArco.x - inicioBarra.x, finArco.y - inicioBarra.y), 0.02,
+                          "la barrita de la G tiene que salir de donde termina el arco")
+        XCTAssertGreaterThan(inicioBarra.x, finBarra.x, "la barrita de la G va hacia adentro")
+    }
+
+    /// Las pancitas de la "B" se tocan en un punto del palito; si se traslapan, se
+    /// cruzan y en la cintura se ve una equis.
+    func testLasPancitasDeLaBSeJuntanSinCruzarse() {
+        guard let b = GlyphLibrary.glyph(for: "B"), b.strokes.count == 3,
+              let finArriba = b.strokes[1].points.last,
+              let inicioAbajo = b.strokes[2].points.first else { return XCTFail("B mal formada") }
+        XCTAssertLessThan(hypot(finArriba.x - inicioAbajo.x, finArriba.y - inicioAbajo.y), 0.02)
+        let fondoArriba = b.strokes[1].points.map(\.y).max() ?? 0
+        let topeAbajo = b.strokes[2].points.map(\.y).min() ?? 1
+        XCTAssertLessThanOrEqual(fondoArriba, topeAbajo + 0.001, "las pancitas de la B se traslapan")
+    }
+
     /// Con la guía gruesa, un acento a menos de ~0.055 de su letra se pega a ella y
     /// el niño ve un solo garabato. Pasó con Á, É, Í y Ó.
     func testLosAcentosNoTocanSuLetra() {

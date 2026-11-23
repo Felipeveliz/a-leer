@@ -316,8 +316,10 @@ enum GlyphLibrary {
 
         g["B"] = Glyph(name: "B", width: 0.56, strokes: [
             GlyphStroke(points: line(pt(0.08, 0.10), pt(0.08, 0.88))),
-            GlyphStroke(points: arc(c: pt(0.10, 0.32), rx: 0.34, ry: 0.22, from: -90, to: 90, n: 24)),
-            GlyphStroke(points: arc(c: pt(0.10, 0.66), rx: 0.38, ry: 0.22, from: -90, to: 90, n: 24)),
+            // Las dos pancitas se tocan en un solo punto del palito (y = 0.49): si se
+            // traslapan, sus arcos se cruzan y en la cintura se ve una equis.
+            GlyphStroke(points: arc(c: pt(0.10, 0.295), rx: 0.34, ry: 0.195, from: -90, to: 90, n: 24)),
+            GlyphStroke(points: arc(c: pt(0.10, 0.685), rx: 0.38, ry: 0.195, from: -90, to: 90, n: 24)),
         ])
 
         g["C"] = Glyph(name: "C", width: 0.56, strokes: [
@@ -342,10 +344,13 @@ enum GlyphLibrary {
             GlyphStroke(points: line(pt(0.08, 0.49), pt(0.38, 0.49), n: 8)),
         ])
 
-        g["G"] = Glyph(name: "G", width: 0.60, strokes: [
-            GlyphStroke(points: arc(c: pt(0.33, 0.49), rx: 0.27, ry: 0.39, from: -55, to: -305, n: 44)),
-            // barrita hacia adentro en la boca de la "C".
-            GlyphStroke(points: line(pt(0.33, 0.52), pt(0.52, 0.52), n: 8)),
+        g["G"] = Glyph(name: "G", width: 0.66, strokes: [
+            // La "C" no se detiene abajo: sigue subiendo por la derecha hasta la
+            // mitad (-360° = 0°, punto (0.60, 0.49)). Sin esa subida la barrita
+            // quedaba flotando en la boca y la letra se leía como una "C" con guion.
+            GlyphStroke(points: arc(c: pt(0.33, 0.49), rx: 0.27, ry: 0.39, from: -55, to: -360, n: 52)),
+            // Barrita hacia adentro: sale de donde terminó el arco y va a la izquierda.
+            GlyphStroke(points: line(pt(0.60, 0.49), pt(0.40, 0.49), n: 8)),
         ])
 
         g["H"] = Glyph(name: "H", width: 0.60, strokes: [

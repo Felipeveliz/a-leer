@@ -91,6 +91,9 @@ struct PalabraEscribeFlowView: View {
                         RoundedRectangle(cornerRadius: 16, style: .continuous)
                             .fill(.white.opacity(0.85))
                     )
+                    // Primero el modelo y luego el Spacer: si el nombre es largo,
+                    // el modelo toma todo el ancho antes de tener que encogerse.
+                    .layoutPriority(1)
             } else {
                 Button {
                     mostrarModeloUnMomento()
@@ -142,7 +145,7 @@ struct PalabraEscribeFlowView: View {
                 .frame(maxWidth: .infinity)
                 .frame(minHeight: 240, idealHeight: 340, maxHeight: 360)
 
-                TagPill(text: "\(actual + 1) / \(letras.count)")
+                TagPill(text: "\((indicesTrazables.firstIndex(of: actual) ?? 0) + 1) / \(indicesTrazables.count)")
                 HintText(text: "Empieza en el punto verde 🟢")
             }
         }
@@ -160,6 +163,13 @@ struct PalabraEscribeFlowView: View {
         } else {
             irAFase3()
         }
+    }
+
+    /// Índices de las letras que sí se trazan. El espacio del nombre completo (y
+    /// cualquier carácter sin glifo) no es una letra: si contara, el contador se
+    /// brincaría números ("3 / 9" → "5 / 9" en "Ana López").
+    private var indicesTrazables: [Int] {
+        letras.indices.filter { GlyphLibrary.glyph(for: letras[$0]) != nil }
     }
 
     /// Primer índice (desde `i`) cuya letra tiene glifo; nil si no queda ninguno.
