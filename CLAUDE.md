@@ -386,6 +386,13 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       osa/oso, pasto, torre, sol). Hay que derivar las sílabas de las palabras de cada
       hoja en vez de mantener dos listas sueltas. Con eso el aviso `AvisoRespaldo`
       desaparece solo en Sílabas (en Oración sigue aplicando: la hoja 3 no trae oración).
+- [ ] **3. Quitar la pastilla del grupo** (`TagPill(text: silaba.grupo)` en `SilabasView`
+      y la equivalente de `PalabrasView`). Reflejaba los encabezados Ll/Rr/Nn de las
+      primeras hojas, pero la hoja 3 es solo una lista de palabras y esos grupos se los
+      pusimos nosotros: salen cosas como "sol" en **Ss** o "Irma" en **Repaso**. Y a un
+      niño de 5 años saber el grupo no le aporta nada; es dato de adulto en la pantalla
+      del niño. **Las pastillas de progreso ("3 / 11") se quedan.** Al quitarla, ver si
+      el campo `grupo` de `Silaba`/`Palabra` sigue haciendo falta para algo.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
