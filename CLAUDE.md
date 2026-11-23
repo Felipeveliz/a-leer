@@ -409,6 +409,13 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       pero con un **tamaño mínimo** (≈24 pt, en vez del 15% de 40 que da ~18 pt al que
       llega hoy); si con ese mínimo no cabe, la frase **se desliza de lado** con el dedo
       en vez de encogerse más. Las pestañas de Sílabas y Palabras no se tocan.
+- [ ] **6. Quitar el aviso `AvisoRespaldo`** ("Hoja 3 no trae oración, así que estas son
+      de las otras"): el componente en `Theme.swift` y sus dos usos, en `SilabasView` y
+      `OracionView`. Felipe lo leyó como error de la app tres veces; explicarle al niño de
+      dónde salió el contenido no le sirve a nadie. **El respaldo en sí se queda**: nunca
+      una pantalla vacía, solo que ahora es silencioso. Con el punto 2 hecho, Sílabas ya
+      no necesitará respaldo; Oración sí seguirá usándolo mientras la hoja 3 no traiga
+      oración. Esto deja sin efecto la parte de la sección 5 que describe el aviso.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
