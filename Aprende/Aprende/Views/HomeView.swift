@@ -78,7 +78,7 @@ struct HomeView: View {
                         .buttonStyle(PressDownButtonStyle())
                         .padding(.top, 6)
 
-                        footer
+                        CreditoDeAutor()
                             .padding(.top, 8)
                     }
                     .padding(.horizontal, 20)
@@ -94,24 +94,6 @@ struct HomeView: View {
         .fullScreenCover(isPresented: .init(get: { !perfil.configurado },
                                             set: { _ in })) {
             CapturaNombreView(esPrimerArranque: true)
-        }
-    }
-
-    /// Crédito pequeño con enlace a X.
-    private var footer: some View {
-        HStack(spacing: 5) {
-            Text("Desarrollado por")
-                .font(.kid(13, .semibold))
-                .foregroundStyle(Palette.gray)
-            Link(destination: URL(string: "https://x.com/eduardovelross")!) {
-                HStack(spacing: 3) {
-                    Text("𝕏")
-                        .font(.system(size: 12, weight: .bold))
-                    Text("EduardoVelross")
-                        .font(.kid(13, .bold))
-                }
-                .foregroundStyle(Palette.blue)
-            }
         }
     }
 }

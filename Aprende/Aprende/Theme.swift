@@ -212,6 +212,39 @@ struct TagPill: View {
     }
 }
 
+/// Crédito del autor con enlace a su cuenta de X.
+///
+/// Vive aquí y no en una pantalla porque sale en dos (el inicio y "Acerca de")
+/// y tienen que verse igual; duplicado, uno de los dos se queda viejo.
+struct CreditoDeAutor: View {
+    /// La URL va construida aquí y no con `!`: un force unwrap por un enlace de
+    /// cortesía no vale tirar la app.
+    private static let cuenta = URL(string: "https://x.com/eduardovelross")
+
+    var body: some View {
+        HStack(spacing: 5) {
+            Text("Desarrollado por")
+                .font(.kid(13, .semibold))
+                .foregroundStyle(Palette.gray)
+            if let cuenta = Self.cuenta {
+                Link(destination: cuenta) { nombre }
+            } else {
+                nombre
+            }
+        }
+    }
+
+    private var nombre: some View {
+        HStack(spacing: 3) {
+            Text("𝕏")
+                .font(.system(size: 12, weight: .bold))
+            Text("EduardoVelross")
+                .font(.kid(13, .bold))
+        }
+        .foregroundStyle(Palette.blue)
+    }
+}
+
 /// Texto de pista gris bajo el contenido.
 struct HintText: View {
     let text: String

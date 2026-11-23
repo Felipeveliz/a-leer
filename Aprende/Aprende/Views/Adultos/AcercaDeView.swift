@@ -124,9 +124,7 @@ struct AcercaDeView: View {
                     .font(.kid(16))
                     .foregroundStyle(Palette.blue)
             }
-            Text("Hecho por Eduardo Veliz")
-                .font(.kid(13, .semibold))
-                .foregroundStyle(Palette.gray)
+            CreditoDeAutor()
                 .padding(.top, 4)
         }
     }
