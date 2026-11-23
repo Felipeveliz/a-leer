@@ -93,11 +93,12 @@ cd Aprende && xcodebuild -project Aprende.xcodeproj -scheme Aprende -destination
 ```
 
 ### Tests
-El target `AprendeTests` cubre la lógica pura: `TraceEngine`, la tabla de `AppData` y
-los invariantes de `GlyphLibrary`. No cubre vistas; eso va por el skill `qa-aprende`.
+El target `AprendeTests` cubre la lógica pura: `TraceEngine`, la tabla de `AppData`, los
+invariantes de `GlyphLibrary` y la normalización del nombre de `PerfilStore`. No cubre
+vistas; eso va por el skill `qa-aprende`.
 
 ```bash
-cd Aprende && xcodebuild test -project Aprende.xcodeproj -scheme Aprende -destination 'platform=iOS Simulator,name=iPhone 17 Pro'
+cd Aprende && xcodebuild test -project Aprende.xcodeproj -scheme Aprende -destination 'platform=iOS Simulator,name=iPhone 17'
 ```
 
 Los tests tienen que pasar antes de cada commit que toque `TraceEngine.swift`,
@@ -215,7 +216,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 └── Aprende/
     ├── Aprende.xcodeproj/      pbxproj mínimo; el código entra por grupo sincronizado
     ├── Config/ExportOptions.plist  Subida a App Store Connect
-    ├── AprendeTests/           Tests de TraceEngine, AppData y GlyphLibrary
+    ├── AprendeTests/           Tests de TraceEngine, AppData, GlyphLibrary y PerfilStore
     └── Aprende/
         ├── AprendeApp.swift    @main; fuerza esquema claro
         ├── Models.swift        AppData: todo el contenido estático
@@ -300,6 +301,13 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   corrige con "Modificar nombre"; **es el único teclado de la app** y el niño nunca
   escribe en él. El nombre se parte por espacios: una "palabra" trazable por parte. Por
   eso `GlyphLibrary` tuvo que crecer al abecedario completo.
+- **El nombre se guarda con mayúscula inicial en cada parte**
+  (`PerfilStore.conMayusculaInicial`, pedido de Felipe del 23 de noviembre). En Escribe
+  el niño traza **exactamente** lo que se guardó: un "eliab" tecleado en minúsculas le
+  enseñaría a escribir su propio nombre mal, al revés de lo que la app le enseña con
+  Lola o Rosa. La autocapitalización del teclado no basta, porque el adulto la puede
+  sobrescribir. Las partículas de los apellidos compuestos se quedan en minúscula
+  ("Juan de la Cruz") y las mayúsculas internas se respetan ("D'Angelo").
 - **Sin red, sin cuentas, sin analítica.** Lo único que persiste es `UserDefaults`.
 - **Solo en países hispanohablantes** (decisión de Felipe, 22 de noviembre): los 18
   territorios de habla hispana con App Store propia. Cuba y Guinea Ecuatorial no están
@@ -395,10 +403,14 @@ Los nueve que dictó el 23 de noviembre, ya implementados y probados:
       `grupo` se queda en los datos como procedencia, pero **ya no se muestra**.
 - [x] **4.** Fuera los subtítulos de instrucciones en Sílabas y Palabras. `ScreenHeader`
       ahora acepta `subtitle` opcional.
-- [x] **5.** La oración va en **una línea a tamaño fijo (34 pt)** dentro de un carril
-      horizontal: en iPad entra completa y centrada, en iPhone **se desliza de lado**.
-      Antes se encogía hasta ~18 pt. Se intentó con `ViewThatFits` y no sirve: elegía
-      siempre el tamaño mayor y dejaba la frase cortada.
+- [x] **5.** La oración va a **tamaño fijo (34 pt)**, que ya no se encoge (antes bajaba a
+      ~18 pt y el salto desde la sílaba de 110 pt se veía feo). Se intentó con
+      `ViewThatFits` y no sirve: elegía siempre el tamaño mayor y dejaba la frase
+      cortada. El carril horizontal deslizable que lo sustituyó **también falló** y se
+      quitó el 23 de noviembre: en iPhone la frase aparecía cortada a media palabra
+      ("…elo") y nada indicaba que siguiera. Ahora la acomoda `FlujoDePalabras`
+      (`Layout` en `OracionView.swift`) en los renglones que hagan falta, centrados y
+      sin partir ninguna palabra: un renglón en iPad, dos en iPhone.
 - [x] **6.** Fuera el aviso `AvisoRespaldo` ("Hoja 3 no trae oración…"), componente y usos.
       El respaldo sigue, pero silencioso.
 - [x] **7.** Botón **🧮 Ábaco** en Matemáticas, que alterna como "Separar sílabas": muestra

@@ -52,7 +52,7 @@ struct HomeView: View {
                             MenuCard(
                                 emoji: "✍️",
                                 title: "Escribe",
-                                subtitle: "tu nombre, palabras y números",
+                                subtitle: "diseñado para iPad y Apple Pencil",
                                 colors: [Palette.coral, Palette.orangeLight]
                             )
                         }

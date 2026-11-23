@@ -53,4 +53,28 @@ final class PerfilStore: ObservableObject {
     var partes: [String] {
         nombre.split(whereSeparator: \.isWhitespace).map(String.init)
     }
+
+    /// Partículas de los apellidos compuestos. En español van en minúscula cuando no
+    /// encabezan el nombre: "Juan de la Cruz", no "Juan De La Cruz".
+    private static let particulas: Set<String> = [
+        "de", "del", "la", "las", "los", "y", "e", "da", "das", "do", "dos", "van", "von",
+    ]
+
+    /// Pone mayúscula inicial en cada parte del nombre. En Escribe el niño traza
+    /// EXACTAMENTE lo que se guardó: si el adulto escribe "eliab", aprendería a escribir
+    /// su nombre con minúscula, al revés de lo que la app enseña con Lola o Rosa. La
+    /// autocapitalización del teclado no basta, porque el adulto la puede sobrescribir.
+    /// Una parte escrita TODA en mayúsculas se baja (alguien tecleó con Bloq Mayús); una
+    /// con mayúsculas internas se respeta, para no romper "D'Angelo" ni "McAllister".
+    static func conMayusculaInicial(_ texto: String) -> String {
+        texto.split(whereSeparator: \.isWhitespace)
+            .map(String.init)
+            .enumerated()
+            .map { i, parte in
+                if i > 0, particulas.contains(parte.lowercased()) { return parte.lowercased() }
+                let cuerpo = parte == parte.uppercased() ? parte.lowercased() : parte
+                return cuerpo.prefix(1).uppercased() + cuerpo.dropFirst()
+            }
+            .joined(separator: " ")
+    }
 }

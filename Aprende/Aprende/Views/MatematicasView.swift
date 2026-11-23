@@ -76,11 +76,11 @@ struct MatematicasView: View {
         // Hasta 7 cuentas (6+0 es la suma más larga): caben en una fila en iPhone.
         HStack(spacing: 10) {
             grupoDeCuentas(suma.a, color: Palette.blue)
-            if suma.a > 0 && suma.b > 0 {
-                Text("+")
-                    .font(.kid(28))
-                    .foregroundStyle(Palette.grayLight)
-            }
+            // El "+" va siempre, incluso con un cero: la suma que se ve arriba tiene
+            // dos sumandos y el ábaco tiene que verse igual que ella.
+            Text("+")
+                .font(.kid(28))
+                .foregroundStyle(Palette.grayLight)
             grupoDeCuentas(suma.b, color: Palette.coral)
         }
         .frame(maxWidth: .infinity)
@@ -94,14 +94,23 @@ struct MatematicasView: View {
 
     private func grupoDeCuentas(_ cuantas: Int, color: Color) -> some View {
         HStack(spacing: 6) {
-            ForEach(0..<max(cuantas, 0), id: \.self) { _ in
+            if cuantas <= 0 {
+                // El cero también ocupa su lugar: una cuenta vacía, de contorno
+                // punteado. Sin ella, "0 + 2" enseñaba dos cuentas y nada más, y el
+                // niño no veía por ningún lado el cero que está leyendo arriba.
                 Circle()
-                    .fill(color)
+                    .strokeBorder(Palette.grayLight, style: StrokeStyle(lineWidth: 2, dash: [4, 4]))
                     .frame(width: 26, height: 26)
-                    .overlay(Circle().stroke(.white.opacity(0.6), lineWidth: 2))
+            } else {
+                ForEach(0..<cuantas, id: \.self) { _ in
+                    Circle()
+                        .fill(color)
+                        .frame(width: 26, height: 26)
+                        .overlay(Circle().stroke(.white.opacity(0.6), lineWidth: 2))
+                }
             }
         }
-        .accessibilityLabel("\(cuantas)")
+        .accessibilityLabel(cuantas <= 0 ? "ninguna" : "\(cuantas)")
     }
 
     // MARK: - Botón de respuesta

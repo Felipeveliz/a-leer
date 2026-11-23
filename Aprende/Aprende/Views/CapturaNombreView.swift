@@ -115,7 +115,7 @@ struct CapturaNombreView: View {
     }
 
     private func guardar() {
-        perfil.nombre = nombre.trimmingCharacters(in: .whitespacesAndNewlines)
+        perfil.nombre = PerfilStore.conMayusculaInicial(nombre)
         perfil.mano = mano
         enfocado = false
         if !esPrimerArranque { dismiss() }

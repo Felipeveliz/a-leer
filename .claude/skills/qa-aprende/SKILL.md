@@ -10,7 +10,7 @@ la identidad de las vistas de SwiftUI solo falla en ejecución.
 
 La lógica pura sí está cubierta por el target `AprendeTests`
 (`cd Aprende && xcodebuild test -project Aprende.xcodeproj -scheme Aprende -destination
-'platform=iOS Simulator,name=iPhone 17 Pro'`). Correrlo primero: si falla ahí, no tiene
+'platform=iOS Simulator,name=iPhone 17'`). Correrlo primero: si falla ahí, no tiene
 sentido abrir el simulador.
 
 **El simulador no sustituye al iPad.** Los toques sintéticos son limpios y rectos; un

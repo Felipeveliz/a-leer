@@ -9,7 +9,7 @@ description: Toma las capturas de Aprende para la ficha de App Store, en los tam
 
 | Ranura en App Store Connect | Píxeles | Simulador |
 |---|---|---|
-| iPhone con Dynamic Island (medium display) | **1206 × 2622** | iPhone 17 Pro |
+| iPhone con Dynamic Island (medium display) | **1206 × 2622** | iPhone 17 |
 | iPad 13" | **2064 × 2752** | iPad Pro 13-inch (M4) |
 
 Apple escala hacia abajo al resto de tamaños, así que con esas dos ranuras basta.
@@ -21,7 +21,7 @@ Apple escala hacia abajo al resto de tamaños, así que con esas dos ranuras bas
 ## Preparar el simulador
 
 ```
-xcrun simctl boot "iPhone 17 Pro"
+xcrun simctl boot "iPhone 17"
 ```
 
 Esperar ~30 s a que arranque. Luego barra de estado limpia:
@@ -51,7 +51,7 @@ segundos, y si encadenas dos toques seguidos el segundo se pierde o cae en la pa
 equivocada. Un toque, esperar 4 s, capturar, mirar. Para volver al inicio es más fiable
 `terminate` + `launch` que ir hacia atrás a toques.
 
-Coordenadas en puntos (iPhone 17 Pro, 402 × 874):
+Coordenadas en puntos (iPhone 17, 402 × 874):
 
 | Destino | Toque |
 |---|---|

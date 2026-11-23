@@ -146,53 +146,113 @@ struct OracionView: View {
 
     // MARK: Pestaña Oración (frase completa en UNA sola línea)
 
-    /// Tamaño de la frase completa. Antes se encogía hasta caber y en iPhone acababa
-    /// en ~18 pt: pasar de una sílaba de 110 pt a eso era un salto feo. Este tamaño
-    /// no baja nunca; si no cabe, la frase se desliza.
+    /// Tamaño de la frase completa. No se encoge nunca: antes bajaba hasta ~18 pt en
+    /// iPhone y pasar de una sílaba de 110 pt a eso era un salto feo.
     private static let tamanoFrase: CGFloat = 34
 
     private var tarjetaOracion: some View {
         Card {
-            // Siempre en UNA línea. `ViewThatFits` toma el primer tamaño que quepa; si
-            // ni con el mínimo cabe (iPhone angosto), la última opción deja que la
-            // frase se deslice de lado en vez de seguir encogiéndola.
-            // Siempre en UNA línea y a un tamaño fijo cómodo: en iPad la frase entra
-            // completa y queda centrada; en iPhone no cabe y se desliza de lado, en
-            // vez de encogerse hasta quedar diminuta. Se probó `ViewThatFits` con
-            // varios tamaños y elegía siempre el mayor, dejando la frase cortada.
-            GeometryReader { geo in
-                ScrollView(.horizontal, showsIndicators: false) {
-                    frase(tamano: Self.tamanoFrase)
-                        .frame(minWidth: geo.size.width, alignment: .center)
+            // La frase SIEMPRE se ve entera. En iPad entra en un renglón; en iPhone
+            // baja al segundo, pero ninguna palabra se parte ni se queda fuera.
+            // Antes iba en un solo renglón deslizable y aparecía cortada a media
+            // palabra ("…elo"): quien entra aquí viene a leer, no a descubrir que
+            // la frase sigue si arrastra de lado.
+            FlujoDePalabras(separacionH: 2, separacionV: 4) {
+                ForEach(Array(oracion.enumerated()), id: \.offset) { i, palabra in
+                    palabraTocable(i, texto: palabra.texto)
                 }
             }
-            .frame(height: Self.tamanoFrase * 1.9)
+            .frame(maxWidth: .infinity)
 
             HintText(text: "Lee la oración completa. Toca una palabra para señalarla 🙂")
         }
     }
 
-    /// La frase completa a un tamaño dado. `fixedSize` es lo que permite a
-    /// `ViewThatFits` comparar el ancho natural de cada tamaño.
-    private func frase(tamano: CGFloat) -> some View {
-        HStack(spacing: 2) {
-            ForEach(Array(oracion.enumerated()), id: \.offset) { i, palabra in
-                Text(palabra.texto)
-                    .font(.kid(tamano))
-                    .foregroundStyle(resaltada == i ? cafe : Palette.ink)
-                    .padding(.vertical, 3)
-                    .padding(.horizontal, 8)
-                    .background(
-                        RoundedRectangle(cornerRadius: 12, style: .continuous)
-                            .fill(resaltada == i ? Palette.yellow : .clear)
-                    )
-                    .onTapGesture {
-                        withAnimation(.easeOut(duration: 0.15)) { resaltada = i }
-                    }
+    /// Una palabra de la frase: se resalta en amarillo al tocarla.
+    private func palabraTocable(_ i: Int, texto: String) -> some View {
+        Text(texto)
+            .font(.kid(Self.tamanoFrase))
+            .lineLimit(1)
+            .fixedSize()
+            .foregroundStyle(resaltada == i ? cafe : Palette.ink)
+            .padding(.vertical, 3)
+            .padding(.horizontal, 8)
+            .background(
+                RoundedRectangle(cornerRadius: 12, style: .continuous)
+                    .fill(resaltada == i ? Palette.yellow : .clear)
+            )
+            .onTapGesture {
+                withAnimation(.easeOut(duration: 0.15)) { resaltada = i }
+            }
+    }
+}
+
+// MARK: - Acomodo de las palabras
+
+/// Reparte las palabras en los renglones que hagan falta **sin partir ninguna** y
+/// centrando cada renglón. Hace lo que un `HStack` no puede (bajar de renglón) y lo
+/// que un `Text` corrido tampoco (dejar cada palabra tocable por separado).
+private struct FlujoDePalabras: Layout {
+
+    var separacionH: CGFloat = 2
+    var separacionV: CGFloat = 4
+
+    private struct Renglon {
+        var indices: [Int] = []
+        var ancho: CGFloat = 0
+        var alto: CGFloat = 0
+    }
+
+    func sizeThatFits(proposal: ProposedViewSize, subviews: Subviews, cache: inout ()) -> CGSize {
+        let disponible = proposal.width ?? .infinity
+        let renglones = repartir(subviews, en: disponible)
+        let alto = renglones.reduce(0) { $0 + $1.alto }
+            + separacionV * CGFloat(max(renglones.count - 1, 0))
+        let ancho = renglones.map(\.ancho).max() ?? 0
+        return CGSize(width: disponible.isFinite ? disponible : ancho, height: alto)
+    }
+
+    func placeSubviews(in bounds: CGRect, proposal: ProposedViewSize,
+                       subviews: Subviews, cache: inout ()) {
+        var y = bounds.minY
+        for renglon in repartir(subviews, en: bounds.width) {
+            var x = bounds.minX + (bounds.width - renglon.ancho) / 2
+            for i in renglon.indices {
+                let medida = subviews[i].sizeThatFits(.unspecified)
+                subviews[i].place(
+                    at: CGPoint(x: x, y: y + (renglon.alto - medida.height) / 2),
+                    proposal: ProposedViewSize(medida)
+                )
+                x += medida.width + separacionH
+            }
+            y += renglon.alto + separacionV
+        }
+    }
+
+    /// Mete palabras en el renglón hasta que la siguiente ya no cabe. Una palabra
+    /// sola más ancha que el renglón se queda igual en el suyo: partirla sería peor.
+    private func repartir(_ subviews: Subviews, en disponible: CGFloat) -> [Renglon] {
+        var renglones: [Renglon] = []
+        var actual = Renglon()
+
+        for i in subviews.indices {
+            let medida = subviews[i].sizeThatFits(.unspecified)
+            if actual.indices.isEmpty {
+                actual = Renglon(indices: [i], ancho: medida.width, alto: medida.height)
+                continue
+            }
+            let conEsta = actual.ancho + separacionH + medida.width
+            if conEsta > disponible {
+                renglones.append(actual)
+                actual = Renglon(indices: [i], ancho: medida.width, alto: medida.height)
+            } else {
+                actual.indices.append(i)
+                actual.ancho = conEsta
+                actual.alto = max(actual.alto, medida.height)
             }
         }
-        .lineLimit(1)
-        .fixedSize(horizontal: true, vertical: false)
+        if !actual.indices.isEmpty { renglones.append(actual) }
+        return renglones
     }
 }
 
