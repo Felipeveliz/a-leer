@@ -12,7 +12,7 @@ import SwiftUI
 // No existe en Release: el `#if DEBUG` envuelve el archivo entero.
 
 enum QAShortcut: String {
-    case adultos, menu, avance, acerca, cafe, idea, escribe
+    case adultos, menu, avance, acerca, cafe, idea, escribe, actualiza
 
     /// La pantalla pedida por argumento de lanzamiento, si hay alguna.
     static var pedida: QAShortcut? {
@@ -31,6 +31,11 @@ enum QAShortcut: String {
             case .cafe:    CafeView()
             case .idea:    IdeaView()
             case .escribe: EscribeMenuView()
+            case .actualiza:
+                // El candado de verdad no se puede provocar: lo publicado
+                // siempre va por detrás de lo que se está probando.
+                ActualizaView(version: "1.2",
+                              enlace: URL(string: "https://apps.apple.com/app/id6836391055"))
             }
         }
     }

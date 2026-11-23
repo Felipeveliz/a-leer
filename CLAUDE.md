@@ -146,7 +146,8 @@ xcrun simctl io booted screenshot /tmp/avance.png
 ```
 
 Las pantallas aceptadas: `adultos` (la puerta), `menu` (ya dentro), `avance`,
-`acerca`, `cafe`, `idea`.
+`acerca`, `cafe`, `idea`, `escribe` y `actualiza` (el candado de versión, que de otra
+forma no se puede provocar: lo publicado siempre va por detrás de lo que se prueba).
 
 Dos cosas que cuestan una tarde si no se saben:
 
@@ -226,6 +227,12 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
   endpoint propio en vez de credenciales embebidas.
 - **`UpdateChecker`** — la **única llamada de red** de la app: pregunta al iTunes Lookup
   qué versión está publicada. No manda nada del niño ni del dispositivo.
+- **`UpdateGate` + `ActualizaView`** — el candado de versión: si Apple contesta que hay
+  una versión más nueva publicada, tapa la app entera hasta que el adulto actualiza.
+  Vive en `AprendeApp` (no dentro de una pantalla) para que no se pueda esquivar
+  navegando, y se revisa al arrancar y al volver del fondo, como mucho cada 30 minutos.
+  **Solo bloquea con un sí de Apple**: sin red, con error o con una respuesta rara, la
+  app sigue funcionando.
 - **`QAShortcut` (solo DEBUG)** — abre una pantalla de dentro al arrancar
   (`-pantalla avance`), porque `simctl` no sabe dar toques. No existe en Release.
 - **`GlyphLibrary` (`Glyphs.swift`)** — los trazos de cada letra y dígito en una caja
@@ -293,6 +300,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
         ├── Estadisticas.swift      Derivaciones para la pantalla de avance
         ├── StoreManager.swift      Propinas con StoreKit 2
         ├── UpdateChecker.swift     ¿Hay versión nueva? (única llamada de red)
+        ├── UpdateGate.swift        Candado: bloquea la app si hay versión nueva
         ├── FeedbackService.swift   Envíos anónimos, con cola local
         ├── DriveFeedbackClient.swift  Subida a Google Drive
         ├── DriveCredentials.sample.swift  Plantilla; la real está fuera de git
@@ -309,6 +317,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
             ├── PalabrasView.swift      Palabra aleatoria + separar sílabas
             ├── OracionView.swift       Sílabas / palabras / oración completa
             ├── MatematicasView.swift   Sumas con 5 opciones
+            ├── ActualizaView.swift     Pantalla del candado de versión
             ├── Adultos/
             │   ├── AdultosView.swift       Puerta de adulto + menú
             │   ├── EstadisticasView.swift  Cómo va el niño
@@ -405,6 +414,12 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
 - **Las propinas se cobran en pesos** (10 / 25 / 50 / 100 MXN): Toss cobra en dólares y
   esto es México. No desbloquean nada y la pantalla lo dice. En los otros 17 países
   queda la conversión automática de Apple hasta que se ajuste país por país.
+- **Con una versión nueva publicada, la app se bloquea** (decisión de Felipe, 23 de
+  noviembre): nadie se queda practicando con una versión vieja. Dos salvaguardas que no
+  se tocan: **solo bloquea cuando Apple responde que sí** —sin red no se bloquea nada,
+  porque la app vive sin internet— y el botón lleva directo a la ficha. Ojo para el
+  futuro: si alguna versión sube el iOS mínimo, quien no pueda instalarla se queda con
+  la app bloqueada para siempre.
 - **Sin cuentas y sin analítica. Red: una sola llamada**, la de buscar actualizaciones
   (iTunes Lookup), más la subida del feedback cuando el adulto escribe uno. Lo único que
   persiste es `UserDefaults`.
