@@ -421,40 +421,48 @@ Los nueve que dictó el 23 de noviembre, ya implementados y probados:
       de Felipe). Las reglas están en la sección 6 y las vigilan tres tests; la auditoría
       de los 75 glifos salió limpia.
 
-### Pedidos de Felipe (23 de noviembre, por decidir antes de desarrollar)
+### Las cuatro utilidades de Toss (decididas el 23 de noviembre, sin empezar)
 
-Cuatro utilidades que ya existen en **Toss** (`~/Developer/Toss — Swipe & Clean`) y que
-Felipe quiere aquí. En Toss viven en una pestaña "Ajustes"; Aprende no tiene ninguna
-pantalla así, y las cuatro caben justo en la **zona de adultos** que ya estaba propuesta
-más abajo. Cómo están resueltas allá:
+Felipe quiere en Aprende cuatro utilidades que ya existen en **Toss**
+(`~/Developer/Toss — Swipe & Clean`), donde viven en una pestaña "Ajustes". Aprende no
+tiene ninguna pantalla así: las cuatro van en una **zona de adultos** nueva, con puerta
+de adulto delante, porque quien entra ahí no es el niño.
 
-- [ ] **Estadísticas.** En Toss, una fila de cuatro `ProgressBadge` (vistas, guardadas,
-      borradas, espacio liberado) alimentada por `StatisticsService`. Aquí el material ya
-      existe en `ProgressStore` (logros `palabra:<texto>` y `digito:<d>`), pero **solo de
-      Escribe**: Español y Matemáticas no guardan nada (decisión de la sección 5). O las
-      estadísticas son solo de Escribe, o antes hay que empezar a guardar progreso en los
-      otros dos módulos.
-- [ ] **Invítame un café.** En Toss es StoreKit 2 con cuatro consumibles
-      (`com.felipeveliz.toss.tip.{small,medium,large,huge}`) y un `StoreManager`
-      `@Observable`. Aquí hay que decidir dos cosas: los productos nuevos hay que darlos
-      de alta en App Store Connect, y **la app la usa un niño de cinco años** — una compra
-      dentro de la app necesita una puerta de adulto delante, y cambia la respuesta de
-      "¿compras dentro de la app?" en la ficha.
-- [ ] **Acerca de, con versión y buscar actualizaciones.** La mitad de "acerca de" se
-      copia tal cual: Toss tiene un `AboutSheet` (logo, nombre, privacidad, cómo funciona)
-      y pinta la versión con `CFBundleShortVersionString`. **Lo de buscar actualizaciones
-      NO existe en Toss**: habría que escribirlo (consultar la versión publicada en el
-      iTunes Lookup API y comparar), y es la única de las cuatro que no tiene de dónde
-      copiarse. Ojo: eso es una llamada de red en una app que hoy no hace ninguna.
-- [ ] **Envíame una idea y feedback.** En Toss es `FeedbackView` + `FeedbackService` +
-      `DriveFeedbackClient`: cuatro categorías (bug, idea para la app, idea para otra app,
-      saludo), un JSON anónimo por envío subido a Google Drive, con cola local que se
-      reintenta si no hay red. Es anónimo a propósito, para que "Data Not Collected" siga
-      siendo verdad. Aquí choca con dos cosas: **"sin red, sin cuentas, sin analítica"**
-      de la sección 5 (habría que revisar `PrivacyInfo.xcprivacy` y las respuestas de
-      privacidad de la ficha) y que **este repo es público**, así que las credenciales de
-      Drive no pueden ir commiteadas (en Toss el archivo real está fuera de git y solo se
-      versiona `DriveCredentials.sample.swift`).
+- [ ] **Estadísticas.** Decisión de Felipe: "la mejor estadística" posible, no el marcador.
+      Lo medido hoy no alcanza —`ProgressStore` es un `Set` de logros, sin fechas ni
+      intentos—, así que hace falta **instrumentar cada intento**: letra, palabra, fase,
+      si acertó, precisión (de `meanDistance` contra `shapeTolerance`), si empezó en el
+      punto correcto (`startOK`) y cuándo. `TraceResult` tiene que exponer también
+      `endOK`/`shapeOK`/`lengthOK`, que hoy se colapsan en `passed`. Con eso: mapa del
+      abecedario por dificultad, las tres letras que más le cuestan con acceso directo a
+      practicarlas, **dirección vs. forma** como errores distintos (es la diferencia entre
+      no saber por dónde empieza la letra y el pulso), constancia de 30 días con racha,
+      precisión por semana, y aciertos y fallos de Matemáticas. En **Español no se mide
+      nada**: leer en voz alta no se puede verificar y un contador de sílabas vistas no
+      dice nada. No es retroactivo y **todo se queda en el dispositivo**, así que la ficha
+      no cambia. El diagnóstico en prosa, si se hace, se genera con reglas locales: una
+      IA en la app significaría mandar fuera los datos de práctica de un niño.
+- [ ] **Invítame un café.** Cuatro consumibles
+      `com.eduardovelross.aprende.tip.{small,medium,large,huge}` a **10 / 25 / 50 / 100
+      MXN** (decisión de Felipe; Toss cobra en dólares y esto es México). El precio se
+      pinta siempre con `product.displayPrice` de StoreKit, **nunca escrito en el código**:
+      si Apple no tiene el punto exacto toma el más cercano, y los otros 17 países quedan
+      con la conversión automática de Apple hasta que se ajuste país por país. Hay que dar
+      de alta los productos en App Store Connect y cambiar la ficha: **"Compras dentro de
+      la app" pasa de "Ninguna" a propinas**. Puerta de adulto delante: no es requisito de
+      Apple (la app no está marcada Made for Kids) pero la usa un niño de cinco años.
+- [ ] **Acerca de, con versión y buscar actualizaciones.** El `AboutSheet` de Toss (logo,
+      nombre, privacidad, cómo funciona) y la versión con `CFBundleShortVersionString` se
+      copian tal cual. **Buscar actualizaciones no existe en Toss**: hay que escribirlo
+      contra el iTunes Lookup API y es la **única llamada de red** de toda la app.
+- [ ] **Envíame una idea y feedback.** `FeedbackView` + `FeedbackService` +
+      `DriveFeedbackClient` de Toss: cuatro categorías, un JSON por envío a Google Drive y
+      cola local que reintenta sin red. **El nombre del niño queda descartado** (decisión
+      de Felipe del 23 de noviembre): el dato de un menor no sale del dispositivo, y así el
+      envío sigue siendo anónimo como en Toss, que es lo que sostiene el
+      "Data Not Collected" de la ficha y deja `PrivacyInfo.xcprivacy` como está. Las
+      credenciales de Drive **no pueden ir commiteadas** —este repo es público—: el archivo
+      real fuera de git y solo se versiona el `.sample`, como allá.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
