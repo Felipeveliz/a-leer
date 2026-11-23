@@ -612,11 +612,20 @@ que no acepta el trazo continuo (decisión de Felipe del 19 de noviembre: no cam
 build de la revisión). Los arreglos están en TestFlight y van en la siguiente versión.
 
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
-único tester. La **1.1 (8)** está archivada y lista para subir (los cuatro arreglos de
-la ronda de prueba del 23 de noviembre más la zona de adultos con las cuatro utilidades);
-**la subida se quedó bloqueada en `Failed to Use Accounts`**: Xcode necesita la sesión de
-la cuenta de Apple. La última que sí llegó a TestFlight es la **1.1 (7)**, con los nueve
-pedidos del 23 de noviembre. La 1.1 (6) llevaba lo de la
+único tester. La más nueva es la **1.1 (8)**, subida el 23 de noviembre:
+los cuatro arreglos de la ronda de prueba de ese día más la zona de adultos con las
+cuatro utilidades de Toss.
+
+Dos tropiezos de esa subida, por si se repiten:
+
+- El archive lanzado **en segundo plano** falló al firmar con `errSecInternalComponent`
+  aunque el llavero estaba desbloqueado. El mismo comando en primer plano firmó a la
+  primera.
+- `exportArchive` falló con `Failed to Use Accounts` / "App Store Connect access for
+  AZDP5Q3YFJ is required". Lo que lo dice sin adivinar es
+  `defaults read com.apple.dt.Xcode DVTDeveloperAccountManagerAppleIDLists`: con la
+  lista vacía, Xcode no tiene ninguna cuenta y hay que añadirla en Settings › Accounts
+  (entrar en developer.apple.com desde el navegador no sirve). La 1.1 (6) llevaba lo de la
 build 5 (hojas + respaldo + trazo continuo + modelo dibujado) más el perfil del niño
 (nombre y mano), el abecedario completo y "Escribir mi nombre". Un build recién procesado aparece
 como **"Missing Compliance"** y no se distribuye hasta contestarlo; desde la build 3 ya
@@ -632,8 +641,8 @@ Lo aprendido antes, que sigue valiendo:
 ### Pendientes del deploy
 - [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
       aparece en la App Store de México.
-- [ ] Subir la **1.1 (8)** (el archive está hecho en `Aprende/build/`), probarla en el
-      iPad y, si está bien, mandarla a revisión como siguiente versión de la App Store.
+- [ ] Probar la **1.1 (8)** en el iPad desde TestFlight y, si está bien, mandarla a
+      revisión como siguiente versión de la App Store.
 - [ ] **Las propinas necesitan el contrato de Paid Applications** firmado en App Store
       Connect, con datos fiscales y bancarios. Aprende siempre fue gratis, así que lo más
       probable es que no esté: sin él no se pueden dar de alta los consumibles. Solo lo
