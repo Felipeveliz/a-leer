@@ -123,6 +123,18 @@ builds nuevos ya no se quedan en "Missing Compliance" esperando una respuesta a 
 `scripts/make_icon.swift` genera el icono de 1024 y `scripts/render_glyphs.swift` ayuda
 a revisar los trazos de la biblioteca de glifos.
 
+### Si el simulador se cuelga
+Esta Mac no tiene `Simulator.app`, pero el simulador funciona sin él. Si `simctl launch`
+no termina o la app se queda con el icono atenuado, el servicio de CoreSimulator está en
+mal estado. Reiniciarlo (no borra datos de las apps) y volver a arrancar el dispositivo:
+
+```bash
+xcrun simctl shutdown all; killall -9 com.apple.CoreSimulator.CoreSimulatorService
+```
+
+El primer arranque después tarda; la pantalla blanca de los primeros segundos al lanzar
+la app es normal.
+
 ### Añadir archivos al proyecto
 El target usa un **grupo sincronizado con el sistema de archivos**
 (`PBXFileSystemSynchronizedRootGroup` sobre `Aprende/Aprende`), así que las fases
@@ -364,7 +376,11 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 - [x] Modo oscuro: la app fuerza esquema claro.
 - [ ] Validar el punto de la "i" con un solo toque en un dispositivo real (en el
       simulador el toque sintético no es representativo).
-- [ ] Volver a correr una revisión adversaria del código Swift.
+- [x] Revisión adversaria del código de la 1.1 (22 de noviembre). Se arreglaron: la "U"
+      y la "Ú" al revés (∩), los acentos de Á/É/Í/Ó pegados a la letra, la "G" que se
+      leía como "C" con guion, las pancitas de la "B" cruzadas, el nombre completo que
+      se salía de la pantalla en iPhone (`GlyphText` ahora se encoge para caber) y el
+      contador de la fase 1 que contaba los espacios del nombre.
 
 ### Mejoras propuestas, sin decidir
 - [ ] **Voz** (`AVSpeechSynthesizer` es-MX): la app dice "lee en voz alta" en tres
@@ -372,9 +388,10 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 - [ ] Progreso (estrellas) también en Español y Matemáticas.
 - [ ] Matemáticas: restas, dificultad progresiva, racha.
 - [x] Más glifos: ya está el **abecedario completo** (minúsculas, mayúsculas, acentos y
-      ñ/Ñ), dibujado para que "Escribir mi nombre" sirva con cualquier nombre. Verificado
-      con `render_glyphs.swift` (forma) y un check de invariantes; **falta QA visual en
-      el simulador** cuando se pueda (esta Mac no tiene `Simulator.app`).
+      ñ/Ñ), dibujado para que "Escribir mi nombre" sirva con cualquier nombre. Revisado
+      con `render_glyphs.swift` y probado en el simulador el 22 de noviembre.
+- [ ] **Letras de nombres catalanes** (Ò, À, È, ç, ï): hoy se saltan y `CapturaNombreView`
+      avisa al adulto. Decidir con Felipe si se añaden (la app también sale en España).
 - [ ] **Faltan las páginas de sílabas y oración de la hoja 3**, si existen. Hoy la hoja 3
       solo tiene las 20 palabras de "Lectura de palabras".
 - [ ] Zona de adultos: reiniciar el progreso, ver qué ha hecho.
@@ -415,8 +432,9 @@ que no acepta el trazo continuo (decisión de Felipe del 19 de noviembre: no cam
 build de la revisión). Los arreglos están en TestFlight y van en la siguiente versión.
 
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
-único tester. Builds 1 a 5 en "Testing"; la **5** es la buena (hojas + respaldo +
-trazo continuo + modelo dibujado). Un build recién procesado aparece
+único tester. La más nueva es la **1.1 (6)**, subida el 23 de noviembre: lleva lo de la
+build 5 (hojas + respaldo + trazo continuo + modelo dibujado) más el perfil del niño
+(nombre y mano), el abecedario completo y "Escribir mi nombre". Un build recién procesado aparece
 como **"Missing Compliance"** y no se distribuye hasta contestarlo; desde la build 3 ya
 no debería pasar, porque el proyecto declara
 `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO`.
@@ -430,7 +448,8 @@ Lo aprendido antes, que sigue valiendo:
 ### Pendientes del deploy
 - [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
       aparece en la App Store de México.
-- [ ] Mandar la siguiente versión con la build más nueva (la 5 o posterior).
+- [ ] Probar la **1.1 (6)** en el iPad desde TestFlight y, si está bien, mandarla a
+      revisión como siguiente versión de la App Store.
 - [ ] App Store Connect pide revisar las **nuevas preguntas de clasificación por edad**
       (aviso en la lista de apps, sección "Información de la app").
 - [ ] **La build 2 se envió sin que nadie la ejecutara**: la Mac se quedó sin runtimes de
