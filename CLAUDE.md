@@ -421,6 +421,41 @@ Los nueve que dictó el 23 de noviembre, ya implementados y probados:
       de Felipe). Las reglas están en la sección 6 y las vigilan tres tests; la auditoría
       de los 75 glifos salió limpia.
 
+### Pedidos de Felipe (23 de noviembre, por decidir antes de desarrollar)
+
+Cuatro utilidades que ya existen en **Toss** (`~/Developer/Toss — Swipe & Clean`) y que
+Felipe quiere aquí. En Toss viven en una pestaña "Ajustes"; Aprende no tiene ninguna
+pantalla así, y las cuatro caben justo en la **zona de adultos** que ya estaba propuesta
+más abajo. Cómo están resueltas allá:
+
+- [ ] **Estadísticas.** En Toss, una fila de cuatro `ProgressBadge` (vistas, guardadas,
+      borradas, espacio liberado) alimentada por `StatisticsService`. Aquí el material ya
+      existe en `ProgressStore` (logros `palabra:<texto>` y `digito:<d>`), pero **solo de
+      Escribe**: Español y Matemáticas no guardan nada (decisión de la sección 5). O las
+      estadísticas son solo de Escribe, o antes hay que empezar a guardar progreso en los
+      otros dos módulos.
+- [ ] **Invítame un café.** En Toss es StoreKit 2 con cuatro consumibles
+      (`com.felipeveliz.toss.tip.{small,medium,large,huge}`) y un `StoreManager`
+      `@Observable`. Aquí hay que decidir dos cosas: los productos nuevos hay que darlos
+      de alta en App Store Connect, y **la app la usa un niño de cinco años** — una compra
+      dentro de la app necesita una puerta de adulto delante, y cambia la respuesta de
+      "¿compras dentro de la app?" en la ficha.
+- [ ] **Acerca de, con versión y buscar actualizaciones.** La mitad de "acerca de" se
+      copia tal cual: Toss tiene un `AboutSheet` (logo, nombre, privacidad, cómo funciona)
+      y pinta la versión con `CFBundleShortVersionString`. **Lo de buscar actualizaciones
+      NO existe en Toss**: habría que escribirlo (consultar la versión publicada en el
+      iTunes Lookup API y comparar), y es la única de las cuatro que no tiene de dónde
+      copiarse. Ojo: eso es una llamada de red en una app que hoy no hace ninguna.
+- [ ] **Envíame una idea y feedback.** En Toss es `FeedbackView` + `FeedbackService` +
+      `DriveFeedbackClient`: cuatro categorías (bug, idea para la app, idea para otra app,
+      saludo), un JSON anónimo por envío subido a Google Drive, con cola local que se
+      reintenta si no hay red. Es anónimo a propósito, para que "Data Not Collected" siga
+      siendo verdad. Aquí choca con dos cosas: **"sin red, sin cuentas, sin analítica"**
+      de la sección 5 (habría que revisar `PrivacyInfo.xcprivacy` y las respuestas de
+      privacidad de la ficha) y que **este repo es público**, así que las credenciales de
+      Drive no pueden ir commiteadas (en Toss el archivo real está fuera de git y solo se
+      versiona `DriveCredentials.sample.swift`).
+
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
       Números). Arreglado: un solo `FreeWritePad` fuera del `if`.
