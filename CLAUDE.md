@@ -533,11 +533,13 @@ copiaron de allá; "buscar actualizaciones" no existía y se escribió aquí.
       las tres que más cuestan **con su diagnóstico y en qué palabras practicarlas**,
       precisión por semana, constancia de 28 días y las sumas (tino, cuáles falla y
       cuánto se apoya en el ábaco). No es retroactivo: mide desde esta versión.
-- [x] **Invítame un café.** Cuatro consumibles a 10 / 25 / 50 / 100 MXN con StoreKit 2.
-      **Faltan los productos en App Store Connect** (ver pendientes del deploy): sin
-      ellos la pantalla dice honestamente que no hay opciones disponibles, en vez de
-      quedarse girando. En el simulador salen con `Config/Aprende.storekit`, que el
-      esquema ya referencia.
+- [x] **Invítame un café.** Cuatro consumibles a **10 / 25 / 50 / 100 MXN** con
+      StoreKit 2, **dados de alta en App Store Connect el 23 de noviembre** (los cuatro
+      en "Prepare for Submission", precio base México, nombre y descripción en es-MX).
+      Los puntos de precio exactos solo aparecen al pulsar **"See Additional Prices"**:
+      la lista corta no trae ni $10 ni $25. En el simulador salen con
+      `Config/Aprende.storekit`, que el esquema ya referencia; `simctl` no aplica esa
+      configuración, así que lanzada a mano la pantalla dice que no hay opciones.
 - [x] **Acerca de, con versión y buscar actualizaciones.** La versión se lee del bundle;
       el buscador consulta el iTunes Lookup y compara por número (`1.10` > `1.9`).
 - [x] **Envíame una idea.** Las cuatro categorías de Toss, JSON anónimo a Drive y cola
@@ -612,9 +614,10 @@ que no acepta el trazo continuo (decisión de Felipe del 19 de noviembre: no cam
 build de la revisión). Los arreglos están en TestFlight y van en la siguiente versión.
 
 **TestFlight**: grupo interno **"Pruebas"** con distribución automática y Felipe como
-único tester. La más nueva es la **1.1 (8)**, subida el 23 de noviembre:
-los cuatro arreglos de la ronda de prueba de ese día más la zona de adultos con las
-cuatro utilidades de Toss.
+único tester. La más nueva es la **1.1 (10)**, subida el 23 de noviembre: los
+cuatro arreglos de la ronda de prueba de ese día, la zona de adultos con las cuatro
+utilidades de Toss, el crédito de X también en "Acerca de" y los tres subtítulos de
+Escribe con "DISEÑADO PARA IPAD Y PENCIL".
 
 Dos tropiezos de esa subida, por si se repiten:
 
@@ -641,7 +644,7 @@ Lo aprendido antes, que sigue valiendo:
 ### Pendientes del deploy
 - [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
       aparece en la App Store de México.
-- [ ] Probar la **1.1 (8)** en el iPad desde TestFlight y, si está bien, mandarla a
+- [ ] Probar la **1.1 (10)** en el iPad desde TestFlight y, si está bien, mandarla a
       revisión como siguiente versión de la App Store.
 - [ ] **Las propinas necesitan el contrato de Paid Applications** firmado en App Store
       Connect, con datos fiscales y bancarios. Aprende siempre fue gratis, así que lo más
@@ -658,10 +661,13 @@ Lo aprendido antes, que sigue valiendo:
 - [ ] Si Apple vuelve a pedir el vídeo: instalarla desde TestFlight y grabarla en el iPad.
 - [ ] Más capturas de iPad: solo hay la de inicio.
 - [ ] Subir `CURRENT_PROJECT_VERSION` antes de cada build nuevo.
-- [ ] **Dar de alta las cuatro propinas en App Store Connect** (consumibles
-      `com.eduardovelross.aprende.tip.{small,medium,large,huge}`, precio base en MXN:
-      10 / 25 / 50 / 100). Hasta que existan, la pantalla del café sale sin opciones
-      también en TestFlight, porque el sandbox lee los productos de la ficha.
+- [x] Las cuatro propinas están dadas de alta (23 de noviembre). El contrato de
+      **Paid Applications estaba activo** desde el 17 de noviembre y la cuenta bancaria
+      configurada, así que no hizo falta nada de eso.
+- [ ] **Cambiar la captura de revisión de las cuatro propinas.** La que está puesta es
+      la pantalla del café **sin opciones** (era la única que existía: los productos no
+      existían todavía). Antes de mandar la versión a revisión hay que sustituirla por
+      una con las cuatro filas visibles, desde el iPad.
 - [ ] **Cambiar "Compras dentro de la app" de "Ninguna" a propinas** en la ficha
       (`AppStoreMetadata/es-MX.md` línea 16) cuando los productos estén dados de alta.
 - [ ] Confirmar que las respuestas de privacidad siguen siendo "Data Not Collected": el
