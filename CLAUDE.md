@@ -368,7 +368,16 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 ## 8. Pendientes
 
 ### Pedidos de Felipe (decididos, por hacer)
-- [ ] **Las sílabas de una hoja salen de las palabras de esa hoja.** Hoy `AppData.silabas`
+
+Numerados como él los dictó, para poder referirse a ellos por número.
+
+- [ ] **1. Captura de nombre (primer arranque y "Modificar nombre"):** el botón de mano
+      **izquierda va a la izquierda** y el de **derecha a la derecha** (hoy están al revés).
+      **Ninguno seleccionado por defecto** (hoy viene marcada "Derecha"): el adulto tiene
+      que elegir uno a la fuerza, y "Listo" no se activa hasta que haya nombre **y** mano.
+      Toca `CapturaNombreView` y, si `Mano` deja de tener valor por defecto,
+      `PerfilStore`.
+- [ ] **2. Las sílabas de una hoja salen de las palabras de esa hoja.** Hoy `AppData.silabas`
       es una lista escrita a mano, aparte de `palabras` y etiquetada solo con la hoja 2.
       Por eso, con solo la hoja 3 marcada, Sílabas la da por vacía y sale el aviso
       "Hoja 3 no trae sílabas" — y es falso: sus 20 palabras se descomponen en **26
@@ -377,12 +386,6 @@ abrir el código, el cambio necesitaba actualizar el archivo.
       osa/oso, pasto, torre, sol). Hay que derivar las sílabas de las palabras de cada
       hoja en vez de mantener dos listas sueltas. Con eso el aviso `AvisoRespaldo`
       desaparece solo en Sílabas (en Oración sigue aplicando: la hoja 3 no trae oración).
-- [ ] **Captura de nombre (primer arranque y "Modificar nombre"):** el botón de mano
-      **izquierda va a la izquierda** y el de **derecha a la derecha** (hoy están al revés).
-      **Ninguno seleccionado por defecto** (hoy viene marcada "Derecha"): el adulto tiene
-      que elegir uno a la fuerza, y "Listo" no se activa hasta que haya nombre **y** mano.
-      Toca `CapturaNombreView` y, si `Mano` deja de tener valor por defecto,
-      `PerfilStore`.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
