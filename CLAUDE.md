@@ -433,6 +433,15 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       al tercer fallo (la rama de fallo no mira `showsDemo`): dejar las dos fases
       coherentes y preguntar a Felipe si en fase 2 también quiere la demo en cada error.
 
+**Duda abierta de Felipe (23 de noviembre), sin decidir:** no está seguro de que el
+orden de los trazos sea el que enseñan en la escuela — lo preguntó por el **5**, que la
+app hace en 2 trazos (cuerpo primero, sombrerito al final, que es la convención más
+común). No es cosmético: el punto verde marca dónde empezar, así que un orden distinto
+al de su escuela hace que la app **rechace** un trazo bien hecho. Hoy: 0, 1, 2, 3, 6, 7
+y 8 van en 1 trazo; 4, 5 y 9 en 2. Siguiente paso: generar la hoja de los 75 trazos con
+`scripts/render_glyphs.swift` para que Felipe la contraste con el cuaderno de Eliab o con
+la maestra, y corregir lo que no coincida.
+
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
       Números). Arreglado: un solo `FreeWritePad` fuera del `if`.
