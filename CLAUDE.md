@@ -364,6 +364,14 @@ abrir el código, el cambio necesitaba actualizar el archivo.
 
 ## 8. Pendientes
 
+### Pedidos de Felipe (decididos, por hacer)
+- [ ] **Captura de nombre (primer arranque y "Modificar nombre"):** el botón de mano
+      **izquierda va a la izquierda** y el de **derecha a la derecha** (hoy están al revés).
+      **Ninguno seleccionado por defecto** (hoy viene marcada "Derecha"): el adulto tiene
+      que elegir uno a la fuerza, y "Listo" no se activa hasta que haya nombre **y** mano.
+      Toca `CapturaNombreView` y, si `Mano` deja de tener valor por defecto,
+      `PerfilStore`.
+
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
       Números). Arreglado: un solo `FreeWritePad` fuera del `if`.
