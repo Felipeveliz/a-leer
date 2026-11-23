@@ -200,7 +200,13 @@ struct LetterTraceView: View {
         // El niño no levanta el lápiz: la "m" la hace de un tirón, no en tres
         // tiempos. Se prueba primero el trazo suelto y, si no cuadra, se van
         // uniendo los siguientes hasta ver si el movimiento cubre varios.
-        guard let hasta = primerTramoQueCuadra(points, strokes: strokes, height: height) else {
+        let evaluacion = evalua(points, strokes: strokes, height: height)
+
+        guard let hasta = evaluacion.hasta else {
+            // El intento fallido es la mitad valiosa del registro: de aquí sale
+            // si lo que le falta es saber por dónde empieza la letra o pulso.
+            PracticeLog.shared.registra(glifo: glyph.name, ok: false, precision: 0,
+                                        fallo: TraceFault.desde(evaluacion.base))
             UINotificationFeedbackGenerator().notificationOccurred(.warning)
             withAnimation { retryVisible = true }
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
@@ -217,6 +223,11 @@ struct LetterTraceView: View {
         }
 
         do {
+            PracticeLog.shared.registra(
+                glifo: glyph.name, ok: true,
+                precision: (evaluacion.logrado ?? evaluacion.base).precision,
+                fallo: nil
+            )
             UINotificationFeedbackGenerator().notificationOccurred(.success)
             withAnimation(.easeOut(duration: 0.2)) {
                 completed = hasta + 1
@@ -236,13 +247,25 @@ struct LetterTraceView: View {
         }
     }
 
-    /// Índice del último trazo del glifo que cubre este movimiento, o `nil` si
-    /// no cuadra con ninguno. Prueba primero el trazo suelto y luego va uniendo
-    /// los siguientes, porque un solo movimiento del niño puede valer por
-    /// varios trazos de la definición.
-    private func primerTramoQueCuadra(_ points: [CGPoint], strokes: [[CGPoint]],
-                                      height: CGFloat) -> Int? {
+    /// Lo que se sacó de un movimiento del niño.
+    private struct Evaluacion {
+        /// Último trazo del glifo que cubre el movimiento, o `nil` si no cuadró.
+        let hasta: Int?
+        /// Medición contra el trazo que se le PEDÍA (el suelto). Es la que sirve
+        /// para diagnosticar: contra una unión de varios trazos, "empezó lejos"
+        /// no querría decir nada.
+        let base: TraceResult
+        /// La medición que sí cuadró, que puede ser de varios trazos unidos.
+        let logrado: TraceResult?
+    }
+
+    /// Evalúa el movimiento contra el trazo pendiente y, si no cuadra, contra
+    /// las uniones siguientes: un solo movimiento del niño puede valer por
+    /// varios trazos de la definición (la "m" se escribe de un tirón).
+    private func evalua(_ points: [CGPoint], strokes: [[CGPoint]],
+                        height: CGFloat) -> Evaluacion {
         let empiezaEnPunto = glyph.strokes[completed].isDot
+        var base = TraceResult.fallido
 
         for fin in completed..<strokes.count {
             // El punto de la "i" es un toque aparte: ni se une a lo anterior ni
@@ -256,8 +279,9 @@ struct LetterTraceView: View {
             let r = TraceEngine.validate(user: points, target: objetivo,
                                          height: height,
                                          isDot: fin == completed && empiezaEnPunto)
-            if r.passed { return fin }
+            if fin == completed { base = r }
+            if r.passed { return Evaluacion(hasta: fin, base: base, logrado: r) }
         }
-        return nil
+        return Evaluacion(hasta: nil, base: base, logrado: nil)
     }
 }

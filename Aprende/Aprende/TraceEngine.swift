@@ -9,7 +9,17 @@ import CoreGraphics
 struct TraceResult {
     let passed: Bool
     let startOK: Bool
+    let endOK: Bool
+    let shapeOK: Bool
+    let lengthOK: Bool
     let meanDistance: CGFloat
+    /// Qué tan clavado quedó el trazo, de 0 a 1 (1 = encima del modelo).
+    ///
+    /// Es `meanDistance` medida contra la desviación que el motor permite, así
+    /// que no depende del tamaño de la pantalla y se puede promediar entre un
+    /// iPhone y un iPad. Las estadísticas de la zona de adultos viven de esto:
+    /// `passed` solo dice sí o no, y la pregunta del adulto es si va mejorando.
+    let precision: Double
 }
 
 enum TraceEngine {
@@ -29,25 +39,25 @@ enum TraceEngine {
     static func validate(user: [CGPoint], target: [CGPoint],
                          height: CGFloat, isDot: Bool) -> TraceResult {
         guard user.count >= 2 || isDot, let targetFirst = target.first else {
-            return TraceResult(passed: false, startOK: false, meanDistance: .infinity)
+            return .fallido
         }
 
         // Caso especial: un puntito (el de la "i") = toque corto cerca del lugar.
         if isDot {
-            guard let uFirst = user.first else {
-                return TraceResult(passed: false, startOK: false, meanDistance: .infinity)
-            }
+            guard let uFirst = user.first else { return .fallido }
             let len = pathLength(user)
             let near = dist(centroid(user), targetFirst) < 0.22 * height
             let short = len < 0.25 * height
-            return TraceResult(passed: near && short, startOK: near,
-                               meanDistance: dist(uFirst, targetFirst))
+            let d = dist(uFirst, targetFirst)
+            return TraceResult(passed: near && short, startOK: near, endOK: near,
+                               shapeOK: near, lengthOK: short, meanDistance: d,
+                               precision: Self.precision(d, tolerancia: 0.22 * height))
         }
 
         let u = resample(user, count: resampleCount)
         let t = resample(target, count: resampleCount)
         guard u.count == resampleCount, t.count == resampleCount else {
-            return TraceResult(passed: false, startOK: false, meanDistance: .infinity)
+            return .fallido
         }
 
         // 1. Debe EMPEZAR cerca del punto verde (ahí vive la dirección correcta).
@@ -68,7 +78,17 @@ enum TraceEngine {
         let lengthOK = ratio > 0.45 && ratio < 2.2
 
         return TraceResult(passed: startOK && endOK && shapeOK && lengthOK,
-                           startOK: startOK, meanDistance: mean)
+                           startOK: startOK, endOK: endOK,
+                           shapeOK: shapeOK, lengthOK: lengthOK,
+                           meanDistance: mean,
+                           precision: Self.precision(mean, tolerancia: shapeTolerance * height))
+    }
+
+    /// Precisión de 0 a 1 a partir de una desviación y la tolerancia que la
+    /// permite: 0 cuando se sale justo del límite y 1 cuando va encima.
+    static func precision(_ desviacion: CGFloat, tolerancia: CGFloat) -> Double {
+        guard tolerancia > 0, desviacion.isFinite else { return 0 }
+        return Double(max(0, min(1, 1 - desviacion / tolerancia)))
     }
 
     /// Une varios trazos del glifo en un solo camino continuo, metiendo el
@@ -146,4 +166,11 @@ enum TraceEngine {
         while out.count < count { out.append(pts[pts.count - 1]) }
         return out
     }
+}
+
+extension TraceResult {
+    /// Trazo que no se pudo ni medir (menos de dos puntos, o remuestreo fallido).
+    static let fallido = TraceResult(passed: false, startOK: false, endOK: false,
+                                     shapeOK: false, lengthOK: false,
+                                     meanDistance: .infinity, precision: 0)
 }

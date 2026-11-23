@@ -156,6 +156,10 @@ struct MatematicasView: View {
     private func tocar(_ numero: Int) {
         guard !resuelta else { return }
 
+        // Se registra con el ábaco puesto o no: necesitar el apoyo no es un
+        // problema, y dejar de necesitarlo es justo lo que el adulto quiere ver.
+        PracticeLog.shared.registra(suma: suma, ok: numero == suma.total, conApoyo: abaco)
+
         if numero == suma.total {
             // Acierto: botón verde y opciones bloqueadas hasta la siguiente suma.
             withAnimation(.easeOut(duration: 0.2)) {
