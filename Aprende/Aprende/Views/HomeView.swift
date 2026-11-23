@@ -58,6 +58,26 @@ struct HomeView: View {
                         }
                         .buttonStyle(PressDownButtonStyle())
 
+                        // Entrada a la zona de adultos: discreta a propósito, debajo
+                        // de los tres módulos y sin color de tarjeta. El niño puede
+                        // tocarla; la puerta de adulto es la que no pasa.
+                        NavigationLink {
+                            AdultosView()
+                        } label: {
+                            HStack(spacing: 7) {
+                                Image(systemName: "person.2.fill")
+                                    .font(.system(size: 13, weight: .bold))
+                                Text("Para adultos")
+                                    .font(.kid(15, .semibold))
+                            }
+                            .foregroundStyle(Palette.gray)
+                            .padding(.vertical, 10)
+                            .padding(.horizontal, 18)
+                            .background(Capsule().fill(.white.opacity(0.7)))
+                        }
+                        .buttonStyle(PressDownButtonStyle())
+                        .padding(.top, 6)
+
                         footer
                             .padding(.top, 8)
                     }

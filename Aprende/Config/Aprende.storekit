@@ -1,0 +1,79 @@
+{
+  "identifier" : "A1B2C3D4-APRE-4E5F-8A6B-7C8D9E0F1A2B",
+  "nonRenewingSubscriptions" : [],
+  "products" : [
+    {
+      "displayPrice" : "10.00",
+      "familyShareable" : false,
+      "internalID" : "TIP01",
+      "localizations" : [
+        {
+          "description" : "Un café para seguir haciendo Aprende.",
+          "displayName" : "Un café",
+          "locale" : "es_MX"
+        }
+      ],
+      "productID" : "com.eduardovelross.aprende.tip.small",
+      "referenceName" : "Tip Small",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "25.00",
+      "familyShareable" : false,
+      "internalID" : "TIP02",
+      "localizations" : [
+        {
+          "description" : "Un café grande. Gracias de verdad.",
+          "displayName" : "Café grande",
+          "locale" : "es_MX"
+        }
+      ],
+      "productID" : "com.eduardovelross.aprende.tip.medium",
+      "referenceName" : "Tip Medium",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "50.00",
+      "familyShareable" : false,
+      "internalID" : "TIP03",
+      "localizations" : [
+        {
+          "description" : "Café y pan. Esto alcanza para un buen rato de trabajo.",
+          "displayName" : "Café y pan",
+          "locale" : "es_MX"
+        }
+      ],
+      "productID" : "com.eduardovelross.aprende.tip.large",
+      "referenceName" : "Tip Large",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "100.00",
+      "familyShareable" : false,
+      "internalID" : "TIP04",
+      "localizations" : [
+        {
+          "description" : "Un pastel completo. ¡Eres de los que hacen que esto siga!",
+          "displayName" : "Pastel completo",
+          "locale" : "es_MX"
+        }
+      ],
+      "productID" : "com.eduardovelross.aprende.tip.huge",
+      "referenceName" : "Tip Huge",
+      "type" : "Consumable"
+    }
+  ],
+  "settings" : {
+    "_applicationInternalID" : "6836391055",
+    "_developerTeamID" : "AZDP5Q3YFJ",
+    "_failTransactionsEnabled" : false,
+    "_locale" : "es_MX",
+    "_storeKitErrors" : [],
+    "_storefront" : "MEX"
+  },
+  "subscriptionGroups" : [],
+  "version" : {
+    "major" : 3,
+    "minor" : 0
+  }
+}

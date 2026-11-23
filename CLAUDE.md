@@ -94,8 +94,9 @@ cd Aprende && xcodebuild -project Aprende.xcodeproj -scheme Aprende -destination
 
 ### Tests
 El target `AprendeTests` cubre la lógica pura: `TraceEngine`, la tabla de `AppData`, los
-invariantes de `GlyphLibrary` y la normalización del nombre de `PerfilStore`. No cubre
-vistas; eso va por el skill `qa-aprende`.
+invariantes de `GlyphLibrary`, la normalización del nombre de `PerfilStore`, los
+acumulados de `PracticeLog` con sus niveles de dominio y la comparación de versiones de
+`UpdateChecker`. No cubre vistas; eso va por el skill `qa-aprende`.
 
 ```bash
 cd Aprende && xcodebuild test -project Aprende.xcodeproj -scheme Aprende -destination 'platform=iOS Simulator,name=iPhone 17'
@@ -123,6 +124,42 @@ builds nuevos ya no se quedan en "Missing Compliance" esperando una respuesta a 
 
 `scripts/make_icon.swift` genera el icono de 1024 y `scripts/render_glyphs.swift` ayuda
 a revisar los trazos de la biblioteca de glifos.
+
+### Un clon nuevo no compila sin las credenciales de Drive
+
+`DriveCredentials.swift` está en `.gitignore` (este repo es público). En una copia
+nueva hay que crearlo a partir de la plantilla, o el feedback no compila:
+
+```bash
+cp Aprende/Aprende/DriveCredentials.sample.swift Aprende/Aprende/DriveCredentials.swift
+# quitar el `#if false` y poner los valores reales (los mismos de Toss)
+```
+
+### Cómo MIRAR una pantalla sin poder dar toques
+
+Esta Mac no tiene herramienta de toques para el simulador, así que para ver una
+pantalla de dentro se arranca directamente (solo DEBUG, ver `QAShortcut`):
+
+```bash
+xcrun simctl launch booted com.eduardovelross.aprende -pantalla avance
+xcrun simctl io booted screenshot /tmp/avance.png
+```
+
+Las pantallas aceptadas: `adultos` (la puerta), `menu` (ya dentro), `avance`,
+`acerca`, `cafe`, `idea`.
+
+Dos cosas que cuestan una tarde si no se saben:
+
+- **`xcrun simctl spawn booted defaults write` NO llega a la app.** Escribe en las
+  preferencias del simulador, no en el contenedor sandbox de la app, y la pantalla
+  sigue enseñando lo de antes. Para sembrar datos de prueba hay que hacerlo desde un
+  test (lo hospeda la propia app) y lanzar la app después.
+- **`ImageRenderer` no sirve para ver estas pantallas.** Un `NavigationStack` sale como
+  el icono de "prohibido" y el contenido de un `ScrollView` sale vacío; todas las
+  pantallas van dentro de `ScreenScaffold`, que es un `ScrollView`.
+
+Para ver un bloque que queda abajo del scroll: sembrar **menos** datos (el contenido de
+arriba encoge y sube el de abajo) o capturar en el iPad, que es más alto.
 
 ### Si el simulador se cuelga
 Esta Mac no tiene `Simulator.app`, pero el simulador funciona sin él. Si `simctl launch`
@@ -167,6 +204,26 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
   estaba fijo en código; con un salón entero cada niño trae el suyo. Se pregunta en el
   primer arranque (`CapturaNombreView` sobre `HomeView` mientras `!configurado`) y se
   corrige desde "Escribir mi nombre". La mano decide de qué lado va el modelo en Escribe.
+- **`PracticeLog`** — lo que alimenta las estadísticas del adulto. Guarda
+  **acumulados**, no un evento por intento (un registro crudo hay que podarlo, y lo
+  primero que se poda es el historial que muestra el avance): una fila por glifo
+  (intentos, aciertos, precisión y por qué falló), una por día y una por suma, en
+  `UserDefaults` (`aprende.practica.*`). Se escribe desde `LetterTraceView` y
+  `MatematicasView`. Nunca sale del dispositivo.
+- **`Estadisticas`** — las derivaciones que ve la zona de adultos: nivel de dominio por
+  letra, las que más cuestan con su diagnóstico, precisión por semana, constancia y
+  sumas. Toda la lógica vive aquí, no en el `body` de la vista.
+- **`StoreManager`** — StoreKit 2 para las propinas. Los precios **nunca** se escriben
+  en código: se piden a StoreKit (`displayPrice`), que trae la moneda de cada país.
+- **`FeedbackService` + `DriveFeedbackClient`** — "Envíame una idea": un JSON anónimo
+  por envío subido a Google Drive, con cola local que reintenta sin red. Copiado de
+  Toss. `DriveCredentials.swift` tiene las credenciales reales y **está en
+  `.gitignore`** (este repo es público); lo versionado es `DriveCredentials.sample.swift`,
+  envuelto en `#if false` para que no colisione al compilar.
+- **`UpdateChecker`** — la **única llamada de red** de la app: pregunta al iTunes Lookup
+  qué versión está publicada. No manda nada del niño ni del dispositivo.
+- **`QAShortcut` (solo DEBUG)** — abre una pantalla de dentro al arrancar
+  (`-pantalla avance`), porque `simctl` no sabe dar toques. No existe en Release.
 - **`GlyphLibrary` (`Glyphs.swift`)** — los trazos de cada letra y dígito en una caja
   unitaria con Y hacia abajo (ascendentes 0.08, x-height 0.38, línea base 0.88,
   descendentes 1.00). El **orden de los puntos codifica la dirección correcta** de
@@ -216,6 +273,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 └── Aprende/
     ├── Aprende.xcodeproj/      pbxproj mínimo; el código entra por grupo sincronizado
     ├── Config/ExportOptions.plist  Subida a App Store Connect
+    ├── Config/Aprende.storekit     Productos de prueba (propinas) para el simulador
     ├── AprendeTests/           Tests de TraceEngine, AppData, GlyphLibrary y PerfilStore
     └── Aprende/
         ├── AprendeApp.swift    @main; fuerza esquema claro
@@ -227,6 +285,14 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
         ├── ProgressStore.swift    Estrellas en UserDefaults
         ├── HojaStore.swift         Hojas marcadas, en UserDefaults
         ├── PerfilStore.swift       Nombre y mano del niño, en UserDefaults
+        ├── PracticeLog.swift       Acumulados de práctica (intentos, días, sumas)
+        ├── Estadisticas.swift      Derivaciones para la pantalla de avance
+        ├── StoreManager.swift      Propinas con StoreKit 2
+        ├── UpdateChecker.swift     ¿Hay versión nueva? (única llamada de red)
+        ├── FeedbackService.swift   Envíos anónimos, con cola local
+        ├── DriveFeedbackClient.swift  Subida a Google Drive
+        ├── DriveCredentials.sample.swift  Plantilla; la real está fuera de git
+        ├── QAShortcut.swift        Atajo de QA (solo DEBUG)
         ├── GlyphText.swift         Palabra dibujada con los trazos del glifo
         ├── PrivacyInfo.xcprivacy  Manifiesto de privacidad (UserDefaults, CA92.1)
         ├── Theme.swift            Paleta y componentes compartidos
@@ -239,6 +305,12 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
             ├── PalabrasView.swift      Palabra aleatoria + separar sílabas
             ├── OracionView.swift       Sílabas / palabras / oración completa
             ├── MatematicasView.swift   Sumas con 5 opciones
+            ├── Adultos/
+            │   ├── AdultosView.swift       Puerta de adulto + menú
+            │   ├── EstadisticasView.swift  Cómo va el niño
+            │   ├── AcercaDeView.swift      Versión y buscar actualizaciones
+            │   ├── CafeView.swift          Propinas
+            │   └── IdeaView.swift          Envíame una idea
             └── Escribe/
                 ├── EscribeMenuView.swift
                 ├── MiNombreView.swift            Partes del nombre + nombre completo
@@ -308,7 +380,30 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   Lola o Rosa. La autocapitalización del teclado no basta, porque el adulto la puede
   sobrescribir. Las partículas de los apellidos compuestos se quedan en minúscula
   ("Juan de la Cruz") y las mayúsculas internas se respetan ("D'Angelo").
-- **Sin red, sin cuentas, sin analítica.** Lo único que persiste es `UserDefaults`.
+- **La zona de adultos va detrás de una puerta.** Lo que no es para el niño (cómo va,
+  acerca de, el café y las ideas) vive en "Para adultos", debajo de los tres módulos.
+  Delante hay un número **escrito con letra** que hay que teclear con dígitos: no es un
+  candado de verdad, es que leer "cuarenta y siete" exige leer, y el niño está
+  aprendiendo. Un número en dígitos sí lo sabría copiar.
+- **Las estadísticas son de aprendizaje, no de uso** (decisión de Felipe, 23 de
+  noviembre). No hay minutos de pantalla, ni sesiones, ni veces que abrió la app, ni
+  racha como trofeo. Cada número contesta algo sobre cómo va aprendiendo: qué letras
+  domina, cuáles le cuestan, **por qué** falla (empezar en otro punto es no saber por
+  dónde empieza la letra; la forma desviada es pulso), si mejora semana a semana y si ya
+  no necesita el ábaco. En **Español no se mide nada**: leer en voz alta no se puede
+  verificar, y contar sílabas vistas no dice nada.
+- **El mapa de letras va separado por caja** (minúsculas, mayúsculas, números). Juntas,
+  la "l" y la "I" de Irma son la misma barra vertical y el adulto no sabe cuál mira.
+- **El nombre del niño NO sale del dispositivo.** El feedback es anónimo: va lo que
+  escribió el adulto más el modelo de iPad y la versión. Ni el nombre ni nada de la
+  práctica. Es el dato de un menor de cinco años, y además es lo que sostiene el
+  "Data Not Collected" de la ficha.
+- **Las propinas se cobran en pesos** (10 / 25 / 50 / 100 MXN): Toss cobra en dólares y
+  esto es México. No desbloquean nada y la pantalla lo dice. En los otros 17 países
+  queda la conversión automática de Apple hasta que se ajuste país por país.
+- **Sin cuentas y sin analítica. Red: una sola llamada**, la de buscar actualizaciones
+  (iTunes Lookup), más la subida del feedback cuando el adulto escribe uno. Lo único que
+  persiste es `UserDefaults`.
 - **Solo en países hispanohablantes** (decisión de Felipe, 22 de noviembre): los 18
   territorios de habla hispana con App Store propia. Cuba y Guinea Ecuatorial no están
   en la lista de Apple, y Puerto Rico usa la tienda de Estados Unidos. Estados Unidos
@@ -421,48 +516,29 @@ Los nueve que dictó el 23 de noviembre, ya implementados y probados:
       de Felipe). Las reglas están en la sección 6 y las vigilan tres tests; la auditoría
       de los 75 glifos salió limpia.
 
-### Las cuatro utilidades de Toss (decididas el 23 de noviembre, sin empezar)
+### Las cuatro utilidades de Toss (hechas el 23 de noviembre)
 
-Felipe quiere en Aprende cuatro utilidades que ya existen en **Toss**
-(`~/Developer/Toss — Swipe & Clean`), donde viven en una pestaña "Ajustes". Aprende no
-tiene ninguna pantalla así: las cuatro van en una **zona de adultos** nueva, con puerta
-de adulto delante, porque quien entra ahí no es el niño.
+Las cuatro viven en la **zona de adultos** (`Views/Adultos/`), detrás de la puerta.
+Felipe las pidió copiando a **Toss** (`~/Developer/Toss — Swipe & Clean`), y tres se
+copiaron de allá; "buscar actualizaciones" no existía y se escribió aquí.
 
-- [ ] **Estadísticas.** Decisión de Felipe: "la mejor estadística" posible, no el marcador.
-      Lo medido hoy no alcanza —`ProgressStore` es un `Set` de logros, sin fechas ni
-      intentos—, así que hace falta **instrumentar cada intento**: letra, palabra, fase,
-      si acertó, precisión (de `meanDistance` contra `shapeTolerance`), si empezó en el
-      punto correcto (`startOK`) y cuándo. `TraceResult` tiene que exponer también
-      `endOK`/`shapeOK`/`lengthOK`, que hoy se colapsan en `passed`. Con eso: mapa del
-      abecedario por dificultad, las tres letras que más le cuestan con acceso directo a
-      practicarlas, **dirección vs. forma** como errores distintos (es la diferencia entre
-      no saber por dónde empieza la letra y el pulso), constancia de 30 días con racha,
-      precisión por semana, y aciertos y fallos de Matemáticas. En **Español no se mide
-      nada**: leer en voz alta no se puede verificar y un contador de sílabas vistas no
-      dice nada. No es retroactivo y **todo se queda en el dispositivo**, así que la ficha
-      no cambia. El diagnóstico en prosa, si se hace, se genera con reglas locales: una
-      IA en la app significaría mandar fuera los datos de práctica de un niño.
-- [ ] **Invítame un café.** Cuatro consumibles
-      `com.eduardovelross.aprende.tip.{small,medium,large,huge}` a **10 / 25 / 50 / 100
-      MXN** (decisión de Felipe; Toss cobra en dólares y esto es México). El precio se
-      pinta siempre con `product.displayPrice` de StoreKit, **nunca escrito en el código**:
-      si Apple no tiene el punto exacto toma el más cercano, y los otros 17 países quedan
-      con la conversión automática de Apple hasta que se ajuste país por país. Hay que dar
-      de alta los productos en App Store Connect y cambiar la ficha: **"Compras dentro de
-      la app" pasa de "Ninguna" a propinas**. Puerta de adulto delante: no es requisito de
-      Apple (la app no está marcada Made for Kids) pero la usa un niño de cinco años.
-- [ ] **Acerca de, con versión y buscar actualizaciones.** El `AboutSheet` de Toss (logo,
-      nombre, privacidad, cómo funciona) y la versión con `CFBundleShortVersionString` se
-      copian tal cual. **Buscar actualizaciones no existe en Toss**: hay que escribirlo
-      contra el iTunes Lookup API y es la **única llamada de red** de toda la app.
-- [ ] **Envíame una idea y feedback.** `FeedbackView` + `FeedbackService` +
-      `DriveFeedbackClient` de Toss: cuatro categorías, un JSON por envío a Google Drive y
-      cola local que reintenta sin red. **El nombre del niño queda descartado** (decisión
-      de Felipe del 23 de noviembre): el dato de un menor no sale del dispositivo, y así el
-      envío sigue siendo anónimo como en Toss, que es lo que sostiene el
-      "Data Not Collected" de la ficha y deja `PrivacyInfo.xcprivacy` como está. Las
-      credenciales de Drive **no pueden ir commiteadas** —este repo es público—: el archivo
-      real fuera de git y solo se versiona el `.sample`, como allá.
+- [x] **Estadísticas.** "La mejor estadística posible", de avance y pedagogía (decisión
+      de Felipe). Hizo falta **empezar a medir**: `TraceResult` ahora expone
+      `endOK`/`shapeOK`/`lengthOK` y una `precision` de 0 a 1 que antes se tiraba, y
+      `PracticeLog` acumula cada intento. La pantalla enseña dominio letra por letra,
+      las tres que más cuestan **con su diagnóstico y en qué palabras practicarlas**,
+      precisión por semana, constancia de 28 días y las sumas (tino, cuáles falla y
+      cuánto se apoya en el ábaco). No es retroactivo: mide desde esta versión.
+- [x] **Invítame un café.** Cuatro consumibles a 10 / 25 / 50 / 100 MXN con StoreKit 2.
+      **Faltan los productos en App Store Connect** (ver pendientes del deploy): sin
+      ellos la pantalla dice honestamente que no hay opciones disponibles, en vez de
+      quedarse girando. En el simulador salen con `Config/Aprende.storekit`, que el
+      esquema ya referencia.
+- [x] **Acerca de, con versión y buscar actualizaciones.** La versión se lee del bundle;
+      el buscador consulta el iTunes Lookup y compara por número (`1.10` > `1.9`).
+- [x] **Envíame una idea.** Las cuatro categorías de Toss, JSON anónimo a Drive y cola
+      local. Sin el nombre del niño (sección 5). Las credenciales reales están fuera de
+      git y la app lo tolera: si no están configuradas, el envío se queda en la cola.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
@@ -562,3 +638,12 @@ Lo aprendido antes, que sigue valiendo:
 - [ ] Si Apple vuelve a pedir el vídeo: instalarla desde TestFlight y grabarla en el iPad.
 - [ ] Más capturas de iPad: solo hay la de inicio.
 - [ ] Subir `CURRENT_PROJECT_VERSION` antes de cada build nuevo.
+- [ ] **Dar de alta las cuatro propinas en App Store Connect** (consumibles
+      `com.eduardovelross.aprende.tip.{small,medium,large,huge}`, precio base en MXN:
+      10 / 25 / 50 / 100). Hasta que existan, la pantalla del café sale sin opciones
+      también en TestFlight, porque el sandbox lee los productos de la ficha.
+- [ ] **Cambiar "Compras dentro de la app" de "Ninguna" a propinas** en la ficha
+      (`AppStoreMetadata/es-MX.md` línea 16) cuando los productos estén dados de alta.
+- [ ] Confirmar que las respuestas de privacidad siguen siendo "Data Not Collected": el
+      feedback es anónimo y las estadísticas no salen del dispositivo, así que no
+      deberían cambiar.

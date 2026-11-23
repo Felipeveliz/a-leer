@@ -1,1 +1,5 @@
 Aprende/build/
+
+# Credenciales reales de Google Drive (feedback). El archivo real NUNCA se
+# commitea: este repo es público. Solo se versiona DriveCredentials.sample.swift.
+**/DriveCredentials.swift

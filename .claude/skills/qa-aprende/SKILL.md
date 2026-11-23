@@ -73,6 +73,26 @@ Y el recorrido normal:
 - El punto de la "i" con **un toque corto**.
 - Tocar dos veces seguidas una tarjeta del menú: no debe abrir dos pantallas.
 
+### Zona de adultos (desde la 1.1 build 8)
+
+No la toca el niño, pero sí se rompe sola si nadie la mira:
+
+- **La puerta**: el número va escrito con letra y "Entrar" no se activa hasta teclear
+  algo. Fallar cambia el número, para que no se acierte por insistencia.
+- **Avance**: con el perfil recién creado tiene que decir que todavía no hay nada que
+  contar, no pintar ceros. Con práctica: el mapa separado en minúsculas, mayúsculas y
+  números; "lo que le cuesta" con el motivo y en qué palabras practicarla; la barra de
+  precisión por semana (hace falta más de una semana para que aparezca); la constancia;
+  y las sumas con el apoyo del ábaco.
+- **Acerca de**: la versión tiene que coincidir con la del proyecto. "Buscar
+  actualizaciones" es la única llamada de red: sin wifi tiene que decirlo, no colgarse.
+- **Un café**: sin los productos dados de alta en App Store Connect dice que no hay
+  opciones disponibles. **Eso no es el bug**: el bug sería un spinner eterno.
+- **Envíame una idea**: "Enviar" apagado con el texto vacío; al enviar, la pantalla
+  confirma aunque no haya red (la cola reintenta sola).
+
+Para mirarlas sin dar toques, el atajo de QA está en `CLAUDE.md` → sección 2.
+
 ## Qué no hace falta revisar
 
 - **Modo oscuro**: la app fuerza esquema claro en `AprendeApp`. Si alguien quita ese
