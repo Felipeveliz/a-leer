@@ -433,14 +433,21 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       al tercer fallo (la rama de fallo no mira `showsDemo`): dejar las dos fases
       coherentes y preguntar a Felipe si en fase 2 también quiere la demo en cada error.
 
-**Duda abierta de Felipe (23 de noviembre), sin decidir:** no está seguro de que el
-orden de los trazos sea el que enseñan en la escuela — lo preguntó por el **5**, que la
-app hace en 2 trazos (cuerpo primero, sombrerito al final, que es la convención más
-común). No es cosmético: el punto verde marca dónde empezar, así que un orden distinto
-al de su escuela hace que la app **rechace** un trazo bien hecho. Hoy: 0, 1, 2, 3, 6, 7
-y 8 van en 1 trazo; 4, 5 y 9 en 2. Siguiente paso: generar la hoja de los 75 trazos con
-`scripts/render_glyphs.swift` para que Felipe la contraste con el cuaderno de Eliab o con
-la maestra, y corregir lo que no coincida.
+- [ ] **9. Los trazos siguen la convención estándar, NO la escuela de Eliab.** Decisión de
+      Felipe (23 de noviembre), preguntando por el **5** (hoy: 2 trazos, cuerpo y luego el
+      sombrerito): *"no me importa como lo enseña la escuela, quiero que la app lo enseñe
+      correctamente a como el mundo necesita aprender"*. **Deja sin efecto** el criterio
+      anterior de copiar la letra de su escuela: la referencia ya no es el cuaderno de
+      Eliab, y ya no hay que contrastar nada con la maestra.
+      Aviso honesto: **no existe un estándar mundial único** (Zaner-Bloser, D'Nealian y los
+      cuadernos de caligrafía en español difieren en algunas letras). Así que esto se
+      vuelve accionable de una sola forma: **escribir las reglas en este archivo y que los
+      75 trazos las cumplan sin excepción**. Reglas propuestas, a confirmar con Felipe:
+      de arriba abajo; de izquierda a derecha; los círculos en contra del reloj
+      (a, c, d, g, o, q: empezar como a las 2 y girar a la izquierda); primero el cuerpo y
+      al final la barra o el punto (t, i, j, 4, 5). Después, auditar los 75 contra esas
+      reglas, como se hizo con la "U", los acentos, la "G" y la "B". Hoy 0, 1, 2, 3, 6, 7
+      y 8 van en 1 trazo, y 4, 5 y 9 en 2.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
