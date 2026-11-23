@@ -416,6 +416,13 @@ Numerados como él los dictó, para poder referirse a ellos por número.
       una pantalla vacía, solo que ahora es silencioso. Con el punto 2 hecho, Sílabas ya
       no necesitará respaldo; Oración sí seguirá usándolo mientras la hoja 3 no traiga
       oración. Esto deja sin efecto la parte de la sección 5 que describe el aviso.
+- [ ] **7. Botón "Ábaco" en Matemáticas.** Mismo papel que "Separar sílabas" en palabras:
+      un apoyo que el niño pide cuando no le sale. Al tocarlo, la suma se muestra en
+      cuentas para contarlas; al tocarlo otra vez se esconde (como Separar ↔ Juntar).
+      Propuesta a confirmar con Felipe: **los dos sumandos en grupos y colores distintos**
+      (3 + 2 = tres cuentas azules y dos coral en la misma fila), que es justo la idea de
+      "juntar grupos" de la que hablamos; no una sola fila de 5, porque ahí se pierde de
+      dónde salió cada parte. Sin audio. Las respuestas siguen siendo los botones 2–6.
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
