@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "permissions": {
+    "ask": [
+      "Bash(git reset --hard *)",
+      "Bash(git push --force*)",
+      "Bash(xcrun simctl erase *)"
+    ],
+    "allow": [
+      "Bash(xcodebuild *)",
+      "Bash(xcrun simctl list*)",
+      "Bash(xcrun simctl boot *)",
+      "Bash(xcrun simctl bootstatus *)",
+      "Bash(xcrun simctl install *)",
+      "Bash(xcrun simctl launch *)",
+      "Bash(xcrun simctl terminate *)",
+      "Bash(xcrun simctl io *)",
+      "Bash(xcrun simctl get_app_container *)",
+      "Bash(xcrun simctl shutdown *)",
+      "Bash(swift scripts/*)",
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(df *)",
+      "Bash(du *)"
+    ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/session-start.sh\" 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.sh\" 2>/dev/null || true",
+            "timeout": 15,
+            "statusMessage": "Revisando que no entren credenciales al commit"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/recordatorio-web.sh\" 2>/dev/null || true",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  }
+}

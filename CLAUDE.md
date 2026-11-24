@@ -22,6 +22,11 @@ sumas y escritura a mano con el dedo o con Apple Pencil. Interfaz en español me
 - Si hay duda sobre una decisión técnica o de producto, **preguntar antes de asumir**.
   No inventar features.
 - No preguntar lo que se puede deducir del código.
+- **Un punto a la vez: una sola pregunta por mensaje**, y nunca rellenar una respuesta
+  faltante con un supuesto. (Regla que Felipe usa en sus otros proyectos; aquí faltaba.)
+- Cuando Felipe diga **"eso después"**, el tema entra a la sección 8 y no se vuelve a
+  proponer por iniciativa propia. Cuando pregunte **"qué falta"**, se contesta con esa
+  lista, completa y sin inventarle prioridades.
 - No crear documentos, artefactos ni archivos adicionales sin que Felipe lo pida.
 - **Si el bloqueo es que se cayó su sesión** (App Store Connect, el portal de
   desarrollador), la respuesta es una línea: *"inicia sesión y yo sigo"*. Sin hipótesis
@@ -44,6 +49,13 @@ revisión y esperar a aprobarla para liberarla a mano no es terminar el deploy.
 - Si una versión quedó en manual y Apple la aprueba (**Pending Developer Release**),
   liberarla de inmediato, sin preguntar.
 - "Haz deploy" significa dejar la app **publicada**, no "enviada".
+- **Mientras dura un deploy no se intercala nada**: ni copy, ni documentación, ni
+  refactors, ni limpiezas, ni "ya que estoy aquí". Lo que aparezca en el camino se anota
+  y se hace después. Tampoco se para entre pasos a preguntar "¿qué sigue?": se encadena
+  build, archivo, subida, ficha, capturas y envío, y se verifica el estado final en la
+  consola. Lo único que detiene un deploy es algo que solo puede hacer Felipe —aceptar un
+  contrato, teclear una contraseña, grabar un video—, y eso se le dice en una línea.
+  (Regla de Delivery Network, del día que un deploy tardó horas por desviarse.)
 
 ### Cómo se trabaja
 - **Reproducir antes de corregir.** Un bug se ve fallar primero. Si no se puede
@@ -57,6 +69,40 @@ revisión y esperar a aprobarla para liberarla a mano no es terminar el deploy.
   sección 6 y el estado a la sección 8, en el mismo commit. Un bug que vuelve es un bug
   que no se documentó.
 - **Un flujo que se repite tres veces merece su skill** en `.claude/skills/`.
+- **Nada de sesiones monolíticas.** Si una tarea se está alargando y ya hay un bloque
+  funcional con build verde, se commitea ahí; no se acumulan horas de trabajo sin punto
+  de retorno.
+
+### Guardarraíles: permisos y hooks
+
+Las reglas de este archivo que se pueden hacer cumplir **mecánicamente** no dependen de
+que el agente se acuerde de ellas. Todo vive en `.claude/` y se versiona con el repo, así
+que viaja a cualquier sesión y a cualquier agente (idea traída de Delivery Network).
+
+- **`.claude/settings.json`** declara permisos y engancha los hooks. En `allow` están los
+  comandos de verificación que se repiten mucho y no cambian nada (`xcodebuild`, los
+  `simctl` del flujo de QA, `git status/diff/log`, `df`, `du`), para no pedir permiso
+  cincuenta veces en una sesión de pruebas. En `ask` quedan las tres cosas que no se
+  deshacen: `git reset --hard`, `git push --force` y `simctl erase` (borra el contenedor
+  de la app y con él los datos sembrados).
+- **`.claude/hooks/guard-bash.sh`** (PreToolUse sobre Bash) pide confirmación ante
+  cualquier camino por el que `DriveCredentials.swift` pueda entrar al repo: un commit con
+  credenciales en el stage, un `git add -f` y cualquier comando que reescriba
+  `.gitignore`. **Este repo es público** y ese refresh token lo comparten Aprende, Toss y
+  Karol: un commit así no se arregla borrando el archivo después, queda en el historial y
+  hay que revocar el token, lo que tumba el feedback de las tres apps. Nunca decide por su
+  cuenta: siempre devuelve `ask`.
+- **`.claude/hooks/recordatorio-web.sh`** (PostToolUse sobre Write y Edit) avisa, al tocar
+  cualquier archivo de red, compras o datos guardados, de revisar `privacidad.html` y
+  `soporte.html`. Es la regla de la sección 8 que más fácil se olvida y la lee el revisor
+  de Apple: la 1.0 llegó a revisión diciendo que la app no se conecta a internet.
+- **`.claude/hooks/session-start.sh`** avisa si quedan menos de 10 GB de disco. Un archive
+  de Release ocupa varios GB entre el `.xcarchive` y el `.ipa`.
+
+Lo que **a propósito no** se trajo de los otros proyectos: el hook de paridad
+iOS/Android (aquí hay una sola app), `git commit` y `git push` en `ask` (en este repo la
+regla es la contraria: commit y push automáticos al terminar cada tarea) y los hooks de
+producción de Firebase (aquí no hay backend).
 
 ### Skills del proyecto
 Antes de una tarea, revisar si hay un skill que la cubra:
@@ -224,7 +270,13 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
   El token de Drive viaja dentro del binario, así que quien descargue la app puede
   sacarlo: el scope `drive.file` acota el daño a los archivos que creó ese cliente, y es
   el mismo trato que ya se aceptó en Toss. Si algún día estorba, el camino es un
-  endpoint propio en vez de credenciales embebidas.
+  endpoint propio en vez de credenciales embebidas. **Es el mismo cliente OAuth de Toss
+  y Karol**: revocar el token en Google deja sin feedback a las tres apps.
+  Dos invariantes que vienen de Toss y no se tocan: **un JSON por envío**, nunca un
+  `feedback.json` compartido —si el token embebido se filtrara, un usuario podría leer
+  los envíos de otro—, y **ningún identificador estable** en el JSON (ni id de
+  dispositivo, ni nombre, ni cuenta). Eso es lo que sostiene el "Data Not Collected" de
+  la ficha por la excepción de formularios de feedback de Apple.
 - **`UpdateChecker`** — la **única llamada de red** de la app: pregunta al iTunes Lookup
   qué versión está publicada. No manda nada del niño ni del dispositivo.
 - **`UpdateGate` + `ActualizaView`** — el candado de versión: si Apple contesta que hay
@@ -271,6 +323,8 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 ```
 .
 ├── CLAUDE.md
+├── .claude/settings.json      Permisos y hooks del agente (ver sección 1)
+├── .claude/hooks/             guard-bash · recordatorio-web · session-start
 ├── .claude/skills/            ios-deploy · capturas-app-store · qa-aprende
 ├── index.html                  Versión web (GitHub Pages), origen de los contenidos
 ├── scripts/
@@ -490,6 +544,7 @@ este archivo en el mismo commit**. No "después", no "en la siguiente sesión".
 | Framework o dependencia nueva | Encabezado + 3. Arquitectura (y por qué) |
 | Herramienta, script, test o paso de CI nuevo | 2. Build & run |
 | Skill nuevo en `.claude/skills/` | 1. Skills del proyecto |
+| Hook, permiso o script nuevo en `.claude/` | 1. Guardarraíles: permisos y hooks |
 | Pendiente resuelto o nuevo | 8. Pendientes |
 
 **No hace falta** actualizarlo por: un typo en el copy, un cambio de color o padding, un
@@ -560,6 +615,24 @@ copiaron de allá; "buscar actualizaciones" no existía y se escribió aquí.
 - [x] **Envíame una idea.** Las cuatro categorías de Toss, JSON anónimo a Drive y cola
       local. Sin el nombre del niño (sección 5). Las credenciales reales están fuera de
       git y la app lo tolera: si no están configuradas, el envío se queda en la cola.
+
+### Qué hacer con las ideas que llegan ("Envíame una idea")
+
+Protocolo traído de Karol, donde el feedback in-app sí tiene un ciclo definido. Aquí no
+existía: la pantalla ya está publicada y sin esto los envíos llegan a Drive y nadie los
+mira.
+
+1. Los envíos caen en la carpeta **`Aprende`** del Drive de Felipe, **un JSON por envío**
+   (no hay archivo compartido, a propósito; ver sección 3).
+2. Felipe los baja y los pega en la conversación. Claude los **agrupa por categoría**,
+   descarta duplicados y separa lo que es un bug real de lo que es una idea.
+3. Cada cosa aceptada entra a este archivo: los bugs a **Revisión de código**, las ideas a
+   **Mejoras propuestas, sin decidir**, y lo que Felipe descarte **no se vuelve a
+   proponer**.
+4. Los JSON no se editan (son de un solo envío y no llevan estado). Lo que hace de
+   registro es la línea de abajo, y se actualiza en el mismo commit.
+
+**Revisados hasta: ningún envío todavía** (la 1.1 es la primera versión con la pantalla).
 
 ### Revisión de código
 - [x] Fase 3 "¡Tú solo!" borraba lo escrito al pulsar "¡Listo!" (también pasaba en
@@ -662,6 +735,9 @@ Lo aprendido antes, que sigue valiendo:
 - **La descripción no admite emoji.**
 - El App ID hay que registrarlo a mano en developer.apple.com antes de crear la ficha.
 - Las notas del revisor en **inglés**.
+- Límites de los campos de la ficha, para no escribir de más y tener que recortar:
+  nombre 30, subtítulo 30, texto promocional 170, descripción 4000, palabras clave 100,
+  novedades 4000.
 
 ### Pendientes del deploy
 - [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
@@ -690,7 +766,11 @@ Lo aprendido antes, que sigue valiendo:
       iPad con las cuatro filas. Se enviaron con la pantalla del café **sin opciones**,
       que era la única captura que existía cuando se dieron de alta (los productos no
       existían todavía, así que StoreKit no devolvía ninguno). Es el riesgo conocido de
-      esta entrega.
+      esta entrega. Ahora que los cuatro están dados de alta, la captura buena sale de
+      **TestFlight en el iPad**, donde el entorno de pruebas sí los devuelve; no hace
+      falta tocar código. Karol resolvió esto con un override en DEBUG para probar sin
+      StoreKit, pero aquí costaría una abstracción sobre `Product` que no vale el riesgo
+      en código que ya está en revisión.
 - [ ] **Las páginas web se actualizaron el 23 de noviembre** (privacidad y soporte):
       decían que la app no se conecta a internet y que no tiene compras, las dos cosas
       falsas desde la 1.1. Viven en este mismo repo y se publican solas en
