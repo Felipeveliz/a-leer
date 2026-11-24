@@ -13,11 +13,11 @@ Idioma principal de la app: **español (México)**. Es el único localizado.
 | Categoría principal | Educación |
 | Categoría secundaria | (ninguna) |
 | Precio | Gratis |
-| Compras dentro de la app | Ninguna |
+| Compras dentro de la app | Propinas (consumibles, 10 / 25 / 50 / 100 MXN). No desbloquean nada. |
 | Publicidad | Ninguna |
 | Clasificación por edad | 4+ |
 | Made for Kids | **No** (ver nota al final) |
-| Versión | 1.0 (build 1) |
+| Versión | 1.1 (build 11) |
 
 ## Nombre (30 caracteres máx.)
 

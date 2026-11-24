@@ -777,8 +777,8 @@ Lo aprendido antes, que sigue valiendo:
       `felipeveliz.github.io/a-leer`. **Cada cambio de la app que toque red, compras o
       datos guardados tiene que llegar también a esas dos páginas**: el revisor de Apple
       las lee.
-- [ ] **Cambiar "Compras dentro de la app" de "Ninguna" a propinas** en la ficha
-      (`AppStoreMetadata/es-MX.md` línea 16) cuando los productos estén dados de alta.
+- [x] La ficha ya dice que hay **propinas** en "Compras dentro de la app", y la versión
+      de `AppStoreMetadata/es-MX.md` está en 1.1 (11) (se arrastraba el 1.0 build 1).
 - [ ] Confirmar que las respuestas de privacidad siguen siendo "Data Not Collected": el
       feedback es anónimo y las estadísticas no salen del dispositivo, así que no
       deberían cambiar.
