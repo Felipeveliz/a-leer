@@ -786,15 +786,20 @@ Lo aprendido antes, que sigue valiendo:
 - [x] Las cuatro propinas están dadas de alta (23 de noviembre). El contrato de
       **Paid Applications estaba activo** desde el 17 de noviembre y la cuenta bancaria
       configurada, así que no hizo falta nada de eso.
-- [ ] **Cambiar la captura de revisión de las cuatro propinas** en cuanto haya una del
-      iPad con las cuatro filas. Se enviaron con la pantalla del café **sin opciones**,
-      que era la única captura que existía cuando se dieron de alta (los productos no
-      existían todavía, así que StoreKit no devolvía ninguno). Es el riesgo conocido de
-      esta entrega. Ahora que los cuatro están dados de alta, la captura buena sale de
-      **TestFlight en el iPad**, donde el entorno de pruebas sí los devuelve; no hace
-      falta tocar código. Karol resolvió esto con un override en DEBUG para probar sin
-      StoreKit, pero aquí costaría una abstracción sobre `Product` que no vale el riesgo
-      en código que ya está en revisión.
+- [ ] **La captura de revisión de las cuatro propinas solo se cambia si Apple la pide.**
+      Las cuatro se enviaron con la pantalla del café **sin opciones**: es un campo
+      obligatorio por producto y al darlos de alta todavía no existían, así que StoreKit
+      no devolvía ninguno (el orden se muerde la cola). **Si Apple aprueba, aquí no hay
+      nada que hacer** —esa imagen solo la ve el revisor, no sale en la ficha, no afecta
+      a la app, y una versión nueva no vuelve a revisar productos ya aprobados—, y esta
+      línea se borra. Decisión de Felipe del 23 de noviembre, preguntando para qué se
+      iba a cambiar algo que ya pasó.
+      Vuelve a importar en dos casos: si Apple **rechaza** pidiéndola, o si algún día se
+      edita uno de esos productos (nombre, descripción, precio), que lo manda otra vez a
+      revisión. En ambos, la captura buena sale de **TestFlight en el iPad**, donde el
+      entorno de pruebas sí devuelve los cuatro; no hace falta tocar código. Karol
+      resolvió lo de probar sin StoreKit con un override en DEBUG, pero aquí costaría una
+      abstracción sobre `Product` que no vale la pena por una captura.
 - [ ] **Las páginas web se actualizaron el 23 de noviembre** (privacidad y soporte):
       decían que la app no se conecta a internet y que no tiene compras, las dos cosas
       falsas desde la 1.1. Viven en este mismo repo y se publican solas en
