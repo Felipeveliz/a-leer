@@ -79,30 +79,54 @@ Las reglas de este archivo que se pueden hacer cumplir **mecánicamente** no dep
 que el agente se acuerde de ellas. Todo vive en `.claude/` y se versiona con el repo, así
 que viaja a cualquier sesión y a cualquier agente (idea traída de Delivery Network).
 
+**Ningún guardarrail interrumpe a Felipe** (regla suya del 23 de noviembre: "que siga sin
+parar y que no me pida permisos"). Los permisos van en bypass, así que nada de esto
+pregunta: lo que está mal se **niega** y el agente se las arregla sin molestarlo, y lo que
+de verdad hay que decidir se pregunta en el chat, no en un diálogo de permiso. Por eso en
+este repo **no hay lista `ask`**.
+
 - **`.claude/settings.json`** declara permisos y engancha los hooks. En `allow` están los
   comandos de verificación que se repiten mucho y no cambian nada (`xcodebuild`, los
-  `simctl` del flujo de QA, `git status/diff/log`, `df`, `du`), para no pedir permiso
-  cincuenta veces en una sesión de pruebas. En `ask` quedan las tres cosas que no se
-  deshacen: `git reset --hard`, `git push --force` y `simctl erase` (borra el contenedor
-  de la app y con él los datos sembrados).
-- **`.claude/hooks/guard-bash.sh`** (PreToolUse sobre Bash) pide confirmación ante
-  cualquier camino por el que `DriveCredentials.swift` pueda entrar al repo: un commit con
-  credenciales en el stage, un `git add -f` y cualquier comando que reescriba
-  `.gitignore`. **Este repo es público** y ese refresh token lo comparten Aprende, Toss y
-  Karol: un commit así no se arregla borrando el archivo después, queda en el historial y
-  hay que revocar el token, lo que tumba el feedback de las tres apps. Nunca decide por su
-  cuenta: siempre devuelve `ask`.
+  `simctl` del flujo de QA, `git status/diff/log`, `df`, `du`), que sirven cuando el
+  bypass está apagado. En `deny` va la **lectura** del archivo de credenciales de Drive:
+  el agente no necesita su contenido nunca, y un secreto que no entra al contexto no se
+  puede filtrar en un commit, un log ni un pegado. `deny` se respeta **incluso en
+  bypass**; es el único sitio donde poner algo que no debe pasar jamás.
+- **`.claude/hooks/guard-bash.py`** (PreToolUse sobre Bash) **niega** los dos caminos por
+  los que el archivo de credenciales puede entrar al repo: un commit que lo lleve en el
+  stage y un `add` forzado. **Este repo es público** y ese refresh token lo comparten
+  Aprende, Toss y Karol: un commit así no se arregla borrando el archivo después, queda en
+  el historial y hay que revocar el token, lo que tumba el feedback de las tres apps.
+  Está en Python y no en bash por un falso positivo real del mismo día: buscando los
+  textos sueltos dentro del comando completo, bloqueó un `add` inocente porque la ruta
+  del scratchpad contenía "-felipeveliz" y el mensaje del commit nombraba el archivo. Un
+  guardarrail que bloquea lo bueno se acaba apagando, así que ahora parte los argumentos
+  de verdad y solo mira las rutas de ese comando (y, para el commit, el stage de verdad,
+  no el texto).
 - **`.claude/hooks/recordatorio-web.sh`** (PostToolUse sobre Write y Edit) avisa, al tocar
   cualquier archivo de red, compras o datos guardados, de revisar `privacidad.html` y
   `soporte.html`. Es la regla de la sección 8 que más fácil se olvida y la lee el revisor
   de Apple: la 1.0 llegó a revisión diciendo que la app no se conecta a internet.
 - **`.claude/hooks/session-start.sh`** avisa si quedan menos de 10 GB de disco. Un archive
   de Release ocupa varios GB entre el `.xcarchive` y el `.ipa`.
+- **`.claude/hooks/prueba-hooks.sh`** prueba los tres anteriores, en las dos direcciones:
+  que **nieguen** lo que tienen que negar y que **no estorben** en lo normal (compilar,
+  forzar un artefacto de build, un commit que solo nombra el archivo). Correrla después de
+  tocar cualquier hook: `bash .claude/hooks/prueba-hooks.sh`.
 
-Lo que **a propósito no** se trajo de los otros proyectos: el hook de paridad
-iOS/Android (aquí hay una sola app), `git commit` y `git push` en `ask` (en este repo la
-regla es la contraria: commit y push automáticos al terminar cada tarea) y los hooks de
-producción de Firebase (aquí no hay backend).
+**Por qué existe esa prueba** (lección del harness de TallerMaster): ahí cuatro hooks no
+dispararon nunca porque leían el comando de una **variable de entorno**, cuando Claude
+Code entrega la llamada como **JSON por la entrada estándar**. Un guardarrail que no
+dispara es peor que no tenerlo, porque se da por hecho que está protegiendo. Todo hook
+nuevo lee stdin y entra con su caso en la prueba, en las dos direcciones.
+
+Lo que **a propósito no** se trajo de los otros proyectos ni del harness de TallerMaster:
+el hook de paridad iOS/Android (aquí hay una sola app), `git commit` y `git push` en `ask`
+(en este repo la regla es la contraria: commit y push automáticos al terminar cada tarea),
+los hooks de producción de Firebase (aquí no hay backend), el bloqueo de `--no-verify`
+(este repo no tiene hooks de git), el formateador en PostToolUse (no hay linter, sección
+2) y la memoria en archivos aparte —learnings con identificadores y bitácoras diarias—,
+que choca de frente con la regla de que toda la memoria del proyecto vive en este archivo.
 
 ### Skills del proyecto
 Antes de una tarea, revisar si hay un skill que la cubra:
@@ -324,7 +348,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 .
 ├── CLAUDE.md
 ├── .claude/settings.json      Permisos y hooks del agente (ver sección 1)
-├── .claude/hooks/             guard-bash · recordatorio-web · session-start
+├── .claude/hooks/             guard-bash · recordatorio-web · session-start · prueba-hooks
 ├── .claude/skills/            ios-deploy · capturas-app-store · qa-aprende
 ├── index.html                  Versión web (GitHub Pages), origen de los contenidos
 ├── scripts/

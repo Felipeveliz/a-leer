@@ -1,11 +1,6 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "permissions": {
-    "ask": [
-      "Bash(git reset --hard *)",
-      "Bash(git push --force*)",
-      "Bash(xcrun simctl erase *)"
-    ],
     "allow": [
       "Bash(xcodebuild *)",
       "Bash(xcrun simctl list*)",
@@ -22,7 +17,11 @@
       "Bash(git diff*)",
       "Bash(git log*)",
       "Bash(df *)",
-      "Bash(du *)"
+      "Bash(du *)",
+      "Bash(bash .claude/hooks/*)"
+    ],
+    "deny": [
+      "Read(**/DriveCredentials.swift)"
     ]
   },
   "hooks": {
@@ -43,7 +42,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.sh\" 2>/dev/null || true",
+            "command": "\"$CLAUDE_PROJECT_DIR/.claude/hooks/guard-bash.py\" 2>/dev/null || true",
             "timeout": 15,
             "statusMessage": "Revisando que no entren credenciales al commit"
           }
