@@ -32,7 +32,7 @@ struct AdultosView: View {
 
     private var menu: some View {
         VStack(spacing: 14) {
-            ScreenHeader(emoji: "👋", title: "Para adultos",
+            ScreenHeader(emoji: "👋", title: "Métricas de aprendizaje",
                          subtitle: "Esta parte no es para el niño",
                          color: Palette.purple)
                 .padding(.bottom, 6)
@@ -136,7 +136,7 @@ private struct PuertaDeAdulto: View {
 
     var body: some View {
         VStack(spacing: 22) {
-            ScreenHeader(emoji: "🔒", title: "Para adultos",
+            ScreenHeader(emoji: "🔒", title: "Métricas de aprendizaje",
                          subtitle: "Escribe el número con dígitos para entrar",
                          color: Palette.purple)
 

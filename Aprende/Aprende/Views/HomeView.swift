@@ -60,14 +60,17 @@ struct HomeView: View {
 
                         // Entrada a la zona de adultos: discreta a propósito, debajo
                         // de los tres módulos y sin color de tarjeta. El niño puede
-                        // tocarla; la puerta de adulto es la que no pasa.
+                        // tocarla; la puerta es la que no pasa. Se llama "Métricas de
+                        // aprendizaje" y no "Para adultos" (Felipe, 24 de noviembre):
+                        // en una app de 4+, "adultos" se lee como contenido para
+                        // adultos, y eso es lo último que queremos sugerir.
                         NavigationLink {
                             AdultosView()
                         } label: {
                             HStack(spacing: 7) {
                                 Image(systemName: "person.2.fill")
                                     .font(.system(size: 13, weight: .bold))
-                                Text("Para adultos")
+                                Text("Métricas de aprendizaje")
                                     .font(.kid(15, .semibold))
                             }
                             .foregroundStyle(Palette.gray)

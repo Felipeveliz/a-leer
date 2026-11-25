@@ -17,7 +17,7 @@ Idioma principal de la app: **español (México)**. Es el único localizado.
 | Publicidad | Ninguna |
 | Clasificación por edad | 4+ |
 | Made for Kids | **No** (ver nota al final) |
-| Versión | 1.1 (build 11) |
+| Versión | 1.2 (build 12) |
 
 ## Nombre (30 caracteres máx.)
 
@@ -47,42 +47,29 @@ Tres módulos para los primeros pasos: leer sílabas y palabras, sumar del 2 al 
 ("This field contains one or more invalid characters").
 
 ```
-Aprende es una app sencilla para acompañar a un niño en sus primeros pasos con la
-lectura, los números y la escritura a mano. Sin anuncios, sin compras, sin cuentas y
-sin conexión a internet.
+Aprende es una app sencilla para acompañar a un niño en sus primeros pasos con la lectura, los números y la escritura a mano. Sin anuncios, sin cuentas y sin recopilar ningún dato.
 
 ESPAÑOL
-Sílabas para leer en voz alta, agrupadas por familia (la, le, li, lo, lu / ra, re, ri...).
-Palabras que se pueden separar en sílabas de colores con un toque, para ver cómo se
-arman. Y una oración completa que se practica por partes: primero las sílabas, luego
-las palabras y al final la frase entera.
+Sílabas para leer en voz alta, agrupadas por familia (la, le, li, lo, lu / ra, re, ri...). Palabras que se pueden separar en sílabas de colores con un toque, para ver cómo se arman. Y una oración completa que se practica por partes: primero las sílabas, luego las palabras y al final la frase entera.
 
 MATEMÁTICAS
-Sumas con resultado del 2 al 6, el rango con el que se empieza. El niño toca la
-respuesta entre cinco opciones grandes; si acierta, el botón se pone verde, y si no,
-se mueve un poco y lo vuelve a intentar. Nunca hay un tache rojo.
+Sumas con resultado del 2 al 6, el rango con el que se empieza. El niño toca la respuesta entre cinco opciones grandes; si acierta, el botón se pone verde, y si no, se mueve un poco y lo vuelve a intentar. Nunca hay un tache rojo. Un botón de ábaco muestra los dos sumandos en cuentas de colores para contarlos.
 
 ESCRIBE
-Lo más cuidado de la app. Cada letra y cada número se traza siguiendo un punto verde y
-una flecha que marcan por dónde empezar y hacia dónde ir, porque la dirección del trazo
-importa tanto como la forma. La app primero enseña cómo se hace con una animación, y
-después toca al niño.
+Lo más cuidado de la app. Cada letra y cada número se traza siguiendo un punto verde y una flecha que marcan por dónde empezar y hacia dónde ir, porque la dirección del trazo importa tanto como la forma. La app primero enseña cómo se hace con una animación, y después toca al niño.
 
-Cada palabra pasa por tres fases: las letras una por una, la palabra completa letra por
-letra, y al final "¡Tú solo!", un cuaderno en blanco sin guías donde escribe la palabra
-de memoria y luego la compara con el modelo.
+Cada palabra pasa por tres fases: las letras una por una, la palabra completa letra por letra, y al final "¡Tú solo!", un cuaderno en blanco sin guías donde escribe la palabra de memoria y luego la compara con el modelo. También puede aprender a escribir su propio nombre.
 
-Funciona con el dedo y con Apple Pencil. Las palabras están ordenadas de la más fácil de
-trazar a la más difícil, y los números también.
+Funciona con el dedo y con Apple Pencil. Las palabras están ordenadas de la más fácil de trazar a la más difícil, y los números también.
 
 PROGRESO
-Cada palabra y cada número terminados dan una estrella, que se guarda en el dispositivo
-para que el niño vea lo que ya logró.
+Cada palabra y cada número terminados dan una estrella, que se guarda en el dispositivo para que el niño vea lo que ya logró.
+
+MÉTRICAS DE APRENDIZAJE
+Debajo de los tres módulos, detrás de una puerta que pide escribir con dígitos una cantidad escrita con letra. Adentro, un adulto ve cómo va el niño letra por letra: cuáles domina, cuáles le cuestan y por qué falla, si su trazo mejora semana a semana y cómo va con las sumas. Todo se mide y se queda en el dispositivo.
 
 PRIVACIDAD
-Aprende no recopila ningún dato. No tiene cuentas, ni analítica, ni publicidad, ni
-conexión a ningún servidor. Las estrellas se guardan solo en el dispositivo y se borran
-si se borra la app.
+Aprende no recopila ningún dato. No tiene cuentas, ni analítica, ni publicidad. Las estrellas y el avance se guardan solo en el dispositivo y se borran si se borra la app; el nombre del niño nunca sale de ahí. La app se conecta a internet para dos cosas, las dos sin datos del niño: avisar si hay una versión nueva, y enviar la idea que un adulto escriba desde esa misma sección. Ahí también se puede dejar una propina voluntaria, que no desbloquea nada: la app es gratis y completa sin pagar.
 
 Pensada para niños de preescolar y primero de primaria, para usarse con un adulto cerca.
 ```
@@ -90,7 +77,10 @@ Pensada para niños de preescolar y primero de primaria, para usarse con un adul
 ## Novedades de esta versión (4000 máx.)
 
 ```
-Primera versión.
+MÉTRICAS DE APRENDIZAJE
+La sección que antes se llamaba "Para adultos" ahora se llama así. Sigue debajo de los tres módulos y detrás de la misma puerta, y adentro no cambió nada: cómo va el niño letra por letra, acerca de la app, el café y las ideas.
+
+Es el único cambio de esta versión.
 ```
 
 ## Palabras clave (100 caracteres máx., separadas por comas, sin espacios)
