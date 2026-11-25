@@ -16,15 +16,37 @@ Felipe: una contraseña, un código 2FA, aceptar un contrato legal.
 personal de Felipe: se le piden en el momento y se teclean directamente en la consola
 de Apple.
 
+## Ningún paso depende de una sesión iniciada a mano
+
+Regla del estándar (§4) después de que la sesión de App Store Connect dentro de Xcode
+tumbara el deploy dos días seguidos, con un error que ni siquiera dice que sea de
+sesión: `exportArchive Failed to Use Accounts`. Todo lo que habla con Apple usa la
+**llave de API**, que no caduca y no necesita a nadie delante:
+
+```
+ASC_KEY_ID=8A52V34NP7
+ASC_ISSUER_ID=b45b7034-6055-4ad6-a6a7-efe178190a1b
+~/.appstoreconnect/private_keys/AuthKey_8A52V34NP7.p8   (permisos 600, fuera de git)
+```
+
+Es una llave **de equipo**: la misma de las demás apps de la cuenta. Si ese archivo
+falta, nada de esto funciona y hay que crear otra en App Store Connect › Users and
+Access › Integrations, que es lo único de la cadena que tiene que hacer Felipe. Apple
+solo deja descargar el `.p8` una vez y **no hay copia fuera de esta Mac**: si se muere
+el disco, se crea una llave nueva (no se pierde nada del proyecto).
+
+`scripts/asc.py` es el cliente de la API: `estado`, `leer`, `escribir` y `novedades`.
+Firma el token con OpenSSL —esta Mac no tiene PyJWT ni cryptography— y nunca imprime la
+llave ni el token.
+
 ## Antes de empezar
 
-1. **Xcode tiene que tener la cuenta de Apple con sesión iniciada** (Xcode › Settings ›
-   Accounts). Sin ella el archive falla con `No Accounts: Add a new account in Accounts
-   settings` y no hay forma de seguir desde la terminal. Es un bloqueo de Felipe.
-2. **Subir `CURRENT_PROJECT_VERSION`** en `Aprende/Aprende.xcodeproj/project.pbxproj`.
-   Aparece dos veces (Debug y Release). App Store Connect rechaza un build repetido.
-3. Build Debug verde.
-4. Al menos 3 GB libres en disco.
+1. **Subir `CURRENT_PROJECT_VERSION`** (y `MARKETING_VERSION`, si cambia la versión) en
+   `Aprende/Aprende.xcodeproj/project.pbxproj`. Cada una aparece **cuatro** veces, no
+   dos: cambiarlas todas con `sed` y contar antes y después. App Store Connect rechaza
+   un build repetido.
+2. Build Debug verde y los 101 tests en verde.
+3. Al menos 3 GB libres en disco.
 
 ## 1. Archive
 
@@ -35,10 +57,14 @@ cd Aprende && xcodebuild -project Aprende.xcodeproj -scheme Aprende \
 ```
 
 Tiene que terminar en `** ARCHIVE SUCCEEDED **`. Tarda uno o dos minutos, pero puede
-pasar de diez: darle tiempo antes de darlo por colgado. Lanzarlo en segundo plano y
-avanzar con las capturas mientras corre.
+pasar de diez: darle tiempo antes de darlo por colgado. **En primer plano**: lanzado en
+segundo plano ha fallado al firmar con `errSecInternalComponent` con el llavero
+desbloqueado, y el mismo comando en primer plano firmó a la primera.
 
-## 2. Subir
+## 2. Exportar el .ipa (sin cuenta) y subirlo con la llave
+
+Son dos pasos, y esa es la gracia: `ExportOptions.plist` dice `destination = export`,
+así que el primero **no habla con Apple** y no puede fallar por una sesión caída.
 
 ```
 cd Aprende && xcodebuild -exportArchive -archivePath build/Aprende.xcarchive \
@@ -46,8 +72,18 @@ cd Aprende && xcodebuild -exportArchive -archivePath build/Aprende.xcarchive \
   -allowProvisioningUpdates
 ```
 
-Tiene que decir `Upload succeeded` y `** EXPORT SUCCEEDED **`. Después borrar
+```
+cd Aprende && xcrun altool --upload-app -f build/export/Aprende.ipa -t ios \
+  --apiKey 8A52V34NP7 --apiIssuer b45b7034-6055-4ad6-a6a7-efe178190a1b
+```
+
+Termina en `UPLOAD SUCCEEDED with no errors`. La línea de arriba sobre
+`CDUploaderStateInfoResumeFilePath` sale siempre y **no** es un error. Después borrar
 `Aprende/build/export` (ya está en Apple; `Aprende/build/` está ignorado por git).
+
+Procesar el build tarda uno o dos minutos y hay que esperar a que quede `VALID` antes
+de engancharlo a una versión; se consulta en
+`/v1/builds?filter[app]=<id>&sort=-version`.
 
 ## 3. La primera vez de un bundle ID nuevo
 

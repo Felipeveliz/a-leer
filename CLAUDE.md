@@ -185,12 +185,32 @@ cd Aprende && xcodebuild -project Aprende.xcodeproj -scheme Aprende -configurati
 cd Aprende && xcodebuild -exportArchive -archivePath build/Aprende.xcarchive -exportOptionsPlist Config/ExportOptions.plist -exportPath build/export -allowProvisioningUpdates
 ```
 
-Subir a App Store Connect **necesita que Xcode tenga la cuenta de Apple con sesión
-iniciada** (Xcode › Settings › Accounts). Sin ella, el archive falla con
-`No Accounts: Add a new account in Accounts settings`. Hay que subir
-`CURRENT_PROJECT_VERSION` en cada subida: App Store Connect rechaza un build repetido.
-El proyecto declara `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO`, así que los
-builds nuevos ya no se quedan en "Missing Compliance" esperando una respuesta a mano.
+```bash
+cd Aprende && xcrun altool --upload-app -f build/export/Aprende.ipa -t ios --apiKey 8A52V34NP7 --apiIssuer b45b7034-6055-4ad6-a6a7-efe178190a1b
+```
+
+**Ningún paso de la liberación depende de una sesión iniciada a mano** (regla del
+`ESTANDAR.md`, §4, adoptada aquí el 24 de noviembre). Antes la subida iba con
+`destination = upload`, que usa la sesión de App Store Connect de Xcode; esa sesión
+vence sola y el error que da, `exportArchive Failed to Use Accounts`, ni siquiera dice
+que sea de sesión. Ahora `Config/ExportOptions.plist` dice `destination = export`: el
+`.ipa` se genera **sin cuenta** y se sube con la llave de API, que no caduca.
+
+- Llave **de equipo**, rol App Manager, la misma de las demás apps de la cuenta:
+  `ASC_KEY_ID=8A52V34NP7`, `ASC_ISSUER_ID=b45b7034-6055-4ad6-a6a7-efe178190a1b`.
+- El `.p8` vive en `~/.appstoreconnect/private_keys/` con permisos 600, que es donde
+  `altool` lo busca solo. `.gitignore` veta `*.p8`, `*.p12` y `*.mobileprovision`.
+- **No hay copia fuera de esta Mac** y Apple solo deja descargarlo una vez. Si se
+  pierde, no se pierde nada del proyecto: se borra en App Store Connect y se crea otra.
+- `scripts/asc.py` es el cliente de la API (`estado`, `leer`, `escribir`, `novedades`):
+  firma el token con OpenSSL, porque esta Mac no tiene PyJWT ni `cryptography`, y nunca
+  imprime la llave ni el token. Con él se crea la versión, se le engancha el build, se
+  escribe la ficha y se envía a revisión sin abrir el navegador.
+
+Hay que subir `CURRENT_PROJECT_VERSION` en cada subida: App Store Connect rechaza un
+build repetido. **Aparece cuatro veces en el `pbxproj`, no dos**, igual que
+`MARKETING_VERSION`. El proyecto declara `INFOPLIST_KEY_ITSAppUsesNonExemptEncryption =
+NO`, así que los builds nuevos ya no se quedan en "Missing Compliance".
 
 `scripts/make_icon.swift` genera el icono de 1024 y `scripts/render_glyphs.swift` ayuda
 a revisar los trazos de la biblioteca de glifos.
@@ -352,6 +372,7 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
 ├── .claude/skills/            ios-deploy · capturas-app-store · qa-aprende
 ├── index.html                  Versión web (GitHub Pages), origen de los contenidos
 ├── scripts/
+│   ├── asc.py                  Cliente de la API de App Store Connect
 │   ├── make_icon.swift         Genera el AppIcon de 1024
 │   └── render_glyphs.swift     Revisión visual de los trazos
 ├── privacidad.html             Política de privacidad (la pide App Store Connect)
@@ -471,11 +492,18 @@ No "arreglar" nada de esto sin consultarlo con Felipe:
   Lola o Rosa. La autocapitalización del teclado no basta, porque el adulto la puede
   sobrescribir. Las partículas de los apellidos compuestos se quedan en minúscula
   ("Juan de la Cruz") y las mayúsculas internas se respetan ("D'Angelo").
-- **La zona de adultos va detrás de una puerta.** Lo que no es para el niño (cómo va,
-  acerca de, el café y las ideas) vive en "Para adultos", debajo de los tres módulos.
-  Delante hay un número **escrito con letra** que hay que teclear con dígitos: no es un
-  candado de verdad, es que leer "cuarenta y siete" exige leer, y el niño está
-  aprendiendo. Un número en dígitos sí lo sabría copiar.
+- **La zona de adultos se llama "Métricas de aprendizaje"** y va detrás de una puerta.
+  Lo que no es para el niño (cómo va, acerca de, el café y las ideas) vive ahí, debajo
+  de los tres módulos. Delante hay un número **escrito con letra** que hay que teclear
+  con dígitos: no es un candado de verdad, es que leer "cuarenta y siete" exige leer, y
+  el niño está aprendiendo. Un número en dígitos sí lo sabría copiar.
+  Se llamaba "Para adultos" hasta la 1.2 (decisión de Felipe, 24 de noviembre): **en una
+  app de 4+ para niños de cinco años, "adultos" se lee como contenido para adultos**, que
+  es justo lo contrario de lo que la app es. El nombre tiene que ser el mismo en los tres
+  sitios donde aparece —el botón del inicio, la puerta y el menú— y también en
+  `privacidad.html`, `soporte.html` y la ficha de la App Store. En el código los tipos
+  siguen siendo `AdultosView` y `Views/Adultos/`: eso no lo ve nadie y renombrarlo sería
+  ruido.
 - **Las estadísticas son de aprendizaje, no de uso** (decisión de Felipe, 23 de
   noviembre). No hay minutos de pantalla, ni sesiones, ni veces que abrió la app, ni
   racha como trofeo. Cada número contesta algo sobre cómo va aprendiendo: qué letras
@@ -731,8 +759,32 @@ cuatro arreglos de la ronda de prueba de ese día, la zona de adultos con las cu
 utilidades de Toss, el crédito de X también en "Acerca de", los tres subtítulos de
 Escribe con "DISEÑADO PARA IPAD Y PENCIL" y el candado de versión.
 
-**La 1.1 (11) se envió a revisión el 23 de noviembre**, junto con las cuatro propinas:
-cinco ítems en una sola entrega, con salida automática. Las notas del revisor se
+**La 1.1 (11) está publicada**: Apple la aprobó y salió sola (`READY_FOR_SALE`), con
+las **cuatro propinas en `APPROVED`**. Se envió el 23 de noviembre junto con ellas:
+cinco ítems en una sola entrega, con salida automática.
+
+**La 1.2 (12) se envió el 24 de noviembre**, también con salida automática. Lleva un
+solo cambio de producto —la zona de adultos pasó a llamarse "Métricas de aprendizaje"
+(sección 5)— y la corrección de la ficha que iba con él. Toda la cadena se hizo **por la
+API, sin abrir el navegador**: crear la versión, escribir la ficha, enganchar el build,
+reescribir las notas del revisor y enviar.
+
+Tres cosas que salieron de esa subida y conviene no repetir:
+
+- **No teclear texto con acentos por automatización del navegador.** Las novedades de la
+  1.1 se escribieron así en App Store Connect y llegaron **sin un solo acento y con
+  "NINO" en vez de "NIÑO"**. Estuvo publicado en la ficha hasta la 1.2. Lo que se teclea
+  por el navegador pierde la ñ y los acentos; el texto en español se manda por la API o
+  se pega.
+- **La ficha viva y `AppStoreMetadata/es-MX.md` se habían separado.** El archivo seguía
+  con el borrador de la 1.0 ("Novedades: Primera versión") mientras lo publicado tenía
+  otro texto, escrito a mano en la consola. Ahora el archivo es lo que de verdad está
+  arriba, y se escribe desde ahí con `scripts/asc.py`.
+- **Una versión publicada tiene la ficha congelada.** Cambiar la descripción o las
+  novedades de una `READY_FOR_SALE` devuelve `409 … cannot be edited at this time`: hay
+  que crear una versión nueva, y una versión nueva necesita un build nuevo. Lo único que
+  sí se puede cambiar con la app publicada es el **texto promocional**, que para eso
+  existe. Las notas del revisor se
 reescribieron: las de la 1.0 decían "no paid content or features", que con las propinas
 dentro ya era falso, y ahora explican la puerta de adultos (con ejemplos de los números
 escritos con letra, que si no un revisor que no lee español no entra), las propinas, el
@@ -764,14 +816,10 @@ Lo aprendido antes, que sigue valiendo:
   novedades 4000.
 
 ### Pendientes del deploy
-- [ ] Confirmar que la disponibilidad pasa de "En proceso" a "Disponible" y que Aprende
-      aparece en la App Store de México.
-- [ ] Seguir la revisión de la **1.1 (11)**. Si Apple la rechaza por la captura de las
-      propinas (ver abajo), se cancela la submission, se cambia la captura y se reenvía.
-- [ ] **Las propinas necesitan el contrato de Paid Applications** firmado en App Store
-      Connect, con datos fiscales y bancarios. Aprende siempre fue gratis, así que lo más
-      probable es que no esté: sin él no se pueden dar de alta los consumibles. Solo lo
-      puede hacer Felipe.
+- [x] Disponibilidad confirmada el 24 de noviembre por la API: **18 territorios
+      disponibles**, los 18 que se eligieron. Ya no hay nada "en proceso".
+- [ ] Seguir la revisión de la **1.2 (12)**, enviada el 24 de noviembre con salida
+      automática.
 - [ ] De los nueve pedidos, el **8** (demo del trazo en cada error) se revisó en código
       pero **no se vio fallar en pantalla**: el trazo sintético caía fuera del lienzo
       angosto de la "r". Confirmarlo en el iPad.
@@ -786,20 +834,11 @@ Lo aprendido antes, que sigue valiendo:
 - [x] Las cuatro propinas están dadas de alta (23 de noviembre). El contrato de
       **Paid Applications estaba activo** desde el 17 de noviembre y la cuenta bancaria
       configurada, así que no hizo falta nada de eso.
-- [ ] **La captura de revisión de las cuatro propinas solo se cambia si Apple la pide.**
-      Las cuatro se enviaron con la pantalla del café **sin opciones**: es un campo
-      obligatorio por producto y al darlos de alta todavía no existían, así que StoreKit
-      no devolvía ninguno (el orden se muerde la cola). **Si Apple aprueba, aquí no hay
-      nada que hacer** —esa imagen solo la ve el revisor, no sale en la ficha, no afecta
-      a la app, y una versión nueva no vuelve a revisar productos ya aprobados—, y esta
-      línea se borra. Decisión de Felipe del 23 de noviembre, preguntando para qué se
-      iba a cambiar algo que ya pasó.
-      Vuelve a importar en dos casos: si Apple **rechaza** pidiéndola, o si algún día se
-      edita uno de esos productos (nombre, descripción, precio), que lo manda otra vez a
-      revisión. En ambos, la captura buena sale de **TestFlight en el iPad**, donde el
-      entorno de pruebas sí devuelve los cuatro; no hace falta tocar código. Karol
-      resolvió lo de probar sin StoreKit con un override en DEBUG, pero aquí costaría una
-      abstracción sobre `Product` que no vale la pena por una captura.
+- [x] La captura de revisión de las cuatro propinas **dejó de importar**: Apple aprobó
+      los cuatro productos (`APPROVED`) con la pantalla del café vacía. Solo la ve el
+      revisor y una versión nueva no vuelve a revisar productos ya aprobados. Vuelve a
+      hacer falta únicamente si algún día se edita uno (nombre, descripción, precio),
+      que lo manda otra vez a revisión; entonces sale de TestFlight en el iPad.
 - [ ] **Las páginas web se actualizaron el 23 de noviembre** (privacidad y soporte):
       decían que la app no se conecta a internet y que no tiene compras, las dos cosas
       falsas desde la 1.1. Viven en este mismo repo y se publican solas en

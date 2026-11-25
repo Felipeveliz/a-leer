@@ -78,7 +78,7 @@ Pensada para niños de preescolar y primero de primaria, para usarse con un adul
 
 ```
 MÉTRICAS DE APRENDIZAJE
-La sección que antes se llamaba "Para adultos" ahora se llama así. Sigue debajo de los tres módulos y detrás de la misma puerta, y adentro no cambió nada: cómo va el niño letra por letra, acerca de la app, el café y las ideas.
+Así se llama ahora la sección para los grandes: sigue debajo de los tres módulos y detrás de la misma puerta, y adentro no cambió nada. Cómo va el niño letra por letra, acerca de la app, el café y las ideas.
 
 Es el único cambio de esta versión.
 ```

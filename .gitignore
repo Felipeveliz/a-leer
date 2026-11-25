@@ -3,3 +3,9 @@ Aprende/build/
 # Credenciales reales de Google Drive (feedback). El archivo real NUNCA se
 # commitea: este repo es público. Solo se versiona DriveCredentials.sample.swift.
 **/DriveCredentials.swift
+
+# Llaves de firma y de API. Apple solo deja descargar el .p8 una vez, y este
+# repo es público: el archivo vive en ~/.appstoreconnect/private_keys/.
+*.p8
+*.p12
+*.mobileprovision
