@@ -314,7 +314,19 @@ No hay ViewModels ni capa de servicios: es una app de vistas con estado local
   El token de Drive viaja dentro del binario, así que quien descargue la app puede
   sacarlo: el scope `drive.file` acota el daño a los archivos que creó ese cliente, y es
   el mismo trato que ya se aceptó en Toss. Si algún día estorba, el camino es un
-  endpoint propio en vez de credenciales embebidas. **Es el mismo cliente OAuth de Toss
+  endpoint propio en vez de credenciales embebidas.
+
+  **Pendiente: sacar el token del binario** (2026-11-25). El arreglo que se publicó
+  hoy vuelve a meter el mismo refresh token dentro de la app, así que quien baje el
+  .ipa puede extraerlo y una revocación tumba otra vez a las tres apps, cada una con
+  su propia versión en la tienda para recuperarse. Ya existe el servicio que lo
+  resuelve: **`~/Developer/drive-relay`**, proyecto de Firebase `fv-drive-relay`, con
+  App Attest como autenticación (nada de llaves en el cliente) y el token en Secret
+  Manager. Está escrito, con typecheck limpio y 5 pruebas de firma en verde;
+  **bloqueado en que Felipe active el plan Blaze** de ese proyecto. Cuando se
+  despliegue, esta app cambia su cliente de Drive por el relay y se publica otra
+  versión — y **no se puede enviar esa versión mientras la de hoy siga en revisión**.
+  El token viejo se rota al final, cuando las tres apps ya usen el relay. **Es el mismo cliente OAuth de Toss
   y Karol**: revocar el token en Google deja sin feedback a las tres apps.
   Dos invariantes que vienen de Toss y no se tocan: **un JSON por envío**, nunca un
   `feedback.json` compartido —si el token embebido se filtrara, un usuario podría leer
