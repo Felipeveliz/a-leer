@@ -17,7 +17,7 @@ Idioma principal de la app: **español (México)**. Es el único localizado.
 | Publicidad | Ninguna |
 | Clasificación por edad | 4+ |
 | Made for Kids | **No** (ver nota al final) |
-| Versión | 1.2 (build 12) |
+| Versión | 1.2.1 (build 13) |
 
 ## Nombre (30 caracteres máx.)
 
@@ -77,10 +77,9 @@ Pensada para niños de preescolar y primero de primaria, para usarse con un adul
 ## Novedades de esta versión (4000 máx.)
 
 ```
-MÉTRICAS DE APRENDIZAJE
-Así se llama ahora la sección para los grandes: sigue debajo de los tres módulos y detrás de la misma puerta, y adentro no cambió nada. Cómo va el niño letra por letra, acerca de la app, el café y las ideas.
+Arregla el envío de ideas desde Métricas de aprendizaje: los mensajes se quedaban guardados en el dispositivo en vez de llegar, y ahora salen bien. Si escribiste una idea antes y no llegó, se manda sola al abrir la app.
 
-Es el único cambio de esta versión.
+Nada más cambia: la práctica del niño sigue sin salir del dispositivo.
 ```
 
 ## Palabras clave (100 caracteres máx., separadas por comas, sin espacios)

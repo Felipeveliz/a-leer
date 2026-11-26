@@ -769,6 +769,32 @@ solo cambio de producto —la zona de adultos pasó a llamarse "Métricas de apr
 API, sin abrir el navegador**: crear la versión, escribir la ficha, enganchar el build,
 reescribir las notas del revisor y enviar.
 
+**La 1.2.1 (13) se envió el 25 de noviembre**, con salida automática. Es un arreglo de
+una sola cosa: el envío de ideas llevaba días sin llegar a Drive porque el refresh token
+del cliente OAuth compartido (sección 3) se revocó al exponerse desde Delivery Network, y
+las apps instaladas seguían con el token viejo. El token nuevo ya está en
+`DriveCredentials.swift` y esta build es la que lo lleva; los envíos que quedaron en la
+cola local suben solos al abrir la app. **Revocar ese token vuelve a tumbar las tres
+apps**, y cada una necesita una versión nueva en la tienda para recuperarse: no se arregla
+desde el servidor.
+
+Dos cosas que hubo que resolver en esa subida, y que valen para la próxima:
+
+- **Xcode no tenía ninguna cuenta** (`DVTDeveloperAccountManagerAppleIDLists` vacío) y en
+  el portal no existía un perfil de App Store para Aprende, así que la firma automática no
+  podía crear nada. Se resolvió **sin iniciar sesión**: la llave de API también sirve para
+  el aprovisionamiento, así que se creó el perfil `Aprende App Store` por
+  `POST /v1/profiles` (bundle `C8327D54B6` + certificado de distribución), se instaló en
+  `~/Library/MobileDevice/Provisioning Profiles/` y se archivó con firma manual pasando
+  `CODE_SIGN_STYLE=Manual` y `PROVISIONING_PROFILE_SPECIFIER` por línea de comandos, sin
+  tocar el proyecto.
+- **Las preguntas nuevas de clasificación por edad bloquean el envío**, y el error no lo
+  dice: la creación del `reviewSubmissionItem` contesta `409 ... cannot be reviewed`. Hay
+  que contestarlas en la **ficha editable** (`appInfos` que no esté en `READY_FOR_SALE`),
+  que solo existe después de crear la versión; en la publicada la API responde `409 not
+  editable`. Para Aprende faltaban `datingAndRelationships` y `sharedLocation`, las dos
+  `false`.
+
 Tres cosas que salieron de esa subida y conviene no repetir:
 
 - **No teclear texto con acentos por automatización del navegador.** Las novedades de la
@@ -818,13 +844,16 @@ Lo aprendido antes, que sigue valiendo:
 ### Pendientes del deploy
 - [x] Disponibilidad confirmada el 24 de noviembre por la API: **18 territorios
       disponibles**, los 18 que se eligieron. Ya no hay nada "en proceso".
-- [ ] Seguir la revisión de la **1.2 (12)**, enviada el 24 de noviembre con salida
-      automática.
+- [x] La **1.2 (12)** quedó publicada (`READY_FOR_SALE`).
+- [ ] Seguir la revisión de la **1.2.1 (13)**, enviada el 25 de noviembre con salida
+      automática: arregla el envío de ideas, que se había quedado sin subir a Drive al
+      revocarse el token OAuth compartido con Toss y Karol.
 - [ ] De los nueve pedidos, el **8** (demo del trazo en cada error) se revisó en código
       pero **no se vio fallar en pantalla**: el trazo sintético caía fuera del lienzo
       angosto de la "r". Confirmarlo en el iPad.
-- [ ] App Store Connect pide revisar las **nuevas preguntas de clasificación por edad**
-      (aviso en la lista de apps, sección "Información de la app").
+- [x] Las **nuevas preguntas de clasificación por edad** quedaron contestadas el 25 de
+      noviembre, en la ficha editable de la 1.2.1: `datingAndRelationships` y
+      `sharedLocation` en `false` (las demás ya estaban).
 - [ ] **La build 2 se envió sin que nadie la ejecutara**: la Mac se quedó sin runtimes de
       simulador. Probarla en TestFlight, sobre todo "limón" e "Irma" en Escribe, que
       estrenan los glifos "ó" e "I".
